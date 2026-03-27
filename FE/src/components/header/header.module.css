@@ -1,0 +1,13 @@
+.header {
+  margin: 0;
+  background-color:white;
+}
+
+.header p {
+  padding: 0.5em 1em;
+  margin: 0;
+}
+
+.header h1 {
+  margin-bottom: 0;
+}
