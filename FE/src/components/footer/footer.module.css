@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 .footer p {
@@ -6,4 +7,14 @@
   background-color: lightblue;
   padding: 1em 2em;
   margin: 0;
+=======
+
+
+.footer p {
+  color: blueviolet;
+  text-align: center;
+  background-color: lightblue;
+  padding: 1em 2em;
+  margin: 0;
+>>>>>>> b4fa9db (firstttt)
 }
