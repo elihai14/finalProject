@@ -10,10 +10,36 @@ const db = dbSingleton.getConnection();
 
 
 // מחזיר רשימת תורים של המשתמש שמחובר
-router.get('/', (req,res) => {
-  const email = req.session.user.email;
-  const query = 'SELECT * FROM appointments WHERE id = ?';
-                 db.query(query, [email], (err, results) => {
+router.post('/', (req,res) => {
+  let {clientMail, service, startDate, endDate, barberMail} = req.body;
+  let query = 'SELECT * FROM appointments WHERE 1=1 ';
+  const values = [];
+  if(clientMail)
+  {
+    query += 'AND client_mail_address = ? '
+    values.push(clientMail);
+  }
+  if(service)
+  {
+    query += 'AND service_name = ? '
+    values.push(service);
+  }
+  if(startDate)
+  {
+    query += 'AND appointment_date >= ? '
+    values.push(startDate);
+  }
+  if(endDate)
+  {
+    query += 'AND appointment_date <= ? '
+    values.push(endDate);
+  }
+  if(barberMail)
+  {
+    query += 'AND barber_mail_address = ? '
+    values.push(barberMail);
+  }
+                 db.query(query, values, (err, results) => {
                   if(err) return res.status(400).json({message : 'Internal Server Error'});
                   if(results.length > 0)
                     {

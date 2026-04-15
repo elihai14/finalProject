@@ -3,6 +3,8 @@ const app = express();
 const session = require("express-session");
 const path = require("path");
 const usersRouter = require("./routes/users");
+const appRouter = require("./routes/appointments");
+
 
 const port = 3000;
 
@@ -26,6 +28,8 @@ app.use(express.static(distPath));
 
 // --- שלב 3: נתיבי ה-API ---
 app.use("/users", usersRouter);
+app.use("/appointments", appRouter);
+
 
 // --- שלב 4: פתרון ה-Catch-all (למניעת שגיאות Regex) ---
 // הפונקציה הזו תתפוס כל בקשה שלא טופלה למעלה ותחזיר את ה-index.html
