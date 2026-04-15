@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
-const session = require("express-session");
-const { json } = require("body-parser");
+
 //routes/user.js
 const dbSingleton = require('../dbSingleton');
 
