@@ -52,22 +52,6 @@ router.post('/', (req,res) => {
             })
 });
 
-router.get('/all', (req,res) => {
-  const query = 'SELECT * FROM appointments';
-                 db.query(query, [], (err, results) => {
-                  if(err) return res.status(400).json({message : 'Internal Server Error'});
-                  if(results.length > 0)
-                    {
-                      return res.status(200).json(results);
-                    }
-                    else // בסיס הנתונים החזיר 0 תוצאות 
-                    {
-                        return res.status(400).json({message : 'אין תורים עדיין'});
-                    }
-            })
-});
-
-
 // נתיב להוספת תור 
 router.post('/add-Appointment', (req, res) => {
     // 1. בדיקה שהמשתמש מחובר
@@ -75,29 +59,17 @@ router.post('/add-Appointment', (req, res) => {
         return res.status(401).json({ message: 'User not logged in' });
     }
 
-    const { service, date, time } = req.body;
-    const userEmai = req.session.user.email;
+    const { constraintCode, barberMail, service, date, time } = req.body;
+    const userMail = req.session.user.email;
 
-    // 2. שאילתה לבדיקה: האם למשתמש הספציפי הזה כבר יש תור בתאריך הזה?
-    const checkQuery = 'SELECT appointment_date FROM appointments WHERE appointment_date = ? AND appointment_time = ?';
     
-    db.query(checkQuery, [ date, time], (err, results) => {
-        if (err) return res.status(500).json({ message: 'Internal Server Error' });
-
-        if (results.length > 0) {
-            // נמצא תור קיים
-            return res.status(400).json({ message: 'קיים תור בתאריך זה' });
-          }
-
-        // 3. אם הגענו לכאן, אין תור קיים - אפשר להוסיף!
-        const insertQuery = 'INSERT INTO appointments (service_name, appointment_date, appointment_time, id) VALUES(?,?,?,?)';
-        db.query(insertQuery, [service, date, time, userEmai], (err, result) => {
+        const insertQuery = 'INSERT INTO appointments (appointment_time,appointment_date, constraint_code,service_name,client_mail_address,barber_mail_address) VALUES(?,?,?,?,?,?)';
+        db.query(insertQuery, [  time,date,constraintCode, service, userMail, barberMail], (err, result) => {
             if (err) return res.status(500).json({ message: 'שגיאה בהוספת התור' });
             
             return res.status(200).json({ message: 'התור נוסף בהצלחה' });
         });
     });
-});
 
 
 // פונקצייה מקבלת רשימת תורים קיימים ואת משך הזמן של השירות המבוקש ומחזירה מערך של שעות פנויות 
@@ -171,9 +143,9 @@ router.get('/available-slots' , (req,res) =>{
   });
 
   // נתיב למחיקת תור 
-  router.delete('/delete/:id', (req,res)=>{
+  router.put('/cancel/:id', (req,res)=>{
     const appId = req.params.id;
-    const query = 'DELETE FROM appointments WHERE appointment_id = ?';
+    const query = 'UPDATE appointments SET is_cancel=1 WHERE appointment_id = ?';
     db.query(query, [appId], (err,result)=>{ // שאילתה שמוחקת תור לפי ID של תור מבוקש 
       if(err) return res.status(500).json({message: "Internal server error"});
       if(result.affectedRows === 0 ) return res.status(404).json("appointment not found");//בדיקה אם לא בוצע שינוי
@@ -182,21 +154,7 @@ router.get('/available-slots' , (req,res) =>{
     })
   });
 
-   // נתיב לעדכון תור 
-   router.put('/update', (req,res)=>{
-    
-    const {appId , appointment_time , appointment_date , service_name} = req.body;
-    const query = 'UPDATE appointments SET appointment_time = ? , appointment_date = ? , service_name = ? WHERE appointment_id = ?';
 
-    // שאילתה לעדכון תור מבוקש לפי ID של התור 
-    db.query(query, [ appointment_time, appointment_date, service_name, appId], (err,result)=>{
-      if(err) return res.status(400).json({message: "Internal server error"}); 
-      if(result.affectedRows === 0) return res.status(400).json({message: "תור לא קיים"}); // בדיקה אם לא בוצע שינוי
-      return res.status(200).json({message: "עדכון התור בוצע בהצלחה"});
-
-    })
-  })
-  
 // נתיב לקבלת תור לפי ID 
 router.get('/:id', (req,res) => {
   const id = req.params.id;
