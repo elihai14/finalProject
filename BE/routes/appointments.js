@@ -59,12 +59,12 @@ router.post('/add-Appointment', (req, res) => {
         return res.status(401).json({ message: 'User not logged in' });
     }
 
-    const { constraintCode, barberMail, service, date, time } = req.body;
+    const { constraintCode, barberMail, service, date, time, price } = req.body;
     const userMail = req.session.user.email;
 
     
-        const insertQuery = 'INSERT INTO appointments (appointment_time,appointment_date, constraint_code,service_name,client_mail_address,barber_mail_address) VALUES(?,?,?,?,?,?)';
-        db.query(insertQuery, [  time,date,constraintCode, service, userMail, barberMail], (err, result) => {
+        const insertQuery = 'INSERT INTO appointments (appointment_time,appointment_date, constraint_code,service_name,client_mail_address,barber_mail_address,price) VALUES(?,?,?,?,?,?,?)';
+        db.query(insertQuery, [  time,date,constraintCode, service, userMail, barberMail,price], (err, result) => {
             if (err) return res.status(500).json({ message: 'שגיאה בהוספת התור' });
             
             return res.status(200).json({ message: 'התור נוסף בהצלחה' });
