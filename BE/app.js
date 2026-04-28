@@ -2,20 +2,38 @@ const express = require("express");
 const app = express();
 const session = require("express-session");
 const path = require("path");
+const cors = require("cors"); // <-- הוספנו
+const nodemailer = require("nodemailer"); // <-- הוספנו
+
 const usersRouter = require("./routes/users");
 const appRouter = require("./routes/appointments");
 const servicesRouter = require("./routes/services");
 
+const port = 5000;
 
+// --- הגדרת Nodemailer ---
+// שים לב: כאן תצטרך לשים את המייל שלך ואת ה-App Password
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'elihaiafuta@gmail.com', 
+    pass: 'sphxfmclreqrnznh'    
+  }
+});
 
-const port = 3000;
-
-// הגדרת הנתיב לתיקיית ה-dist (ה-Frontend המוכרז)
+// הגדרת נתיב ה-Frontend
 const distPath = path.join(__dirname, "..", "FE", "dist");
 
-// --- שלב 1: הגדרות Middleware בסיסיות ---
+// --- Middleware ---
+app.use(cors()); // <-- חובה לחיבור עם React
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// אובייקט לשמירת קודים זמניים בשרת
+// (הוא יהיה נגיש לראוטרים שלך אם תעביר אותו ב-req)
+app.locals.otpCodes = {}; 
+app.locals.transporter = transporter;
+
 app.use(
   session({
     secret: "secret-key",
@@ -24,24 +42,19 @@ app.use(
   })
 );
 
-// --- שלב 2: הגשת קבצים סטטיים ---
-// זה מאפשר לדפדפן למצוא את ה-CSS וה-JS שבתוך dist/assets
+// --- קבצים סטטיים ---
 app.use(express.static(distPath));
 
-// --- שלב 3: נתיבי ה-API ---
+// --- נתיבי API ---
 app.use("/users", usersRouter);
 app.use("/appointments", appRouter);
 app.use("/services", servicesRouter);
 
-
-// --- שלב 4: פתרון ה-Catch-all (למניעת שגיאות Regex) ---
-// הפונקציה הזו תתפוס כל בקשה שלא טופלה למעלה ותחזיר את ה-index.html
+// --- Catch-all ---
 app.use((req, res, next) => {
-  // אם הבקשה היא לכתובת API שלא קיימת, אל תחזיר את ה-HTML (אופציונלי)
-  if (req.path.startsWith('/users')) {
+  if (req.path.startsWith('/users') || req.path.startsWith('/appointments')) {
     return res.status(404).json({ error: "API route not found" });
   }
-  // בכל מקרה אחר (ניווט בדפים), שלח את ה-React
   res.sendFile(path.join(distPath, "index.html"));
 });
 

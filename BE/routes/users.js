@@ -24,19 +24,74 @@ router.post("/", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
+  console.log("!!! Request reached the login route !!!"); // הוסף את זה
   const { mailAddress } = req.body;
+  const { otpCodes, transporter } = req.app.locals; // שליפת הכלים מה-app.js
 
   const query = "SELECT * FROM users WHERE mail_address = ?";
-  db.query(query, [mailAddress], (err, results) => {
+  
+  db.query(query, [mailAddress], async (err, results) => {
     if (err) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
+
     if (results.length > 0) {
-      return res.status(200).json({message : "User Exists"})
+      // 1. המשתמש קיים - מייצרים קוד רנדומלי
+      const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
+      
+      // 2. שומרים את הקוד בזיכרון השרת (כדי שנוכל לבדוק אותו ב-verify)
+      otpCodes[mailAddress] = otpCode;
+
+      // 3. הגדרת תוכן המייל
+      const mailOptions = {
+        from: 'your-email@gmail.com',
+        to: mailAddress,
+        subject: 'קוד אימות להתחברות',
+        text: `שלום, קוד האימות שלך הוא: ${otpCode}`
+      };
+
+      try {
+        // 4. שליחה בפועל
+        await transporter.sendMail(mailOptions);
+        console.log(`OTP ${otpCode} sent to ${mailAddress}`);
+        return res.status(200).json({ message: "Code sent to email" });
+      } catch (mailErr) {
+        console.error("Mail Error:", mailErr);
+        return res.status(500).json({ message: "Error sending email" });
+      }
+
     } else {
       return res.status(400).json({ message: "User Not Exists" });
     }
   });
+});
+
+router.post("/verify-otp", (req, res) => {
+  const { mailAddress, code } = req.body;
+  const { otpCodes } = req.app.locals;
+
+  if (otpCodes[mailAddress] && otpCodes[mailAddress] === code) {
+    delete otpCodes[mailAddress];
+
+    // כאן אנחנו מוציאים את המשתמש מהדאטהבייס כדי לדעת מה הסטטוס שלו
+    const query = "SELECT status, mail_address FROM users WHERE mail_address = ?";
+    db.query(query, [mailAddress], (err, results) => {
+      if (err || results.length === 0) {
+        return res.status(500).json({ message: "User data not found" });
+      }
+
+      const user = results[0];
+      req.session.user = { email: user.mail_address, status: user.status };
+
+      // שולחים לריאקט את הסטטוס!
+      return res.status(200).json({ 
+        message: "Logged in successfully", 
+        status: user.status // זה הקריטי
+      });
+    });
+  } else {
+    return res.status(401).json({ message: "Invalid code" });
+  }
 });
 
 router.get("/:status", (req, res) => {
