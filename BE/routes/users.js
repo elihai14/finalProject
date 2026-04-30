@@ -23,8 +23,37 @@ router.post("/", (req, res) => {
   });
 });
 
+router.post("/register", (req, res) => {
+  const { fullName, phoneNumber, mailAddress } = req.body;
+
+  if (!fullName || !phoneNumber || !mailAddress) {
+    return res.status(400).json({ message: "נא למלא את כל השדות" });
+  }
+
+  const checkQuery = "SELECT * FROM users WHERE mail_address = ?";
+  
+  db.query(checkQuery, [mailAddress], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    if (results.length > 0) {
+      return res.status(400).json({ message: "המשתמש כבר קיים במערכת" });
+    }
+
+    const insertQuery = "INSERT INTO users (user_name, phone_number, mail_address, status) VALUES (?, ?, ?, 'לקוח')";
+    
+    db.query(insertQuery, [fullName, phoneNumber, mailAddress], (err, result) => {
+      if (err) {
+        return res.status(500).json({ message: "שגיאה בתהליך ההרשמה, נסה שוב" });
+      }
+
+      return res.status(201).json({ message: "נרשמת בהצלחה! כעת ניתן להתחבר" });
+    });
+  });
+});
+
 router.post("/login", (req, res) => {
-  console.log("!!! Request reached the login route !!!"); // הוסף את זה
   const { mailAddress } = req.body;
   const { otpCodes, transporter } = req.app.locals; // שליפת הכלים מה-app.js
 
