@@ -24,7 +24,7 @@ function App() {
 
       <Routes>
         {/* כאן מגדירים איזה נתיב מציג איזו קומפוננטה */}
-        <Route path="/" element={<LoginForm />} />
+        <Route path="/" element={<NewAppForm />} />
         <Route path="/admin-dashboard" element={<AppList />} />
         <Route path="/client-dashboard" element={<AppList />} />
         <Route path="/barber-dashboard" element={<NewAppForm />} />
