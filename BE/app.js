@@ -8,6 +8,7 @@ const nodemailer = require("nodemailer"); // <-- הוספנו
 const usersRouter = require("./routes/users");
 const appRouter = require("./routes/appointments");
 const servicesRouter = require("./routes/services");
+const servicesRouter = require("./routes/constraints");
 
 const port = 5000;
 
@@ -49,6 +50,7 @@ app.use(express.static(distPath));
 app.use("/users", usersRouter);
 app.use("/appointments", appRouter);
 app.use("/services", servicesRouter);
+app.use("/constraints", constraintsRouter);
 
 // --- Catch-all ---
 app.use((req, res, next) => {

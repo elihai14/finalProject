@@ -11,6 +11,7 @@ import NewAppForm from "../components/newAppForm/NewAppForm";
 import AppList from "../components/appList/AppList";
 import LoginForm from "../components/loginForm/LoginForm";
 import AppCard from "../components/appCard/AppCard";
+import RegisterForm from "../components/registerForm/RegisterForm";
 
 function App() {
   return (
@@ -19,12 +20,14 @@ function App() {
 
       <nav>
         {/* משתמשים ב-Link במקום ב-<a> כדי למנוע ריענון של הדף */}
-        <Link to="/">התחברות</Link> |<Link to="/about">הרשמה</Link>
+        <Link to="/">התחברות</Link> |<Link to="/register">הרשמה</Link>
       </nav>
 
       <Routes>
         {/* כאן מגדירים איזה נתיב מציג איזו קומפוננטה */}
-        <Route path="/" element={<NewAppForm />} />
+        <Route path="/" element={<LoginForm />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
         <Route path="/admin-dashboard" element={<AppList />} />
         <Route path="/client-dashboard" element={<AppList />} />
         <Route path="/barber-dashboard" element={<NewAppForm />} />

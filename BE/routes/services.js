@@ -90,7 +90,7 @@ router.post("/admin/add-service", (req, res) => {
   });
 });
 
-router.post("/remove-service", (req, res) => {
+router.put("/remove-service", (req, res) => {
   // בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {
     // בדיקה אם משתמש לא מחובר
