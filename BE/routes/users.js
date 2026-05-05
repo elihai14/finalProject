@@ -113,9 +113,9 @@ router.post("/verify-otp", (req, res) => {
       req.session.user = { email: user.mail_address, status: user.status };
 
       // שולחים לריאקט את הסטטוס!
-      return res.status(200).json({ 
-        message: "Logged in successfully", 
-        status: user.status // זה הקריטי
+      return res.status(200).json({
+        message: "Authentication successful",
+        status: results[0].status
       });
     });
   } else {
