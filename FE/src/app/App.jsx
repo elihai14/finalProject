@@ -19,16 +19,15 @@ function App() {
 
       <nav>
         {/* משתמשים ב-Link במקום ב-<a> כדי למנוע ריענון של הדף */}
-        <Link to="/login">התחברות</Link> |
-        <Link to="/users/register">הרשמה</Link>
+        <Link to="/">התחברות</Link> |<Link to="/register">הרשמה</Link>
       </nav>
 
       <Routes>
         {/* כאן מגדירים איזה נתיב מציג איזו קומפוננטה */}
-        <Route path="/users/register" element={<RegisterForm />} />
-        <Route path="/login" element={<LoginForm />} />
 
-        <Route path="/" element={<NewAppForm />} />
+        <Route path="/" element={<LoginForm />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
         <Route path="/admin-dashboard" element={<AppList />} />
         <Route path="/client-dashboard" element={<AppList />} />
         <Route path="/barber-dashboard" element={<NewAppForm />} />
