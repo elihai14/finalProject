@@ -1,65 +1,48 @@
 @import url('https://fonts.googleapis.com/css2?family=Paytone+One&family=Raleway:wght@400;700&display=swap');
 
-/* #region global */
-/*
-=============== 
-Global Styles
-===============
-*/
+/* ==========================================
+   Global Styles - Classic Luxury & Midnight
+   ========================================== */
 
 :root {
-  font-size: 62.5%;
+  font-size: 62.5%; /* משאיר את החישוב של ה-rem שלך כמו שהיה */
 }
 
 *,
 ::after,
 ::before {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-
-
-body {
+/* הפתרון הסופי לאפור המסריח */
+html, body, #root {
   min-height: 100vh;
-  font-family: 'Raleway', sans-serif;
-  background: lightgray;;
-  color: black;
+  width: 100%;
+  background-color: #121214 !important; /* דורס את ה-lightgray לצמיתות */
+  color: #f4f4f5; /* לבן-עשן נעים לעין */
+  font-family: 'Raleway', 'Segoe UI', system-ui, sans-serif;
   line-height: 1.5;
-  font-size: 1.6rem;
 }
 
 ul {
   list-style-type: none;
 }
+
 a {
   text-decoration: none;
+  color: inherit;
 }
-h1,
-h2,
-h3,
-h4 {
-  color: #222;
+
+/* הגדרות כותרות גלובליות נקיות שלא ידרסו קבצי מודול */
+h1, h2, h3, h4 {
   letter-spacing: 0.1rem;
-  text-transform: capitalize;
-}
-h1 {
-  
-  color:darkblue;
-  font-size: 3rem;
-  text-align: center;
-}
-
-h2 {
-  font-size: 2.5rem;
-}
-
-h3 {
-  font-size: 2rem;
+  color: #f4f4f5;
 }
 
 p {
   margin-bottom: 1.3rem;
-
   font-size: 1.8rem;
 }
 
@@ -70,29 +53,13 @@ img {
 }
 
 button {
-  padding: .5em 1em;
-  border: 1px solid gray;
-  font-size: 2rem;
+  font-family: inherit;
+  cursor: pointer;
 }
 
+/* רספונסיביות בסיסית */
 @media (min-width: 80rem) {
-  h1 {
-    font-size: 4rem;
-  }
-  h2 {
-    font-size: 3rem;
-  }
-  h3 {
-    font-size: 2rem;
-  }
-
-  body {
-    font-size: 1rem;
-  }
-
-  p {
-    font-size: 1.8rem;
-  }
+  h1 { font-size: 4rem; }
+  h2 { font-size: 3rem; }
+  h3 { font-size: 2rem; }
 }
-
-/* #endregion global */

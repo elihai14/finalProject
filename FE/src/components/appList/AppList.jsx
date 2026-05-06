@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import AppCard from '../appCard/AppCard';
-import NewAppForm from '../newAppForm/NewAppForm'; // ייבוא טופס קביעת התור
+import NewAppForm from '../newAppForm/NewAppForm'; 
 import classes from './appList.module.css';
+import DashboardStats from '../dashboardStats/DashboardStats';  
 
 export default function AppList() {
   const [appointments, setAppointments] = useState([]);
@@ -9,7 +10,6 @@ export default function AppList() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // שליפת הסטטוס והמייל מה-localStorage (הערכים מגיעים בעברית מה-DB)
   const userStatus = localStorage.getItem("userStatus"); 
   const userEmail = localStorage.getItem("userEmail");
 
@@ -21,11 +21,10 @@ export default function AppList() {
 
     const requestBody = {};
     if (userStatus === 'ספר') {
-      requestBody.barberMail = userEmail;
+      requestBody.barber_mail_address = userEmail;
     } else if (userStatus === 'לקוח') {
-      requestBody.clientMail = userEmail;
+      requestBody.client_mail_address = userEmail;
     }
-    // אם המשתמש הוא "מנהל" - הבקשה נשארת ריקה והשרת מחזיר הכל
 
     try {
       const response = await fetch(`http://localhost:5000/appointments`, {
@@ -78,69 +77,56 @@ export default function AppList() {
     }
   };
 
+  // רינדור התורים בצורה חכמה ואחידה דרך ה-AppCard המעוצב!
   let arr = appointments.map((app) => {
-    // 1. תצוגה עבור מנהל
+    const appDate = app.appointment_date ? app.appointment_date.split('T')[0] : '';
+    
+    let formattedApp = {
+      id: app.id,
+      date: appDate,
+      time: app.time,
+      serviceName: app.service_name,
+    };
+
+    // התאמת הנתונים לפי סוג המשתמש כדי שלא יתבלגן
     if (userStatus === 'מנהל') {
-      return (
-        <div key={app.id} className={classes.appointment_card}>
-          <div className={classes.time_section}>
-            <span className={classes.date}>{app.appointment_date ? app.appointment_date.split('T')[0] : ''}</span>
-            <span className={classes.time}>{app.time}</span>
-            <span className={classes.barberName}>ספר: {app.barber_mail_address}</span>
-            <span className={classes.clientName}>לקוח: {app.client_mail_address}</span>
-          </div>
-
-          <div className={classes.details_section}>
-            <h3 className={classes.service_name}>{app.service_name}</h3>
-            <button className={classes.cancel_btn} onClick={() => handleCancelAppointment(app.id)}>
-              ביטול תור
-            </button>
-          </div>
-        </div>
-      );
+      formattedApp.barberName = `ספר: ${app.barber_mail_address}`;
+      formattedApp.clientEmail = app.client_mail_address;
+    } else if (userStatus === 'ספר') {
+      formattedApp.clientEmail = app.client_mail_address;
+    } else if (userStatus === 'לקוח') {
+      formattedApp.barberName = app.barber_mail_address;
+      formattedApp.price = app.price ? `₪${app.price}` : "₪180";
     }
-    // 2. תצוגה עבור ספר
-    else if (userStatus === 'ספר') {
-      return (
-        <div key={app.id} className={classes.appointment_card}>
-          <div className={classes.time_section}>
-            <span className={classes.date}>{app.appointment_date ? app.appointment_date.split('T')[0] : ''}</span>
-            <span className={classes.time}>{app.time}</span>
-            <span className={classes.barberName}>לקוח: {app.client_mail_address}</span>
-          </div>
 
-          <div className={classes.details_section}>
-            <h3 className={classes.service_name}>{app.service_name}</h3>
-            <button className={classes.cancel_btn} onClick={() => handleCancelAppointment(app.id)}>
-              ביטול תור
-            </button>
-          </div>
-        </div>
-      );
-    } 
-    // 3. תצוגה עבור לקוח
-    else {
-      const formattedApp = {
-        id: app.id,
-        serviceName: app.service_name,
-        barberName: app.barber_mail_address,
-        date: app.appointment_date ? app.appointment_date.split('T')[0] : '',
-        time: app.time,
-        price: app.price || "₪70"
-      };
-      return <AppCard key={app.id} app={formattedApp} />;
-    }
+    return (
+      <AppCard 
+        key={app.id || app.appointment_id} 
+        app={formattedApp} 
+        onCancel={() => handleCancelAppointment(app.id)} 
+      />
+    );
   });
 
   return (
     <div className={classes.appList}>
-      {/* הצגת טופס קביעת התור בראש העמוד רק אם המשתמש הוא לקוח */}
+      
+      {/* 1. מציג את הגרפים לספר ומנהל בחלק העליון של הדף */}
+      {(userStatus === 'ספר' || userStatus === 'מנהל') && (
+        <DashboardStats userStatus={userStatus} />
+      )}
+
+      {/* 2. מציג את טופס קביעת התור רק אם זה לקוח */}
       {userStatus === 'לקוח' && <NewAppForm />}
 
       {successMessage && <div className={classes.success_message}>{successMessage}</div>}
       {error && <div className={classes.error_message}>{error}</div>}
 
-      {isLoading ? <div>טוען תורים...</div> : arr}
+      {/* 3. רשימת התורים שנקבעו תופיע תמיד למטה */}
+      <div className={classes.appointments_container}>
+        {isLoading ? <div className={classes.loading_text}>טוען תורים...</div> : arr}
+      </div>
+
     </div>
   );
 }

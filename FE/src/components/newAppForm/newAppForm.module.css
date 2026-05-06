@@ -1,3 +1,80 @@
 .container {
-  border: 1px solid black;
+  max-width: 650px;
+  width: 100%;
+  margin: 40px auto;
+  background: #1a1a1e;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 24px;
+  padding: 44px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  direction: rtl;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.main_form { display: flex; flex-direction: column; gap: 28px; }
+.form_group { display: flex; flex-direction: column; gap: 10px; text-align: right; }
+
+.form_group label {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #dfb76c; /* לייבלים בצבע זהב */
+}
+
+.form_input {
+  width: 100%;
+  padding: 16px 20px;
+  background-color: #121214;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  color: #f4f4f5;
+  font-size: 1.05rem;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* עיצוב חץ הבחירה בזהב */
+select.form_input {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23dfb76c' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  background-repeat: no-repeat;
+  background-position: left 18px center;
+  background-size: 20px;
+  padding-left: 48px;
+}
+
+.form_input:focus {
+  border-color: #dfb76c;
+  box-shadow: 0 0 0 4px rgba(223, 183, 108, 0.15);
+  background-color: #161619;
+}
+
+.form_input:disabled {
+  background-color: #1c1c21;
+  color: #52525b;
+  cursor: not-allowed;
+  background-image: none;
+  border-color: rgba(255, 255, 255, 0.02);
+}
+
+.btn_submit {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #dfb76c 0%, #c59b4e 100%);
+  color: #121214;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 8px 24px rgba(223, 183, 108, 0.15);
+  margin-top: 12px;
+}
+
+.btn_submit:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(223, 183, 108, 0.3);
+  background: linear-gradient(135deg, #e9c47c 0%, #dfb76c 100%);
 }
