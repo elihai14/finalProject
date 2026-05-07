@@ -1,4 +1,5 @@
 import classes from "./newAppForm.module.css";
+import { getHoursSelect } from "../../../js/mainFunctionView";
 import { useState, useEffect } from "react";
 
 export default function NewAppForm() {
@@ -8,6 +9,10 @@ export default function NewAppForm() {
   const [services, setServices] = useState([]); // שירותי הספר שנבחר
   const [loadingServices, setLoadingServices] = useState(false);
   const [constraints, setConstraints] = useState([]); // ימי העבודה של הספר הנבחר
+  const [selectedService, setSelectedService] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [hours, setHours] = useState([]);
+  const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     // פונקציה אסינכרונית למשיכת הנתונים
@@ -58,6 +63,21 @@ export default function NewAppForm() {
 
     fetchServices();
   }, [selectedBarber]);
+  useEffect(() => {
+    if (!selectedBarber || !selectedService || !selectedDate) return;
+
+    const fetchHours = async () => {
+      const result = await getHoursSelect(
+        selectedBarber,
+        selectedDate,
+        selectedService
+      );
+
+      setHours(result);
+    };
+
+    fetchHours();
+  }, [selectedBarber, selectedService, selectedDate]);
 
   return (
     <div className={classes.container} id="addApp-form">
@@ -92,6 +112,7 @@ export default function NewAppForm() {
             id="serviceSelect"
             className={classes.form_input}
             disabled={!selectedBarber}
+            onChange={(e) => setSelectedService(e.target.value)}
             required
           >
             <option value="">
@@ -116,9 +137,31 @@ export default function NewAppForm() {
             type="date"
             id="dateInput"
             className={classes.form_input}
-            min="2026-10-01"
+            disabled={!selectedBarber && !selectedService}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            min={today}
             required
           />
+        </div>
+
+        <div className={classes.form_group}>
+          <label htmlFor="hourSelect">בחר שעה</label>
+          <select
+            id="hourSelect"
+            className={classes.form_input}
+            disabled={!selectedBarber && !selectedService && !selectedDate}
+            required
+          >
+            <option value="">
+              {hours.length === 0 ? "אין שעות זמינות" : "-- בחר שעה --"}
+            </option>
+
+            {hours.map((h, i) => (
+              <option key={i} value={h}>
+                {h}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button type="submit" className={classes.btn_submit}>

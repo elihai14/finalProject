@@ -27,10 +27,10 @@ router.post("/", (req, res) => {
 });
 
 router.post("/barber/add-service", (req, res) => {
-    // 1. אבטחה: בדיקה שהמשתמש מחובר
-    if (!req.session || !req.session.user) {
-      return res.status(401).json({ message: "User not logged in" });
-    }
+  // 1. אבטחה: בדיקה שהמשתמש מחובר
+  if (!req.session || !req.session.user) {
+    return res.status(401).json({ message: "User not logged in" });
+  }
 
   const { serviceName, price, duration } = req.body;
   const barberMail = req.session.user.mail_address;
@@ -45,18 +45,23 @@ router.post("/barber/add-service", (req, res) => {
       return res.status(400).json({ message: "השירות כבר קיים בתפריט שלך" });
     }
 
-  const insertBarberServices ="INSERT INTO barber_services (mail_address, service_name, price,  duration) VALUES (?, ?, ?, ?)";
+    const insertBarberServices =
+      "INSERT INTO barber_services (mail_address, service_name, price,  duration) VALUES (?, ?, ?, ?)";
 
-    db.query(insertBarberServices,[barberMail, serviceName, price, duration],(err) => {
-      if (err)
-        return res.status(500).json({ message: "Error linking service" });
+    db.query(
+      insertBarberServices,
+      [barberMail, serviceName, price, duration],
+      (err) => {
+        if (err)
+          return res.status(500).json({ message: "Error linking service" });
 
-        return res.status(200).json({ message: "השירות נוסף בהצלחה למספרה שלך" });
-      },
+        return res
+          .status(200)
+          .json({ message: "השירות נוסף בהצלחה למספרה שלך" });
+      }
     );
   });
 });
-
 
 router.post("/admin/add-service", (req, res) => {
   // 1. אבטחה: בדיקה שהמשתמש מחובר
@@ -112,34 +117,56 @@ router.put("/remove-service", (req, res) => {
   });
 });
 
-router.put("/update-service" , (req, res) => {
+router.put("/update-service", (req, res) => {
   // בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {
-  // בדיקה אם משתמש לא מחובר
+    // בדיקה אם משתמש לא מחובר
     return res.status(401).json({ message: "User not logged in" });
   }
-  const barberMail = req.session.user.mail_address; 
+  const barberMail = req.session.user.mail_address;
 
   const { serviceName, newPrice, newDuration } = req.body;
   const query =
     "UPDATE barber_services SET price = ? , duration = ? WHERE service_name = ?                 AND mail_address = ?";
 
-  db.query(query, [newPrice, newDuration,serviceName, barberMail] , (err,results) =>{
-    if (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ message: `השירות ${serviceName} לא חלק מהשירותים שלך` });
-    }
+  db.query(
+    query,
+    [newPrice, newDuration, serviceName, barberMail],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+      if (results.affectedRows === 0) {
+        return res
+          .status(404)
+          .json({ message: `השירות ${serviceName} לא חלק מהשירותים שלך` });
+      }
 
-    return res.status(200).json({ message: "השירות עודכן בהצלחה" });
-  });
+      return res.status(200).json({ message: "השירות עודכן בהצלחה" });
+    }
+  );
 });
 
 router.post("/price", (req, res) => {
   const { barberMail, serviceName } = req.body;
   const query =
     "SELECT price from appointments WHERE barber_mail_address = ? AND service_name = ?";
+  db.query(query, [barberMail, serviceName], (err, results) => {
+    if (err) return res.status(500).json({ message: "Internal Server Error" });
+    if (results.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Price not found for this service and barber" });
+    }
+
+    return res.status(200).json(results[0]);
+  });
+});
+
+router.post("/duration", (req, res) => {
+  const { barberMail, serviceName } = req.body;
+  const query =
+    "SELECT duration from barber_services WHERE mail_address = ? AND service_name = ?";
   db.query(query, [barberMail, serviceName], (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Server Error" });
     if (results.length === 0) {

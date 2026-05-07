@@ -21,6 +21,7 @@ function LoginForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mailAddress: email }),
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -51,6 +52,7 @@ function LoginForm() {
           mailAddress: email,
           code: verificationCode,
         }),
+        credentials: "include",
       });
 
       let data = {};

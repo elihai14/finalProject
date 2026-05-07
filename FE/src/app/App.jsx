@@ -29,7 +29,15 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/admin-dashboard" element={<AppList />} />
-        <Route path="/client-dashboard" element={<AppList />} />
+        <Route
+          path="/client-dashboard"
+          element={
+            <div>
+              <NewAppForm />
+              <AppList />
+            </div>
+          }
+        />
         <Route path="/barber-dashboard" element={<NewAppForm />} />
       </Routes>
       <Footer prog="Elihai & Daniel" year="2026" />
