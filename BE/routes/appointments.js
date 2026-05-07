@@ -36,8 +36,9 @@ router.post("/", (req, res) => {
     if (err) return res.status(400).json({ message: "Internal Server Error" });
     if (results.length > 0) {
       return res.status(200).json(results);
-    } // בסיס הנתונים החזיר 0 תוצאות
-    else {
+
+    } else // בסיס הנתונים החזיר 0 תוצאות
+    {
       return res.status(400).json({ message: "אין תורים עדיין" });
     }
   });
@@ -80,6 +81,7 @@ router.post("/existing-apps", (req, res) => {
     }
 
     return res.status(200).json(results);
+
   });
 });
 
@@ -96,15 +98,56 @@ router.put("/cancel/:id", (req, res) => {
   });
 });
 
-// נתיב לקבלת תור לפי ID
+
+/* ========================================================
+   הזזנו את ראוטי האנליטיקה לכאן - מעל הראוט הדינמי של /:id
+   ======================================================== */
+
+// 1. ראוטר לגרפים החודשיים - משותף לספר ולמנהל
+router.get("/analytics", (req, res) => {
+  const query =
+    "SELECT MONTH(appointment_date) AS month_num , count(appointment_id) AS total_customers , SUM(price) AS total_revenue FROM appointments WHERE YEAR(appointment_date)= 2026 AND is_cancel = 0 GROUP BY MONTH(appointment_date) ORDER BY month_num ASC";
+
+  db.query(query, (err, results) => {
+    if (err) return res.status(500).json({ message: "Internal Server Error" });
+
+    // מחזיר ישר את המערך של החודשים
+    return res.status(200).json(results);
+  });
+});
+
+// 2. ראוטר נפרד לחישוב אחוז הלקוחות החוזרים - רק למנהל
+router.get("/analytics/repeat-customers", (req, res) => {
+  const repeatCustomersQuery =
+    "SELECT COUNT(DISTINCT client_mail_address) AS total_unique, COUNT(CASE WHEN appointment_count > 1 THEN 1 END) AS repeat_count FROM (SELECT client_mail_address, COUNT(appointment_id) AS appointment_count FROM appointments WHERE is_cancel = 0 GROUP BY client_mail_address) AS customer_counts";
+
+  db.query(repeatCustomersQuery, (err, results) => {
+    if (err) return res.status(500).json({ message: "Internal Server Error" });
+
+    // לוקחים את המספרים ישירות מתוך השורה הראשונה שחזרה מה-DB
+    const totalUnique = results[0].total_unique;
+    const repeatCount = results[0].repeat_count;
+
+    // חישוב אחוז פשוט בסיסי
+    let repeatPercentage = 0;
+    if (totalUnique > 0) {
+      repeatPercentage = Math.round((repeatCount / totalUnique) * 100);
+    }
+
+    // מחזירים רק את מספר האחוז הסופי
+    return res.status(200).json({ repeatPercentage: repeatPercentage });
+  });
+});
+
+// נתיב לקבלת תור לפי ID (עכשיו הוא אחרון, אז הוא לא יבלע את המילה analytics)
 router.get("/:id", (req, res) => {
   const id = req.params.id;
   const query = "SELECT * FROM appointments WHERE appointment_id = ?";
   db.query(query, [id], (err, results) => {
     // שאילתה לקבלת תור לפי ID של תור מבוקש
     if (err) return res.status(400).json({ message: "Internal Server Error" });
-    if (results.length === 1) {
-      // בדיקה אם חזרה תוצאה אחת
+    if (results.length === 1) // בדיקה אם חזרה תוצאה אחת
+    {
       return res.status(200).json(results);
     } else {
       return res.status(400).json({ message: "תור לא קיים" });

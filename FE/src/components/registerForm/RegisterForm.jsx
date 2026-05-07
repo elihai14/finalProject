@@ -32,14 +32,14 @@ function RegisterForm() {
       if (response.ok) {
         // הרשמה בוצעה בהצלחה - מעבר ללוגין
         Swal.fire({
-                    title: 'נרשמת בהצלחה!',
-                    text: 'כעת תוכל להתחבר למערכת',
-                    icon: 'success',
-                    confirmButtonText: 'מעולה',
-                    confirmButtonColor: '#3085d6'
-        }).then(() => {
-                        navigate("/"); // יעבור דף רק אחרי שהמשתמש ילחץ על אישור
-});
+              title: 'נרשמת בהצלחה!',
+              text: 'כעת תוכל להתחבר למערכת',
+              icon: 'success',
+              confirmButtonText: 'מעולה',
+              confirmButtonColor: '#38bdf8' // 👈 צבע כחול-ציאן מותאם אישית
+            }).then(() => {
+                    navigate("/"); 
+        });
       } else {
         // כאן נתפסת הבדיקה של הבקאנד (למשל: "משתמש כבר קיים")
         setError(data.message || "שגיאה בתהליך ההרשמה");

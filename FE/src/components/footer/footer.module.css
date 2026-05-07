@@ -1,10 +1,19 @@
-
-
+.footer {
+  width: 100%;
+  background-color: #121214;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 24px 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  direction: ltr;
+  margin-top: 60px;
+}
 
 .footer p {
-  color: blueviolet;
-  text-align: center;
-  background-color: lightblue;
-  padding: 1em 2em;
+  font-size: 0.9rem;
+  color: #71717a;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   margin: 0;
 }

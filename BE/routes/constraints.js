@@ -146,4 +146,5 @@ router.put("/remove-constraint/:id", (req, res) => {
     return res.status(200).json({ message: "האילוץ הוסר בהצלחה" });
   });
 });
+
 module.exports = router;

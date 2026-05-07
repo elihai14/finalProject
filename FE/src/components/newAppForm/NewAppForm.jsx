@@ -42,24 +42,23 @@ export default function NewAppForm() {
       return;
     }
 
-    const fetchServices = async () => {
-      setLoadingServices(true);
-      try {
-        // שים לב: כאן אתה שולח את המייל של הספר כפרמטר ל-API שלך
-        const response = await fetch(`http://localhost:5000/services`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ barberMail: selectedBarber }),
-        });
-        const data = await response.json();
-        setServices(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("שגיאה בטעינת שירותים:", error);
-        setServices([]);
-      } finally {
-        setLoadingServices(false);
-      }
-    };
+      const fetchServices = async () => {
+    setLoadingServices(true);
+    try {
+      // תיקון: שולחים את המפתח הנכון שה-Backend וה-DB מצפים לו!
+      const response = await fetch(`http://localhost:5000/services`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mail_address: selectedBarber }), 
+      });
+      const data = await response.json();
+      setServices(Array.isArray(data) ? data : []);
+    } catch (error) {
+      setServices([]);
+    } finally {
+      setLoadingServices(false);
+    }
+  };
 
     fetchServices();
   }, [selectedBarber]);

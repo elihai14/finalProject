@@ -1,18 +1,46 @@
-
-.app {
-  width: 100vw;
-
-  /* make footer always on bottom */
-  min-height: 100vh; /* page height is at least page height */
-  display: flex;
-  flex-direction: column;
+/* מבטיח שכל האתר מקצה לקצה ינשום שחור-מט יוקרתי */
+:global(body) {
+  margin: 0;
+  padding: 0;
+  background-color: #121214;
+  color: #f4f4f5;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
 }
 
-.app main {
-  
-  flex: 1; /* stretch main above footer */
+/* עיצוב בר הניווט (הקישורים של התחברות | הרשמה) */
+nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  background-color: #1a1a1e;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  direction: rtl;
+  color: #52525b; /* צבע לפס המפרידבין הלינקים */
+  font-weight: 600;
+}
 
-  width: 80%;
-  max-width: 1000px;
-  margin: 0 auto;
+/* עיצוב הלינקים עצמם */
+nav a {
+  color: #a1a1aa;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: all 0.25s ease;
+  padding: 6px 16px;
+  border-radius: 8px;
+}
+
+/* אפקט ריחוף שהופך את הלינק לזהב פרימיום */
+nav a:hover {
+  color: #dfb76c;
+  background-color: rgba(223, 183, 108, 0.06);
+}
+
+/* עיצוב אופציונלי ללינק אקטיבי (אם תרצה להוסיף קלאס בהמשך) */
+nav a:global(.active) {
+  color: #121214;
+  background: linear-gradient(135deg, #dfb76c 0%, #c59b4e 100%);
 }

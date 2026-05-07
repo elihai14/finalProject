@@ -1,0 +1,98 @@
+.loginContainer {
+  max-width: 440px;
+  width: 92%;
+  margin: 80px auto;
+  background: #1a1a1e;
+  border: 1px solid rgba(223, 183, 108, 0.15);
+  border-radius: 24px;
+  padding: 48px 40px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  direction: rtl;
+  text-align: center;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.loginContainer h2 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffffff 0%, #dfb76c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 32px 0;
+}
+
+.form { display: flex; flex-direction: column; gap: 22px; }
+
+.input {
+  width: 100%;
+  padding: 16px 20px;
+  background-color: #121214;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  color: #f4f4f5;
+  font-size: 1.05rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  outline: none;
+  text-align: right;
+}
+
+.input:focus {
+  border-color: #dfb76c;
+  box-shadow: 0 0 0 4px rgba(223, 183, 108, 0.15);
+  background-color: #161619;
+}
+
+.input::placeholder { color: #52525b; }
+
+.button {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #dfb76c 0%, #c59b4e 100%);
+  color: #121214;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(223, 183, 108, 0.15);
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(223, 183, 108, 0.3);
+  background: linear-gradient(135deg, #e9c47c 0%, #dfb76c 100%);
+}
+
+.button:disabled { background: #27272a; color: #52525b; cursor: not-allowed; box-shadow: none; }
+
+.footerText {
+  font-size: 1rem;
+  color: #a1a1aa;
+  margin: 16px 0 0 0;
+  font-weight: 600;
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  color: #dfb76c;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  margin-right: 6px;
+}
+
+.linkBtn:hover { color: #ffffff; text-decoration: underline; }
+
+.errorMessage {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 24px 0;
+}
