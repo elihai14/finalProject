@@ -31,49 +31,58 @@
 }
 
 .date {
-  font-size: 1.4rem; /* מ-8px עלינו ל-14px קריא */
-  color: #c4c4c7;    /* אפור בהיר הרבה יותר במקום האפור הכהה והנעלם */
+  font-size: 0.85rem;
+  color: #a1a1aa; /* אפור מעודן */
   font-weight: 600;
   letter-spacing: 0.5px;
 }
 
 .time {
-  font-size: 2.8rem; /* מוגדל ונוכח */
+  font-size: 2.2rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #ffffff 0%, #dfb76c 100%);
+  background: linear-gradient(135deg, #f3e8ff 0%, #dfb76c 100%); /* גרדיאנט זהב-שמפניה מטריף לשעה */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1.1;
 }
 
 .barberName {
-  font-size: 1.6rem; /* מוגדל */
-  color: #dfb76c;    /* זהב שמפניה */
+  font-size: 1rem;
+  color: #dfb76c; /* שם הספר בזהב */
   font-weight: 700;
   margin-top: 6px;
 }
 
 .clientName {
-  font-size: 1.3rem; /* מ-8px עלינו ל-13px ברור ונקי */
-  color: #a1a1aa;    /* אפור בהיר משמעותית */
+  font-size: 0.85rem;
+  color: #71717a;
   font-weight: 500;
-  margin-top: 4px;
-  display: block;    /* מבטיח שהמייל לא יימחץ */
+}
+
+/* אזור הפירוט */
+.details_section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  flex-grow: 1;
 }
 
 .service_name {
-  font-size: 2.2rem; /* כותרת השירות מוגדלת וחזקה */
+  font-size: 1.4rem;
   font-weight: 750;
-  color: #f4f4f5;
+  color: #f4f4f5; /* לבן חלק */
   margin: 0;
 }
 
 .price {
-  font-size: 1.5rem; /* מחיר ברור */
+  font-size: 1.05rem;
   font-weight: 700;
   color: #dfb76c;
-  background: rgba(223, 183, 108, 0.08);
-  padding: 6px 18px;
+  margin: 0;
+  background: rgba(223, 183, 108, 0.08); /* בועת זהב חצי שקופה */
+  padding: 5px 16px;
   border-radius: 30px;
   border: 1px solid rgba(223, 183, 108, 0.2);
 }
