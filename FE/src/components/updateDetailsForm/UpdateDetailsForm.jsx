@@ -1,8 +1,6 @@
-
-
-
-
-
+import { useState } from "react";
+import Swal from "sweetalert2";
+import classes from "./updateDetailsForm.module.css";
 
 
 export default function UpdateDetailsForm() 
@@ -12,7 +10,6 @@ export default function UpdateDetailsForm()
     const [email, setEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
-    const navigate = useNavigate();
 
     const handleUpdate = async (e) => {
       e.preventDefault();
@@ -21,8 +18,9 @@ export default function UpdateDetailsForm()
 
       try {
         const response = await fetch("http://localhost:5000/users/update", {
-          method: "POST",
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
+          credentials: "include", 
           body: JSON.stringify({
             phoneNumber: phone,
             newEmail: email,
@@ -34,17 +32,15 @@ export default function UpdateDetailsForm()
         if (response.ok) {
           // הרשמה בוצעה בהצלחה - מעבר ללוגין
           Swal.fire({
-            title: "נרשמת בהצלחה!",
-            text: "כעת תוכל להתחבר למערכת",
+            title: "פרטיך עודכנו בהצלחה",
+            text: "פרטיך עודכנו בהצלחה !",
             icon: "success",
             confirmButtonText: "מעולה",
             confirmButtonColor: "#3085d6",
-          }).then(() => {
-            navigate("/"); // יעבור דף רק אחרי שהמשתמש ילחץ על אישור
-          });
+          })
         } else {
           // כאן נתפסת הבדיקה של הבקאנד (למשל: "משתמש כבר קיים")
-          setError(data.message || "שגיאה בתהליך ההרשמה");
+          setError(data.message || "שגיאה בתהליך עדכון הפרטים ");
         }
       } catch (err) {
         setError("שגיאת תקשורת עם השרת");
@@ -60,24 +56,14 @@ export default function UpdateDetailsForm()
         {/* הצגת שגיאה מהבקאנד (כמו "משתמש רשום") */}
         {error && <p className={classes.errorMessage}>{error}</p>}
 
-        <form onSubmit={handleRegister} className={classes.form}>
-          {/* שם מלא */}
-          <input
-            type="text"
-            placeholder="שם מלא"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-            className={classes.input}
-          />
-
+        <form onSubmit={handleUpdate} className={classes.form}>
           {/* מס' טלפון */}
           <input
             type="tel"
             placeholder="מס' טלפון"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            required
+            
             className={classes.input}
           />
 
@@ -87,21 +73,13 @@ export default function UpdateDetailsForm()
             placeholder="כתובת מייל"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            
             className={classes.input}
           />
 
-          {/* כפתור הרשמה */}
           <button type="submit" className={classes.button} disabled={isLoading}>
-            {isLoading ? "נרשם..." : "הרשמה"}
+            עדכון הפרטים
           </button>
-
-          <p className={classes.footerText}>
-            כבר יש לך חשבון?{" "}
-            <Link to="/login" className={classes.linkBtn}>
-              התחבר
-            </Link>
-          </p>
         </form>
       </div>
     );

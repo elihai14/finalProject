@@ -49,7 +49,7 @@ export default function NewAppForm() {
       const response = await fetch(`http://localhost:5000/services`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mail_address: selectedBarber }), 
+        body: JSON.stringify({ barberMail: selectedBarber }),
       });
       const data = await response.json();
       setServices(Array.isArray(data) ? data : []);

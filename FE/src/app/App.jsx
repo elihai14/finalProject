@@ -1,7 +1,7 @@
 import Footer from "../components/footer/Footer";
 import Header from "../components/header/Header";
 import classes from "./app.module.css";
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 import NewAppForm from "../components/newAppForm/NewAppForm";
 import AppList from "../components/appList/AppList";
@@ -21,7 +21,7 @@ function App() {
         <Route path="/" element={<LoginForm />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
-        
+
         {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
         <Route path="/admin-dashboard" element={<AppList />} />
         <Route
@@ -34,9 +34,8 @@ function App() {
           }
         />
         <Route path="/barber-dashboard" element={<NewAppForm />} />
-
       </Routes>
-      
+
       <Footer prog="Elihai & Daniel" year="2026" />
     </BrowserRouter>
   );
