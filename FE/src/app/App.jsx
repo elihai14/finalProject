@@ -1,24 +1,52 @@
 import Footer from "../components/footer/Footer";
 import Header from "../components/header/Header";
 import classes from "./app.module.css";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-
+import {Routes, Route, useLocation } from 'react-router-dom';
+import { useState } from "react";
+import { useEffect } from "react";
 import NewAppForm from "../components/newAppForm/NewAppForm";
 import AppList from "../components/appList/AppList";
 import LoginForm from "../components/loginForm/LoginForm";
 import RegisterForm from "../components/registerForm/RegisterForm";
+import DashboardStats from "../components/dashboardStats/DashboardStats";
+import Navbar from "../components/navBar/NavBar";
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Header />
 
-      <nav>
-        <Link to="/">התחברות</Link> | <Link to="/register">הרשמה</Link>
-      </nav>
+  const [user , setUser] = useState("");
+  const location = useLocation();
+
+  useEffect(() => {
+      // פונקציה אסינכרונית למשיכת הנתונים
+      const fetchUserName = async () => {
+        try {
+          const response = await fetch("http://localhost:5000/users/current",
+            {credentials: 'include'}
+          );
+          const data = await response.json();
+          if (!response.ok) {
+            setUser("");
+          } else {
+            const nameString = String(data.user_name);
+            
+            setUser(nameString); // שמירת הנתונים ב-State
+          }
+        } catch (error) {
+          console.error("שגיאה", error);
+        }
+      };
+  
+      fetchUserName();
+    }, [location.pathname]);
+
+  return (
+    <div>
+      <Header /> 
+
+      <Navbar user={user} setUser={setUser}/>
 
       <Routes>
-        <Route path="/" element={<LoginForm />} />
+        <Route path="/" element={<LoginForm /> } />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
 
@@ -37,7 +65,7 @@ function App() {
       </Routes>
 
       <Footer prog="Elihai & Daniel" year="2026" />
-    </BrowserRouter>
+  </div>
   );
 }
 

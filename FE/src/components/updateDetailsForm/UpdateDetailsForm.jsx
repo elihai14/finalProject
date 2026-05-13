@@ -1,11 +1,17 @@
 import { useState } from "react";
+<<<<<<< HEAD
 import Swal from "sweetalert2";
 import classes from "./updateDetailsForm.module.css";
 
+=======
+import { useNavigate, Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import classes from "./updateDetailsForm.module.css";
+>>>>>>> e5c54ed (add navBar component)
 
 export default function UpdateDetailsForm() 
 {
-
+    const [fullName, setFullName] = useState("");
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -50,12 +56,10 @@ export default function UpdateDetailsForm()
     };
 
     return (
-      <div>
-        <h2>עדכון פרטים</h2>
 
-        {/* הצגת שגיאה מהבקאנד (כמו "משתמש רשום") */}
-        {error && <p className={classes.errorMessage}>{error}</p>}
+  <div className={classes.overlay}>
 
+<<<<<<< HEAD
         <form onSubmit={handleUpdate} className={classes.form}>
           {/* מס' טלפון */}
           <input
@@ -84,3 +88,84 @@ export default function UpdateDetailsForm()
       </div>
     );
 }
+=======
+    <div className={classes.popup}>
+
+      <h2 className={classes.title}>
+        עדכון פרטים
+      </h2>
+
+      {/* הצגת שגיאה מהבקאנד */}
+      {error && (
+        <p className={classes.errorMessage}>
+          {error}
+        </p>
+      )}
+
+      <form
+        onSubmit={handleUpdate}
+        className={classes.form}
+      >
+
+        {/* שם מלא */}
+        <input
+          type="text"
+          placeholder="שם מלא"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          required
+          className={classes.input}
+        />
+
+        {/* מס' טלפון */}
+        <input
+          type="tel"
+          placeholder="מס' טלפון"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          required
+          className={classes.input}
+        />
+
+        {/* כתובת מייל */}
+        <input
+          type="email"
+          placeholder="כתובת מייל"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className={classes.input}
+        />
+
+        {/* כפתור */}
+        <button
+          type="submit"
+          className={classes.button}
+          disabled={isLoading}
+        >
+
+          {isLoading ? "מעדכן..." : "שמור שינויים"}
+
+        </button>
+
+        <p className={classes.footerText}>
+          כבר יש לך חשבון?{" "}
+
+          <Link
+            to="/login"
+            className={classes.linkBtn}
+          >
+            התחבר
+          </Link>
+
+        </p>
+
+      </form>
+
+    </div>
+
+  </div>
+
+);
+}
+>>>>>>> e5c54ed (add navBar component)
