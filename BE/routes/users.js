@@ -177,34 +177,63 @@ router.put("/update", (req, res) => {
   const oldEmail = req.session.user.email;
   const { newEmail, phoneNumber } = req.body;
 
-  if (!newEmail || !phoneNumber) {
+  if (!newEmail && !phoneNumber) {
     return res
       .status(400)
-      .json({ message: "New email and phone number are required" });
+      .json({ message: "New email or phone number are required" });
   }
+  if(newEmail)
+  {
   const checkIsExistQuery = "SELECT * FROM users WHERE mail_address = ?";
   db.query(checkIsExistQuery, [newEmail], (err, result) => {
-    if (err) return res.status(500).json({ message: "Internal Server Error" });
+    if (err) return res.status(500).json({ message: "תקלת שרת פנימית" });
 
-    if (result > 0)
+    if (result.length > 0)
       return res
         .status(500)
-        .json({ message: "this mail address is already exist" });
+        .json({ message: "כתובת המייל שהזנת שייכת למשתמש קיים" });
   });
+}
 
-  const query =
-    "UPDATE users SET mail_address = ?, phone_number = ? WHERE mail_address = ?";
+    let query =
+    "UPDATE users SET ";
+    let values = [];
+    if(newEmail && phoneNumber)
+    {
+      query += "mail_address = ?, phone_number = ?";
+      values.push(newEmail);
+      values.push(phoneNumber);
 
-  db.query(query, [newEmail, phoneNumber, oldEmail], (err, results) => {
+    }
+    else if(newEmail)
+    {
+      query += "mail_address = ?";
+      values.push(newEmail);
+
+    }
+    else
+    {
+      query += "phone_number = ?";
+      values.push(phoneNumber);
+
+    }
+    query += " WHERE mail_address = ?";
+    values.push(oldEmail);
+   
+
+  db.query(query, values, (err, results) => {
     if (err) {
-      return res.status(500).json({ message: "Error updating profile" });
+      return res.status(500).json({ message: "תקלה בתהליך עדכון הפרטים" });
     }
 
     if (results.affectedRows === 0) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(500).json({ message: "תקלה בתהליך עדכון הפרטים" });
     }
+    if(newEmail)
+    {
+        req.session.user.email = newEmail;
 
-    req.session.user.email = newEmail;
+    }
 
     return res.status(200).json({
       message: "Profile updated successfully",

@@ -9,6 +9,8 @@ const db = dbSingleton.getConnection();
 
 router.post("/", (req, res) => {
   const { barberMail } = req.body;
+  console.log(req.body);
+  console.log(barberMail);
 
   const query =
     "SELECT service_name , price FROM barber_services WHERE mail_address = ?";
