@@ -20,7 +20,6 @@ export default function NewAppForm() {
       try {
         const response = await fetch("http://localhost:5000/users/ספר");
         const data = await response.json();
-        console.log(data);
         if (!response.ok) {
           setLoading(false);
         } else {

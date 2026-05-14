@@ -8,19 +8,34 @@ const Navbar = ({ user, setUser }) => {
   const navigate = useNavigate();
   const location = useLocation(); // מאפשר לנו לדעת באיזה דף אנחנו
 
-  const handleLogout = () => {
-    setUser("");
-    // חשוב: תוודא שאתה מוחק את כל מה ששמרת ב-Login
-    localStorage.removeItem('userStatus');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
-    navigate('/login');
-  };
-  console.log(location.pathname);
+  const  handleLogout = async () => {
+    
+      try {
+        const response = await fetch("http://localhost:5000/users/logout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include", 
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+              setUser("");
+              navigate('/');
+
+        }
+       else {
+          console.error(data.message);
+        }}
+       catch (err) {
+        console.error("שגיאת שרת פנימית ")
+      }
+    };
+    
   
   // בדיקה: האם אנחנו נמצאים כרגע בדף התחברות או הרשמה?
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/';
-  
+
   return (
     <nav className={classes.topNav}>
       {/* 
@@ -29,7 +44,8 @@ const Navbar = ({ user, setUser }) => {
           או 
           שאנחנו נמצאים פיזית בדף התחברות/הרשמה
       */}
-        {user == "" && isAuthPage ? (
+      
+        {!user && isAuthPage ? (
         <div className={classes.userLinks}>
             <Link to="/register" className={classes.navButton}>הרשמה</Link>
             <Link to="/login" className={classes.navButton}>התחברות</Link>

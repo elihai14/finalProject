@@ -23,6 +23,24 @@ router.post("/", (req, res) => {
   });
 });
 
+
+router.post("/current", (req, res) => {
+  const mail = req.session.user.email;
+  const query = "SELECT user_name FROM users WHERE mail_address = ?";
+
+  db.query(query, [mail], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    if (results.length > 0) {
+      return res.status(200).json(results[0]);
+    } else {
+      return res.status(404).json({ message: "User not found" });
+    }
+  });
+});
+
 router.post("/register", (req, res) => {
   const { fullName, phoneNumber, mailAddress } = req.body;
 
@@ -102,6 +120,20 @@ router.post("/login", (req, res) => {
     }
   });
 });
+
+
+//נתיב להתנתקות המשתמש מהמערכת
+router.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    //משמיד את הsession ומנתק את המשתמש
+    if (err) {
+      return res.status(500).send("logout failed");
+    }
+    res.clearCookie("connect.sid");
+    return res.status(200).json({ message: "התנתקות בוצעה בהצלחה" });
+  });
+});
+
 
 router.post("/verify-otp", (req, res) => {
   const { mailAddress, code } = req.body;

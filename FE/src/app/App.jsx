@@ -21,10 +21,14 @@ function App() {
       const fetchUserName = async () => {
         try {
           const response = await fetch("http://localhost:5000/users/current",
-            {credentials: 'include'}
+            {credentials: 'include',
+              method: "POST"
+            }
           );
           const data = await response.json();
           if (!response.ok) {
+            console.log(data , "data");
+            
             setUser("");
           } else {
             const nameString = String(data.user_name);
