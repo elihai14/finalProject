@@ -10,21 +10,19 @@ export default function AppList() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const userStatus = localStorage.getItem("userStatus"); 
-  const userEmail = localStorage.getItem("userEmail");
+  // --- להדביק כאן ---
+  const [filters, setFilters] = useState({
+    startDate: '',
+    endDate: '',
+    service: '',
+    clientMail: ''
+  });
 
   const fetchAppointments = async () => {
-    if (!userEmail) return;
-
     setIsLoading(true);
-    setError("");
-
-    const requestBody = {};
-    if (userStatus === 'ספר') {
-      requestBody.barber_mail_address = userEmail;
-    } else if (userStatus === 'לקוח') {
-      requestBody.client_mail_address = userEmail;
-    }
+    const requestBody = { ...filters }; 
+    if (userStatus === 'ספר') requestBody.barberMail = userEmail;
+    else if (userStatus === 'לקוח') requestBody.clientMail = userEmail;
 
     try {
       const response = await fetch(`http://localhost:5000/appointments`, {
@@ -32,20 +30,49 @@ export default function AppList() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)
       });
-
       const data = await response.json();
-
-      if (response.ok) {
-        setAppointments(data);
-      } else {
-        setError(data.message || "לא נמצאו תורים במערכת");
-      }
-    } catch (err) {
-      setError("שגיאת תקשורת עם השרת");
-    } finally {
-      setIsLoading(false);
-    }
+      setAppointments(response.ok ? data : []);
+    } catch (err) { setError("שגיאה"); }
+    finally { setIsLoading(false); }
   };
+
+
+  const userStatus = localStorage.getItem("userStatus"); 
+  const userEmail = localStorage.getItem("userEmail");
+
+  // const fetchAppointments = async () => {
+  //   if (!userEmail) return;
+
+  //   setIsLoading(true);
+  //   setError("");
+
+  //   const requestBody = {};
+  //   if (userStatus === 'ספר') {
+  //     requestBody.barber_mail_address = userEmail;
+  //   } else if (userStatus === 'לקוח') {
+  //     requestBody.client_mail_address = userEmail;
+  //   }
+
+  //   try {
+  //     const response = await fetch(`http://localhost:5000/appointments`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(requestBody)
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (response.ok) {
+  //       setAppointments(data);
+  //     } else {
+  //       setError(data.message || "לא נמצאו תורים במערכת");
+  //     }
+  //   } catch (err) {
+  //     setError("שגיאת תקשורת עם השרת");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     fetchAppointments();
@@ -90,12 +117,12 @@ export default function AppList() {
 
     // התאמת הנתונים לפי סוג המשתמש כדי שלא יתבלגן
     if (userStatus === 'מנהל') {
-      formattedApp.barberName = `ספר: ${app.barber_mail_address}`;
-      formattedApp.clientEmail = app.client_mail_address;
+      formattedApp.barberName = `ספר: ${app.barberName}`;
+      formattedApp.clientEmail = app.customerName;
     } else if (userStatus === 'ספר') {
-      formattedApp.clientEmail = app.client_mail_address;
+      formattedApp.clientEmail = app.customerName;
     } else if (userStatus === 'לקוח') {
-      formattedApp.barberName = app.barber_mail_address;
+      formattedApp.barberName = app.barberName;
       formattedApp.price = app.price ? `₪${app.price}` : "₪180";
     }
 
@@ -114,6 +141,19 @@ export default function AppList() {
       {/* 1. מציג את הגרפים לספר ומנהל בחלק העליון של הדף */}
       {(userStatus === 'ספר' || userStatus === 'מנהל') && (
         <DashboardStats userStatus={userStatus} />
+      )}
+
+      {(userStatus === 'ספר' || userStatus === 'מנהל') && (
+        <div className={classes.filterBar}>
+          <input type="date" onChange={(e) => setFilters({...filters, startDate: e.target.value})} />
+          <input type="date" onChange={(e) => setFilters({...filters, endDate: e.target.value})} />
+          <select onChange={(e) => setFilters({...filters, service: e.target.value})}>
+            <option value="">כל השירותים</option>
+            <option value="תספורת גבר">תספורת גבר</option>
+            <option value="זקן">זקן</option>
+          </select>
+          <button onClick={fetchAppointments}>סנן</button>
+        </div>
       )}
 
       {/* 2. מציג את טופס קביעת התור רק אם זה לקוח */}

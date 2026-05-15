@@ -12,6 +12,8 @@ function DashboardStats({ userStatus }) {
   const [repeatPercentage, setRepeatPercentage] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  
+
   useEffect(() => {
     fetch('http://localhost:5000/appointments/analytics')
       .then(res => {

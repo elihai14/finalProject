@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import classes from "./updateDetailsForm.module.css";
 
-export default function UpdateDetailsForm() 
+export default function UpdateDetailsForm({ onClose }) 
 {
     const [fullName, setFullName] = useState("");
     const [phone, setPhone] = useState("");
@@ -37,7 +37,8 @@ export default function UpdateDetailsForm()
             icon: "success",
             confirmButtonText: "מעולה",
             confirmButtonColor: "#3085d6",
-          })
+          }).then(() => {
+                  onClose();});
         } else {
           // כאן נתפסת הבדיקה של הבקאנד (למשל: "משתמש כבר קיים")
           setError(data.message || "שגיאה בתהליך עדכון הפרטים ");
@@ -112,18 +113,14 @@ export default function UpdateDetailsForm()
 
         </button>
 
-        <p className={classes.footerText}>
-          כבר יש לך חשבון?{" "}
-
-          <Link
-            to="/login"
-            className={classes.linkBtn}
-          >
-            התחבר
-          </Link>
-
-        </p>
-
+        <button
+          type="button"
+          className={classes.cancelButton}
+          onClick={onClose}
+        >
+          ביטול
+        </button>
+        
       </form>
 
     </div>

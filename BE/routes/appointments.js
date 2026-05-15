@@ -10,26 +10,27 @@ const db = dbSingleton.getConnection();
 // מחזיר רשימת תורים של המשתמש שמחובר
 router.post("/", (req, res) => {
   let { clientMail, service, startDate, endDate, barberMail } = req.body;
-  let query = "SELECT * FROM appointments WHERE 1=1 ";
+  let query =
+    "SELECT appointments.*, u1.user_name AS barberName, u2.user_name AS customerName           FROM appointments LEFT JOIN users u1 ON appointments.barber_mail_address =                 u1.mail_address LEFT JOIN users u2 ON appointments.client_mail_address = u2.mail_address  WHERE appointments.is_cancel = 0"; ;
   const values = [];
   if (clientMail) {
-    query += "AND client_mail_address = ? ";
+    query += " AND client_mail_address = ? ";
     values.push(clientMail);
   }
   if (service) {
-    query += "AND service_name = ? ";
+    query += " AND service_name = ? ";
     values.push(service);
   }
   if (startDate) {
-    query += "AND appointment_date >= ? ";
+    query += " AND appointment_date >= ? ";
     values.push(startDate);
   }
   if (endDate) {
-    query += "AND appointment_date <= ? ";
+    query += " AND appointment_date <= ? ";
     values.push(endDate);
   }
   if (barberMail) {
-    query += "AND barber_mail_address = ? ";
+    query += " AND barber_mail_address = ? ";
     values.push(barberMail);
   }
   db.query(query, values, (err, results) => {

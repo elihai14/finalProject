@@ -75,7 +75,7 @@ router.post("/register", (req, res) => {
         return res
           .status(201)
           .json({ message: "נרשמת בהצלחה! כעת ניתן להתחבר" });
-      }
+      },
     );
   });
 });
@@ -155,9 +155,8 @@ router.post("/verify-otp", (req, res) => {
 
       // שולחים לריאקט את הסטטוס!
       return res.status(200).json({
-
         message: "Authentication successful",
-        status: results[0].status
+        status: results[0].status,
       });
     });
   } else {
@@ -214,44 +213,33 @@ router.put("/update", (req, res) => {
       .status(400)
       .json({ message: "New email or phone number are required" });
   }
-  if(newEmail)
-  {
-  const checkIsExistQuery = "SELECT * FROM users WHERE mail_address = ?";
-  db.query(checkIsExistQuery, [newEmail], (err, result) => {
-    if (err) return res.status(500).json({ message: "תקלת שרת פנימית" });
+  if (newEmail) {
+    const checkIsExistQuery = "SELECT * FROM users WHERE mail_address = ?";
+    db.query(checkIsExistQuery, [newEmail], (err, result) => {
+      if (err) return res.status(500).json({ message: "תקלת שרת פנימית" });
 
-    if (result.length > 0)
-      return res
-        .status(500)
-        .json({ message: "כתובת המייל שהזנת שייכת למשתמש קיים" });
-  });
-}
+      if (result.length > 0)
+        return res
+          .status(500)
+          .json({ message: "כתובת המייל שהזנת שייכת למשתמש קיים" });
+    });
+  }
 
-    let query =
-    "UPDATE users SET ";
-    let values = [];
-    if(newEmail && phoneNumber)
-    {
-      query += "mail_address = ?, phone_number = ?";
-      values.push(newEmail);
-      values.push(phoneNumber);
-
-    }
-    else if(newEmail)
-    {
-      query += "mail_address = ?";
-      values.push(newEmail);
-
-    }
-    else
-    {
-      query += "phone_number = ?";
-      values.push(phoneNumber);
-
-    }
-    query += " WHERE mail_address = ?";
-    values.push(oldEmail);
-   
+  let query = "UPDATE users SET ";
+  let values = [];
+  if (newEmail && phoneNumber) {
+    query += "mail_address = ?, phone_number = ?";
+    values.push(newEmail);
+    values.push(phoneNumber);
+  } else if (newEmail) {
+    query += "mail_address = ?";
+    values.push(newEmail);
+  } else {
+    query += "phone_number = ?";
+    values.push(phoneNumber);
+  }
+  query += " WHERE mail_address = ?";
+  values.push(oldEmail);
 
   db.query(query, values, (err, results) => {
     if (err) {
@@ -261,10 +249,8 @@ router.put("/update", (req, res) => {
     if (results.affectedRows === 0) {
       return res.status(500).json({ message: "תקלה בתהליך עדכון הפרטים" });
     }
-    if(newEmail)
-    {
-        req.session.user.email = newEmail;
-
+    if (newEmail) {
+      req.session.user.email = newEmail;
     }
 
     return res.status(200).json({

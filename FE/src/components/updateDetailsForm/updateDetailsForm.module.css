@@ -6,7 +6,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.85); /* רקע כהה מאוד */
+    background-color: rgba(0, 0, 0, 0.85);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,20 +14,21 @@
 }
 
 .popup {
-    background-color: #1a1a1a; /* רקע הפופאפ אפור כהה מאוד */
-    padding: 2rem;
+    background-color: #1a1a1a;
+    padding: 2.5rem;
     border-radius: 12px;
-    border: 2px solid #d4af37; /* מסגרת מוזהבת עדינה */
-    width: 100%;
+    border: 2px solid #d4af37;
+    width: 90%;
     max-width: 450px;
     position: relative;
     direction: rtl;
     color: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .title {
     text-align: center;
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: bold;
     margin-bottom: 2rem;
     color: #ffffff;
@@ -36,71 +37,90 @@
 .form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.2rem;
 }
 
 .input {
-    background-color: #2a2a2a; /* צבע האינפוט כפי שרואים ב-צילום מסך 2026-05-13 155500.png */
+    background-color: #2a2a2a;
     border: 1px solid #3d3d3d;
     border-radius: 8px;
-    padding: 15px;
+    padding: 12px 15px;
     color: #ffffff;
-    font-size: 1.1rem;
+    font-size: 1rem;
     outline: none;
-}
-
-.input::placeholder {
-    color: #888;
+    transition: border-color 0.3s;
 }
 
 .input:focus {
-    border-color: #d4af37; /* הדגשה מוזהבת בפוקוס */
+    border-color: #d4af37;
 }
 
-.buttonGroup {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-    flex-direction: row-reverse; /* כדי שהשמור יהיה בצד ימין */
+/* סידור הכפתורים בשורה אחת */
+.form > button[type="submit"],
+.cancelButton {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .button {
-    background-color: #d4af37; /* הצהוב/זהב של הכפתור הראשי */
+    background-color: #d4af37;
     color: #000000;
-    padding: 12px;
     border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    flex: 2; /* כפתור השמור רחב יותר */
+    margin-top: 0.5rem;
 }
 
-.cancelBtn {
+.button:hover:not(:disabled) {
+    background-color: #b8972f;
+    transform: translateY(-1px);
+}
+
+.button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.cancelButton {
     background-color: transparent;
     color: #ffffff;
     border: 1px solid #3d3d3d;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    flex: 1;
+    margin-top: -0.5rem; /* מצמיד אותו קצת יותר לשמור שינויים */
 }
 
-.closeX {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 1.5rem;
-    cursor: pointer;
+.cancelButton:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: #888;
 }
 
 .errorMessage {
     color: #ff4444;
     font-size: 0.9rem;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     text-align: center;
+    background: rgba(255, 68, 68, 0.1);
+    padding: 8px;
+    border-radius: 4px;
+}.cancelButton {
+    background-color: transparent;
+    color: #ff4d4d; /* אדום בהיר מספיק לקריאה על רקע כהה */
+    border: 1px solid #ff4d4d;
+    margin-top: -0.5rem;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cancelButton:hover {
+    background-color: rgba(255, 77, 77, 0.1); /* רקע אדמדם עדין בריחופ */
+    border-color: #ff1a1a;
+    color: #ff1a1a;
 }
