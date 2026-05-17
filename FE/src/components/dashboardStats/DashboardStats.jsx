@@ -11,11 +11,22 @@ function DashboardStats({ userStatus }) {
   const [chartData, setChartData] = useState([]);
   const [repeatPercentage, setRepeatPercentage] = useState(0);
   const [loading, setLoading] = useState(true);
-
+  const [dashDates, setDashDates] = useState({
+    startDate: '',
+    endDate: ''
+  });
   
 
   useEffect(() => {
-    fetch('http://localhost:5000/appointments/analytics')
+    // 1. ה-fetch הראשון שמביא את נתוני הגרפים (כבר עודכן ל-POST)
+    fetch('http://localhost:5000/appointments/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        startDate: dashDates.startDate,
+        endDate: dashDates.endDate
+      })
+    })
       .then(res => {
         if (!res.ok) {
           throw new Error('Network response was not ok');
@@ -30,8 +41,16 @@ function DashboardStats({ userStatus }) {
         }));
         setChartData(formattedData);
 
+        // 2. עדכון ה-fetch השני ל-POST (כדי שישלח את התאריכים לחישוב הלקוחות החוזרים)
         if (userStatus === 'מנהל') {
-          return fetch('http://localhost:5000/appointments/analytics/repeat-customers')
+          return fetch('http://localhost:5000/appointments/analytics/repeat-customers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              startDate: dashDates.startDate,
+              endDate: dashDates.endDate
+            })
+          })
             .then(res => res.json())
             .then(repeatData => {
               setRepeatPercentage(repeatData.repeatPercentage);
@@ -44,63 +63,87 @@ function DashboardStats({ userStatus }) {
       .catch(err => {
         setLoading(false);
       });
-  }, [userStatus]);
+  }, [userStatus, dashDates]); // מאזין לשינויים של הסטטוס והתאריכים ומעדכן אוטומטית
 
   if (loading) return <div className={classes.loading_text}>טוען נתונים סטטיסטיים...</div>;
 
   return (
-    <div className={classes.stats_container}>
+    <div className={classes.dashboard_wrapper}>
       
-      {/* מלבן 1: כמות לקוחות חודשית */}
-      <div className={classes.stat_card}>
-        <h3>כמות לקוחות חודשית</h3>
-        <div className={classes.chart_wrapper}>
-          <ResponsiveContainer width="100%" height={150}>
-            <BarChart data={chartData}>
-              <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
-              <YAxis hide />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #38bdf8', borderRadius: '8px' }}
-                labelStyle={{ color: '#94a3b8' }}
-                itemStyle={{ color: '#38bdf8' }}
-              />
-              <Bar dataKey="customers" fill="#38bdf8" barSize={25} radius={[4, 4, 0, 0]} /> {/* 👈 צבע כחול בהיר מעוגל קלות */}
-            </BarChart>
-          </ResponsiveContainer>
+      {/* שורת סינון התאריכים מעל הגרפים */}
+      <div className={classes.dashFilterBar}>
+        <div className={classes.dashFilterGroup}>
+          <label>מתאריך:</label>
+          <input 
+            type="date" 
+            value={dashDates.startDate}
+            onChange={(e) => setDashDates({...dashDates, startDate: e.target.value})} 
+          />
+        </div>
+        <div className={classes.dashFilterGroup}>
+          <label>עד תאריך:</label>
+          <input 
+            type="date" 
+            value={dashDates.endDate}
+            onChange={(e) => setDashDates({...dashDates, endDate: e.target.value})} 
+          />
         </div>
       </div>
 
-      {/* מלבן 2: כמות הכנסות חודשית */}
-      <div className={classes.stat_card}>
-        <h3>הכנסות חודשיות</h3>
-        <div className={classes.chart_wrapper}>
-          <ResponsiveContainer width="100%" height={150}>
-            <BarChart data={chartData}>
-              <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
-              <YAxis hide />
-              <Tooltip 
-                formatter={(value) => `₪${value}`} 
-                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #0ea5e9', borderRadius: '8px' }}
-                labelStyle={{ color: '#94a3b8' }}
-                itemStyle={{ color: '#0ea5e9' }}
-              />
-              <Bar dataKey="revenue" fill="#0ea5e9" barSize={25} radius={[4, 4, 0, 0]} /> {/* 👈 כחול ניאון מהמם */}
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* מלבן 3: לקוחות חוזרים - מוצג למנהל */}
-      {userStatus === 'מנהל' && (
+      {/* מיכל הגרפים הקיים שלך - לא השתנה בו כלום */}
+      <div className={classes.stats_container}>
+        
+        {/* מלבן 1: כמות לקוחות חודשית */}
         <div className={classes.stat_card}>
-          <h3>לקוחות חוזרים</h3>
-          <div className={classes.percentage_wrapper}>
-            <span className={classes.percentage_number}>{repeatPercentage}%</span>
-            <p>מכלל הלקוחות שביקרו במספרה</p>
+          <h3>כמות לקוחות חודשית</h3>
+          <div className={classes.chart_wrapper}>
+            <ResponsiveContainer width="100%" height={150}>
+              <BarChart data={chartData}>
+                <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
+                <YAxis hide />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #38bdf8', borderRadius: '8px' }}
+                  labelStyle={{ color: '#94a3b8' }}
+                  itemStyle={{ color: '#38bdf8' }}
+                />
+                <Bar dataKey="customers" fill="#38bdf8" barSize={25} radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
-      )}
 
+        {/* מלבן 2: כמות הכנסות חודשית */}
+        <div className={classes.stat_card}>
+          <h3>הכנסות חודשיות</h3>
+          <div className={classes.chart_wrapper}>
+            <ResponsiveContainer width="100%" height={150}>
+              <BarChart data={chartData}>
+                <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
+                <YAxis hide />
+                <Tooltip 
+                  formatter={(value) => `₪${value}`} 
+                  contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #0ea5e9', borderRadius: '8px' }}
+                  labelStyle={{ color: '#94a3b8' }}
+                  itemStyle={{ color: '#0ea5e9' }}
+                />
+                <Bar dataKey="revenue" fill="#0ea5e9" barSize={25} radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* מלבן 3: לקוחות חוזרים - מוצג למנהל */}
+        {userStatus === 'מנהל' && (
+          <div className={classes.stat_card}>
+            <h3>לקוחות חוזרים</h3>
+            <div className={classes.percentage_wrapper}>
+              <span className={classes.percentage_number}>{repeatPercentage}%</span>
+              <p>מכלל הלקוחות שביקרו במספרה</p>
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }

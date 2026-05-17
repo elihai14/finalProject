@@ -71,3 +71,76 @@
   text-align: center;
   padding: 30px;
 }
+/* --- עיצוב תואם ומשופר עבור סינון תאריכים בדשבורד --- */
+.dashboard_wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashFilterBar {
+  display: flex;
+  justify-content: flex-start; /* שומר על סדר אלמנטים מימין לשמאל */
+  align-items: center;
+  gap: 32px; /* הגדלנו את המרווח בין הבלוקים של התאריכים */
+  background: rgba(255, 255, 255, 0.02); 
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 18px 24px; /* הגדלנו פאדינג שיראה בשרני ויוקרתי יותר */
+  border-radius: 16px;
+  margin-bottom: 28px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dashFilterGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* רווח גדול יותר בין הטקסט לתיבת התאריך */
+}
+
+.dashFilterGroup label {
+  color: #dfb76c; 
+  font-size: 15px; /* הגדלנו את הפונט של 'מתאריך:' ו-'עד תאריך:' */
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dashFilterBar input[type="date"] {
+  background: #1a1a1e; 
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  padding: 12px 18px; /* תיבות גדולות ונוחות יותר ללחיצה */
+  border-radius: 10px;
+  font-size: 15px; /* הגדלנו את פונט התאריך בפנים */
+  font-family: inherit;
+  outline: none;
+  min-width: 180px; /* נותן להם גודל מינימלי יפה שלא יתכווצו */
+  transition: all 0.3s ease;
+}
+
+.dashFilterBar input[type="date"]:focus {
+  border-color: #dfb76c; 
+  box-shadow: 0 0 0 2px rgba(223, 183, 108, 0.1);
+}
+
+/* התאמה מלאה למובייל */
+@media (max-width: 768px) {
+  .dashFilterBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .dashFilterGroup {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .dashFilterBar input[type="date"] {
+    width: 100%;
+    min-width: 100%;
+    box-sizing: border-box;
+  }
+}

@@ -9,13 +9,18 @@ const db = dbSingleton.getConnection();
 
 // מחזיר רשימת תורים של המשתמש שמחובר
 router.post("/", (req, res) => {
-  let { clientMail, service, startDate, endDate, barberMail } = req.body;
+  let { user_name, clientMail, service, startDate, endDate, barberMail } =
+    req.body;
   let query =
     "SELECT appointments.*, u1.user_name AS barberName, u2.user_name AS customerName           FROM appointments LEFT JOIN users u1 ON appointments.barber_mail_address =                 u1.mail_address LEFT JOIN users u2 ON appointments.client_mail_address = u2.mail_address  WHERE appointments.is_cancel = 0"; ;
   const values = [];
   if (clientMail) {
     query += " AND client_mail_address = ? ";
     values.push(clientMail);
+  }
+  if (user_name) {
+    query += " AND u2.user_name LIKE ? ";
+    values.push(`%${user_name}%`);
   }
   if (service) {
     query += " AND service_name = ? ";
@@ -104,9 +109,12 @@ router.put("/cancel/:id", (req, res) => {
    הזזנו את ראוטי האנליטיקה לכאן - מעל הראוט הדינמי של /:id
    ======================================================== */
 
-// 1. ראוטר לגרפים החודשיים - משותף לספר ולמנהל
-router.get("/analytics", (req, res) => {
-  const query = `
+// 1. ראוטר לגרפים החודשיים - משותף לספר ולמנהל (שונה ל-POST)
+router.post("/analytics", (req, res) => {
+  const { startDate, endDate } = req.body;
+  const values = [];
+
+  let query = `
     SELECT 
       MONTH(appointment_date) AS month_num, 
       COUNT(appointment_id) AS total_customers, 
@@ -114,35 +122,65 @@ router.get("/analytics", (req, res) => {
     FROM appointments 
     WHERE YEAR(appointment_date) = 2026 
       AND is_cancel = 0 
-      AND appointment_date <= NOW() 
-    GROUP BY MONTH(appointment_date) 
-    ORDER BY month_num ASC`;
+      AND appointment_date <= NOW()`;
 
-  db.query(query, (err, results) => {
+  // הוספת סינון דינמי לפי תאריכים אם נבחרו בדשבורד
+  if (startDate) {
+    query += " AND appointment_date >= ? ";
+    values.push(startDate);
+  }
+  if (endDate) {
+    query += " AND appointment_date <= ? ";
+    values.push(endDate);
+  }
+
+  query += ` GROUP BY MONTH(appointment_date) ORDER BY month_num ASC`;
+
+  db.query(query, values, (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Server Error" });
     return res.status(200).json(results);
   });
 });
 
-// 2. ראוטר נפרד לחישוב אחוז הלקוחות החוזרים - רק למנהל
-router.get("/analytics/repeat-customers", (req, res) => {
-  const repeatCustomersQuery =
-    "SELECT COUNT(DISTINCT client_mail_address) AS total_unique, COUNT(CASE WHEN appointment_count > 1 THEN 1 END) AS repeat_count FROM (SELECT client_mail_address, COUNT(appointment_id) AS appointment_count FROM appointments WHERE is_cancel = 0 AND appointment_date < NOW() GROUP BY client_mail_address) AS customer_counts";
+// 2. ראוטר נפרד לחישוב אחוז הלקוחות החוזרים - רק למנהל (שונה ל-POST)
+router.post("/analytics/repeat-customers", (req, res) => {
+  const { startDate, endDate } = req.body;
+  const values = [];
 
-  db.query(repeatCustomersQuery, (err, results) => {
+  // בניית תנאי התאריכים עבור תת-השאילתה הפנימית
+  let dateConditions = "";
+  if (startDate) {
+    dateConditions += " AND appointment_date >= ? ";
+    values.push(startDate);
+  }
+  if (endDate) {
+    dateConditions += " AND appointment_date <= ? ";
+    values.push(endDate);
+  }
+
+  const repeatCustomersQuery = `
+    SELECT 
+      COUNT(DISTINCT client_mail_address) AS total_unique, 
+      COUNT(CASE WHEN appointment_count > 1 THEN 1 END) AS repeat_count 
+    FROM (
+      SELECT client_mail_address, COUNT(appointment_id) AS appointment_count 
+      FROM appointments 
+      WHERE is_cancel = 0 
+        AND appointment_date < NOW()
+        ${dateConditions} -- מוסיף את התאריכים ישירות לכאן
+      GROUP BY client_mail_address
+    ) AS customer_counts`;
+
+  db.query(repeatCustomersQuery, values, (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Server Error" });
 
-    // לוקחים את המספרים ישירות מתוך השורה הראשונה שחזרה מה-DB
     const totalUnique = results[0].total_unique;
     const repeatCount = results[0].repeat_count;
-
-    // חישוב אחוז פשוט בסיסי
+    
     let repeatPercentage = 0;
     if (totalUnique > 0) {
       repeatPercentage = Math.round((repeatCount / totalUnique) * 100);
-    }
-
-    // מחזירים רק את מספר האחוז הסופי
+  }
     return res.status(200).json({ repeatPercentage: repeatPercentage });
   });
 });

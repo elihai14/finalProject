@@ -115,3 +115,33 @@
     width: 100%;
   }
 }
+/* --- עיצוב תואם עבור אינפוט שם הלקוח בשורת הסינונים --- */
+.filterInput {
+  background: #1a1a1c;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  width: 100%; /* מתאים בצורה חלקה ל-Flexbox של שורת הסינון */
+  max-width: 160px; /* מונע ממנו להימתח יותר מדי במסכים גדולים */
+}
+
+.filterInput:focus {
+  border-color: #dfb76c;
+  box-shadow: 0 0 0 2px rgba(223, 183, 108, 0.1);
+}
+
+.filterInput::placeholder {
+  color: rgba(255, 255, 255, 0.4); /* צבע אפור עדין לטקסט הרמז */
+}
+
+/* התאמה למסכים קטנים - שיימתח לכל הרוחב כמו שאר האינפוטים */
+@media (max-width: 768px) {
+  .filterInput {
+    max-width: 100%;
+    width: 100%;
+  }
+}
