@@ -12,7 +12,7 @@ router.post("/", (req, res) => {
   let { user_name, clientMail, service, startDate, endDate, barberMail } =
     req.body;
   let query =
-    "SELECT appointments.*, u1.user_name AS barberName, u2.user_name AS customerName           FROM appointments LEFT JOIN users u1 ON appointments.barber_mail_address =                 u1.mail_address LEFT JOIN users u2 ON appointments.client_mail_address = u2.mail_address  WHERE appointments.is_cancel = 0"; ;
+    "SELECT appointments.*, u1.user_name AS barberName, u2.user_name AS customerName           FROM appointments LEFT JOIN users u1 ON appointments.barber_mail_address =                 u1.mail_address LEFT JOIN users u2 ON appointments.client_mail_address = u2.mail_address  WHERE appointments.is_cancel = 0";
   const values = [];
   if (clientMail) {
     query += " AND client_mail_address = ? ";
@@ -42,16 +42,15 @@ router.post("/", (req, res) => {
     if (err) return res.status(400).json({ message: "Internal Server Error" });
     if (results.length > 0) {
       return res.status(200).json(results);
-
-    } else // בסיס הנתונים החזיר 0 תוצאות
-    {
-      return res.status(400).json({ message: "אין תורים עדיין" });
+    } // בסיס הנתונים החזיר 0 תוצאות
+    else {
+      return res.status(200).json([]);
     }
   });
 });
 
 // נתיב להוספת תור
-router.post("/add-Appointment", (req, res) => {
+router.post("/add-appointment", (req, res) => {
   // 1. בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {
     // בדיקה אם משתמש לא מחובר
@@ -87,7 +86,6 @@ router.post("/existing-apps", (req, res) => {
     }
 
     return res.status(200).json(results);
-
   });
 });
 
@@ -103,7 +101,6 @@ router.put("/cancel/:id", (req, res) => {
     return res.status(200).json({ message: "appointment deleted successfuly" });
   });
 });
-
 
 /* ========================================================
    הזזנו את ראוטי האנליטיקה לכאן - מעל הראוט הדינמי של /:id
@@ -176,11 +173,11 @@ router.post("/analytics/repeat-customers", (req, res) => {
 
     const totalUnique = results[0].total_unique;
     const repeatCount = results[0].repeat_count;
-    
+
     let repeatPercentage = 0;
     if (totalUnique > 0) {
       repeatPercentage = Math.round((repeatCount / totalUnique) * 100);
-  }
+    }
     return res.status(200).json({ repeatPercentage: repeatPercentage });
   });
 });
@@ -191,8 +188,8 @@ router.get("/:id", (req, res) => {
   db.query(query, [id], (err, results) => {
     // שאילתה לקבלת תור לפי ID של תור מבוקש
     if (err) return res.status(400).json({ message: "Internal Server Error" });
-    if (results.length === 1) // בדיקה אם חזרה תוצאה אחת
-    {
+    if (results.length === 1) {
+      // בדיקה אם חזרה תוצאה אחת
       return res.status(200).json(results);
     } else {
       return res.status(400).json({ message: "תור לא קיים" });

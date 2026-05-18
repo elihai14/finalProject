@@ -147,4 +147,19 @@ router.put("/remove-constraint/:id", (req, res) => {
   });
 });
 
+router.post("/get-code", (req, res) => {
+  if (!req.session || !req.session.user) {
+    return res.status(401).json({ message: "User not logged in" });
+  }
+
+  const { date, barberMail, time } = req.body;
+  const query =
+    "SELECT constraint_code FROM constraints WHERE constraint_date = ? AND mail_address = ? AND ? BETWEEN start_time AND end_time; ";
+  db.query(query, [date, barberMail, time], (err, results) => {
+    if (err) return res.status(500).json({ message: "Internal Error" });
+    if (results > 0) return req.status(200).json(results[0]);
+    return res.status(404).json({ message: "Constraint Not Found" });
+  });
+});
+
 module.exports = router;

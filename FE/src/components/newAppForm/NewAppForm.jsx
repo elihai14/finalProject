@@ -12,6 +12,8 @@ export default function NewAppForm() {
   const [selectedService, setSelectedService] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [hours, setHours] = useState([]);
+  const [selectedHour, setSelectedHour] = useState("");
+
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
@@ -135,7 +137,7 @@ export default function NewAppForm() {
             type="date"
             id="dateInput"
             className={classes.form_input}
-            disabled={!selectedBarber && !selectedService}
+            disabled={!selectedBarber || !selectedService}
             onChange={(e) => setSelectedDate(e.target.value)}
             min={today}
             required
@@ -147,7 +149,8 @@ export default function NewAppForm() {
           <select
             id="hourSelect"
             className={classes.form_input}
-            disabled={!selectedBarber && !selectedService && !selectedDate}
+            disabled={!selectedBarber || !selectedService || !selectedDate}
+            onChange={(e) => setSelectedHour(e.target.value)}
             required
           >
             <option value="">
@@ -162,7 +165,12 @@ export default function NewAppForm() {
           </select>
         </div>
 
-        <button type="submit" className={classes.btn_submit}>
+        <button
+          type="submit"
+          className={classes.btn_submit}
+          onClick={() => handleCreateApp(selectedDate,selectedBarber,selectedHour,selectedService)}
+          disabled={!selectedBarber || !selectedService || !selectedDate || !selectedHour}
+        >
           קבע תור
         </button>
       </form>

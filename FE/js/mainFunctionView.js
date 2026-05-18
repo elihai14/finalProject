@@ -1,3 +1,5 @@
+import Swal from "sweetalert2";
+
 /**
  * 1. בדיקה האם המשתמש קיים בדאטהבייס לפי מייל
  */
@@ -213,4 +215,86 @@ export async function getHoursSelect(barberMail, date, serviceName) {
   }
 
   return [...new Set(hours)];
+}
+export async function handleCreateApp(date, barberMail, time, service_name) {
+  const constraint_code_response = await fetch(
+    `http://localhost:5000/constraints/get-code`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        barberMail: barberMail,
+        date: date,
+        time: time,
+      }),
+    }
+  );
+  const code = constraint_code_response.json();
+  if (!constraint_code_response.ok) {
+    console.error(code.message);
+    Swal.fire({
+      title: "שגיאה !",
+      text: "מצטערים, קרתה שגיאה בקביעת התור",
+      icon: "error",
+      confirmButtonText: "הבנתי",
+      confirmButtonColor: "#3085d6",
+    });
+    return ;
+  }
+  const price_response = await fetch(`http://localhost:5000/services/price`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      barberMail: barberMail,
+      serviceName: service_name,
+    }),
+  });
+  const price = price_response.json();
+  if (!price_response.ok) {
+    console.error(code.message);
+    Swal.fire({
+      title: "שגיאה !",
+      text: "מצטערים, קרתה שגיאה בקביעת התור",
+      icon: "error",
+      confirmButtonText: "הבנתי",
+      confirmButtonColor: "#3085d6",
+    });
+    return ;
+  }
+
+  const addAppResponse = await fetch(`http://localhost:5000/appointments/add-appointment`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      constraintCode:code,
+      barberMail: barberMail,
+      service: service_name,
+      date:date,
+      time:time,
+      price:price
+    }),
+  });
+  addApp = addAppResponse.json();
+  if(!addAppResponse.ok)
+  {
+    console.error(addApp.message);
+    Swal.fire({
+      title: "שגיאה !",
+      text: "מצטערים, קרתה שגיאה בקביעת התור",
+      icon: "error",
+      confirmButtonText: "הבנתי",
+      confirmButtonColor: "#3085d6",
+    });
+    return ;
+  }
+  Swal.fire({
+    title: "התור נקבע בהצלחה",
+    text: "התור נקבע בהצלחה ויופיע מייד ברשימת התורים",
+    icon: "success",
+    confirmButtonText: "מעולה !",
+    confirmButtonColor: "#3085d6",
+  });
 }
