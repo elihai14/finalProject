@@ -10,6 +10,7 @@ import LoginForm from "../components/loginForm/LoginForm";
 import RegisterForm from "../components/registerForm/RegisterForm";
 import DashboardStats from "../components/dashboardStats/DashboardStats";
 import Navbar from "../components/navBar/NavBar";
+import ServicesManagement from "../components/servicesManagement/ServicesManagement";
 
 function App() {
 
@@ -66,6 +67,7 @@ function App() {
           }
         />
         <Route path="/barber-dashboard" element={<NewAppForm />} />
+        <Route path="/manage-services" element={<ServicesManagement />} />
       </Routes>
 
       <Footer prog="Elihai & Daniel" year="2026" />

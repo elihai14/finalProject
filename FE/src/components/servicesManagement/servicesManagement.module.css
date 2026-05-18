@@ -1,0 +1,276 @@
+.management_container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #18181b; /* שחור מט עמוק */
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #f4f4f5;
+  direction: rtl;
+}
+
+.main_title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #dfb76c; /* זהב שמפניה */
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #e4e4e7; /* אפור בהיר יותר */
+  font-size: 1.1rem; /* מ-0.95 */
+  margin-bottom: 32px;
+}
+
+/* עיצוב טופס ההוספה */
+.add_service_form {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  background: #27272a; /* אפור כהה לכרטיס הטופס */
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(223, 183, 108, 0.15);
+  margin-bottom: 32px;
+}
+
+.form_group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.form_group label {
+  font-size: 1.05rem; /* מ-0.9 */
+  font-weight: 700; /* מ-600 */
+  color: #ffffff; /* מ-#e4e4e7 */
+}
+
+.form_group input,
+.form_group select {
+  background: #18181b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 14px;
+  color: #ffffff;
+  font-size: 1.1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form_group input:focus,
+.form_group select:focus {
+  border-color: #dfb76c; /* פוקוס זהב */
+}
+
+.add_btn {
+  background: #dfb76c;
+  color: #18181b;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  height: 46px; /* תואם לגובה השדות */
+}
+
+.add_btn:hover {
+  background: #cf9b4c;
+  transform: translateY(-1px);
+}
+
+/* הודעות מערכת */
+.success, .error {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid #10b981;
+  color: #10b981;
+}
+
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  color: #ef4444;
+}
+
+/* רשימת השירותים */
+.services_list_section {
+  margin-top: 40px;
+}
+
+.services_list_section h3 {
+  font-size: 1.4rem;
+  color: #ffffff;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 10px;
+}
+
+.services_grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.service_card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #27272a;
+  padding: 18px 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.service_card:hover {
+  border-color: rgba(223, 183, 108, 0.3);
+}
+
+.service_info h4 {
+  font-size: 1.35rem; /* מ-1.15 */
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.service_info p {
+  font-size: 0.85rem;
+  color: #a1a1aa;
+  margin: 0;
+}
+
+.left_actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.service_price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #dfb76c;
+}
+
+/* קבוצת כפתורי פעולה */
+.action_buttons_group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.edit_btn {
+  background: transparent;
+  border: 1px solid rgba(223, 183, 108, 0.4);
+  color: #dfb76c;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit_btn:hover {
+  background: rgba(223, 183, 108, 0.08);
+}
+
+.delete_btn {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.delete_btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+/* מצב עריכה פנימי (Inline Edit) */
+.save_btn {
+  background: #10b981;
+  border: none;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save_btn:hover {
+  background: #059669;
+}
+
+.cancel_edit_btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #a1a1aa;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit_fields {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edit_fields label {
+  color: #a1a1aa;
+  font-size: 0.85rem;
+}
+
+.edit_fields select,
+.edit_price_input {
+  background: #18181b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.edit_price_input {
+  width: 80px;
+}
+
+/* מצבי טעינה וריק */
+.loading_text {
+  color: #dfb76c;
+  text-align: center;
+  font-weight: 600;
+  padding: 20px;
+}
+
+.no_services {
+  color: #a1a1aa;
+  text-align: center;
+  padding: 32px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}

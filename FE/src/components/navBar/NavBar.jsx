@@ -55,6 +55,9 @@ const Navbar = ({ user, setUser }) => {
             <span>שלום, {user}</span>
             <button className={classes.navButton} onClick={() => setShowPopup(true)}>עדכון פרטים</button>
             <button className={`${classes.navButton} ${classes.logoutBtn}`} onClick={handleLogout}>התנתקות</button>
+            <button className={classes.nav_services_btn} onClick={() => navigate('/manage-services')}>
+              ניהול שירותים
+            </button>
         </div>
         )}
       {showPopup && <UpdateDetailsForm  onClose={() => setShowPopup(false)} />}
