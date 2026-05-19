@@ -11,6 +11,8 @@ import RegisterForm from "../components/registerForm/RegisterForm";
 import DashboardStats from "../components/dashboardStats/DashboardStats";
 import Navbar from "../components/navBar/NavBar";
 import ServicesManagement from "../components/servicesManagement/ServicesManagement";
+import ServiceList from "../components/serviceList/ServiceList";
+
 
 function App() {
 
@@ -57,7 +59,11 @@ function App() {
 
         {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
         <Route path="/admin-dashboard" element={<AppList />} />
-        <Route
+        <Route path="/manage-services" element={<div>
+                                                  <ServicesManagement /> <ServiceList />
+                                                </div>}
+
+  
           path="/client-dashboard"
           element={
             <div>

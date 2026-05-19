@@ -136,12 +136,13 @@ router.post("/admin/add-service", (req, res) => {
 
 // 👈 3. עדכון: משנה סטטוס ל-0 רק עבור הספר הספציפי בטבלת barber_services ולא לכל המערכת!
 router.put("/remove-service", (req, res) => {
+  
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
   }
-
+  
   const { serviceName } = req.body;
-  const barberMail = req.session.user.mail_address; // לוקחים את המייל מהסשן
+  const barberMail = req.session.user.email; // לוקחים את המייל מהסשן
 
   const query =
     "UPDATE barber_services SET barber_service_status = 0 WHERE service_name = ? AND mail_address = ?";
@@ -150,7 +151,7 @@ router.put("/remove-service", (req, res) => {
     if (err) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
-    if (results.affectedRows === 0) {
+    if (results.affectedRows === 0) {     
       return res.status(404).json({ message: "שירות לא נמצא בתפריט שלך" });
     }
 

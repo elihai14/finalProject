@@ -117,6 +117,7 @@ export default function ServicesManagement() {
   };
 
   const handleDeleteService = async (serviceName) => {
+    
     const warningText = `שים לב! קיימים תורים לשירות זה במערכת.\nביטול השירות יסיר אותו מהתפריט שלך והוא לא יהיה זמין לקביעה מעתה והלאה.\n\nהאם אתה בטוח שברצונך לבטל את השירות?`;
     if (!window.confirm(warningText)) return;
     try {
@@ -124,8 +125,7 @@ export default function ServicesManagement() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ serviceName })
-      });
+        body: JSON.stringify({ serviceName })      });
       if (res.ok) {
         setMessage({ text: 'השירות הוסר מהתפריט שלך בהצלחה!', type: 'success' });
         setMyServices(myServices.filter(service => service.service_name !== serviceName));
@@ -134,6 +134,8 @@ export default function ServicesManagement() {
         setMessage({ text: data.message || 'לא ניתן לבטל את השירות כרגע', type: 'error' });
       }
     } catch (err) {
+        console.log(err);
+        
       setMessage({ text: 'שגיאת תקשורת בביטול השירות', type: 'error' });
     }
   };
@@ -192,7 +194,6 @@ export default function ServicesManagement() {
         </div>
       )}
 
-      {/* 👈 קריאה לקומפוננטת הרשימה שהוצאנו החוצה */}
       <ServiceList 
         isLoading={isLoading}
         myServices={myServices}
