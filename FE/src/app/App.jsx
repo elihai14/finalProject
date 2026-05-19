@@ -10,7 +10,7 @@ import LoginForm from "../components/loginForm/LoginForm";
 import RegisterForm from "../components/registerForm/RegisterForm";
 import DashboardStats from "../components/dashboardStats/DashboardStats";
 import Navbar from "../components/navBar/NavBar";
-import ServicesManagement from "../components/servicesManagement/ServicesManagement";
+import AddService from "../components/addService/AddService";
 import ServiceList from "../components/serviceList/ServiceList";
 
 
@@ -18,7 +18,6 @@ function App() {
 
   const [user , setUser] = useState("");
   const location = useLocation();
-
   useEffect(() => {
       // פונקציה אסינכרונית למשיכת הנתונים
       const fetchUserName = async () => {
@@ -60,20 +59,17 @@ function App() {
         {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
         <Route path="/admin-dashboard" element={<AppList />} />
         <Route path="/manage-services" element={<div>
-                                                  <ServicesManagement /> <ServiceList />
-                                                </div>}
-
-  
-          path="/client-dashboard"
-          element={
-            <div>
-              <NewAppForm />
-              <AppList />
-            </div>
-          }
+                                                  <AddService /> <ServiceList />
+                                                </div>}/>
+        
+        <Route path="/client-dashboard" element={
+                                                  <div>
+                                                    <NewAppForm />
+                                                    <AppList />
+                                                  </div>
+                                                }
         />
         <Route path="/barber-dashboard" element={<NewAppForm />} />
-        <Route path="/manage-services" element={<ServicesManagement />} />
       </Routes>
 
       <Footer prog="Elihai & Daniel" year="2026" />
