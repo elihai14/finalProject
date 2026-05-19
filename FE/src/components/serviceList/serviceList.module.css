@@ -1,0 +1,98 @@
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #18181b;
+  border-radius: 16px;
+  color: white;
+  direction: rtl;
+}
+
+.title {
+  font-size: 1.8rem;
+  color: #dfb76c;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #27272a;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.info h4 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.info p {
+  margin: 4px 0 0;
+  color: #a1a1aa;
+}
+
+.price {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #dfb76c;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.editBtn {
+  background: transparent;
+  border: 1px solid #dfb76c;
+  color: #dfb76c;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.deleteBtn {
+  background: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.saveBtn {
+  background: #10b981;
+  border: none;
+  padding: 8px 14px;
+  color: white;
+  border-radius: 8px;
+}
+
+.cancelBtn {
+  background: transparent;
+  border: 1px solid #999;
+  color: #999;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.editBox {
+  display: flex;
+  gap: 8px;
+}
+
+.editBox input,
+.editBox select {
+  background: #18181b;
+  border: 1px solid #444;
+  color: white;
+  padding: 6px;
+  border-radius: 6px;
+}

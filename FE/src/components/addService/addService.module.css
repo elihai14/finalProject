@@ -1,3 +1,44 @@
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #18181b;
+  border-radius: 16px;
+  color: white;
+  direction: rtl;
+}
+
+.title {
+  color: #dfb76c;
+  margin-bottom: 20px;
+}
+
+.form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #27272a;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.select,
+.input {
+  padding: 10px;
+  border-radius: 8px;
+  background: #18181b;
+  border: 1px solid #333;
+  color: white;
+}
+
+.button {
+  background: #dfb76c;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
 .management_container {
   max-width: 1000px;
   margin: 40px auto;
