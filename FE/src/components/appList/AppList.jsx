@@ -55,40 +55,6 @@ export default function AppList({ refresh }) {
   const userStatus = localStorage.getItem("userStatus");
   const userEmail = localStorage.getItem("userEmail");
 
-  // const fetchAppointments = async () => {
-  //   if (!userEmail) return;
-
-  //   setIsLoading(true);
-  //   setError("");
-
-  //   const requestBody = {};
-  //   if (userStatus === 'ספר') {
-  //     requestBody.barber_mail_address = userEmail;
-  //   } else if (userStatus === 'לקוח') {
-  //     requestBody.client_mail_address = userEmail;
-  //   }
-
-  //   try {
-  //     const response = await fetch(`http://localhost:5000/appointments`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(requestBody)
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-  //       setAppointments(data);
-  //     } else {
-  //       setError(data.message || "לא נמצאו תורים במערכת");
-  //     }
-  //   } catch (err) {
-  //     setError("שגיאת תקשורת עם השרת");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   useEffect(() => {
     fetchAppointments();
   }, [userEmail, userStatus]);
@@ -163,27 +129,20 @@ export default function AppList({ refresh }) {
         <DashboardStats userStatus={userStatus} />
       )}
 
-      {(userStatus === "ספר" || userStatus === "מנהל") && (
+      
         <div className={classes.filterBar}>
           <input
-            type="text"
-            placeholder="שם הלקוח..."
-            className={classes.filterInput}
-            onChange={(e) =>
-              setFilters({ ...filters, user_name: e.target.value })
-            }
-          />
-          <input
-            type="date"
-            onChange={(e) =>
-              setFilters({ ...filters, startDate: e.target.value })
-            }
-          />
+              type="date"
+              onChange={(e) =>
+                setFilters({ ...filters, startDate: e.target.value })
+              }
+            />
           <input
             type="date"
             onChange={(e) =>
               setFilters({ ...filters, endDate: e.target.value })
             }
+            min={filters.startDate}
           />
           <select
             onChange={(e) =>
@@ -197,9 +156,34 @@ export default function AppList({ refresh }) {
               </option>
             ))}
           </select>
+            {
+              (userStatus === "מנהל" || userStatus === "ספר") &&
+                  <input
+                type="text"
+                placeholder="שם הלקוח..."
+                className={classes.filterInput}
+                onChange={(e) =>
+                  setFilters({ ...filters, user_name: e.target.value })
+                }
+              />
+            }
+
+          {(userStatus === "מנהל" || userStatus === "לקוח") &&
+            <input
+            type="text"
+            placeholder="שם ספר..."
+            className={classes.filterInput}
+            onChange={(e) =>
+              setFilters({ ...filters, user_name: e.target.value })
+            }
+          />
+          }
+          
           <button onClick={fetchAppointments}>סנן</button>
         </div>
-      )}
+      
+
+
 
       {successMessage && (
         <div className={classes.success_message}>{successMessage}</div>
