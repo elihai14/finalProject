@@ -216,7 +216,9 @@ export async function getHoursSelect(barberMail, date, serviceName) {
 
   return [...new Set(hours)];
 }
-export async function handleCreateApp(date, barberMail, time, service_name) {
+export async function handleCreateApp(date, barberMail, time, service_name, 
+                                      setSelectedBarber,setSelectedService,setSelectedDate,setSelectedHour,setHours
+) {
   const constraint_code_response = await fetch(
     `http://localhost:5000/constraints/get-code`,
     {
@@ -230,7 +232,7 @@ export async function handleCreateApp(date, barberMail, time, service_name) {
       }),
     }
   );
-  const code = constraint_code_response.json();
+  const code = await constraint_code_response.json();
   if (!constraint_code_response.ok) {
     console.error(code.message);
     Swal.fire({
@@ -251,7 +253,7 @@ export async function handleCreateApp(date, barberMail, time, service_name) {
       serviceName: service_name,
     }),
   });
-  const price = price_response.json();
+  const price = await price_response.json();
   if (!price_response.ok) {
     console.error(code.message);
     Swal.fire({
@@ -264,20 +266,23 @@ export async function handleCreateApp(date, barberMail, time, service_name) {
     return ;
   }
 
-  const addAppResponse = await fetch(`http://localhost:5000/appointments/add-appointment`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({
-      constraintCode:code,
-      barberMail: barberMail,
-      service: service_name,
-      date:date,
-      time:time,
-      price:price
-    }),
-  });
-  addApp = addAppResponse.json();
+  const addAppResponse = await fetch(
+    `http://localhost:5000/appointments/add-appointment`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        constraintCode: code.constraint_code,
+        barberMail: barberMail,
+        service: service_name,
+        date: date,
+        time: time,
+        price: price.price,
+      }),
+    }
+  );
+  const addApp = await addAppResponse.json();
   if(!addAppResponse.ok)
   {
     console.error(addApp.message);
@@ -297,4 +302,9 @@ export async function handleCreateApp(date, barberMail, time, service_name) {
     confirmButtonText: "מעולה !",
     confirmButtonColor: "#3085d6",
   });
+  setSelectedBarber("");
+  setSelectedService("");
+  setSelectedDate("");
+  setSelectedHour("");
+  setHours([]);
 }

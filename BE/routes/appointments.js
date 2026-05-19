@@ -51,20 +51,24 @@ router.post("/", (req, res) => {
 
 // נתיב להוספת תור
 router.post("/add-appointment", (req, res) => {
+  console.log("innnnnnnnnnnn");
+  
   // 1. בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {
     // בדיקה אם משתמש לא מחובר
     return res.status(401).json({ message: "User not logged in" });
   }
 
+  console.log(req.body);
+  
   const { constraintCode, barberMail, service, date, time, price } = req.body;
   const userMail = req.session.user.email;
 
   const insertQuery =
-    "INSERT INTO appointments (appointment_time,appointment_date, constraint_code,service_name,client_mail_address,barber_mail_address,price) VALUES(?,?,?,?,?,?,?)";
+    "INSERT INTO appointments (appointment_time,appointment_date, constraint_code,service_name,client_mail_address,barber_mail_address,price,is_cancel) VALUES(?,?,?,?,?,?,?,?)";
   db.query(
     insertQuery,
-    [time, date, constraintCode, service, userMail, barberMail, price],
+    [time, date, constraintCode, service, userMail, barberMail, price,0],
     (err, result) => {
       if (err) return res.status(500).json({ message: "שגיאה בהוספת התור" });
 

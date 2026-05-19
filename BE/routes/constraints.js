@@ -154,10 +154,10 @@ router.post("/get-code", (req, res) => {
 
   const { date, barberMail, time } = req.body;
   const query =
-    "SELECT constraint_code FROM constraints WHERE constraint_date = ? AND mail_address = ? AND ? BETWEEN start_time AND end_time; ";
+    "SELECT constraint_code FROM constraints WHERE date = ? AND mail_address = ? AND ? BETWEEN start_time AND end_time; ";
   db.query(query, [date, barberMail, time], (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Error" });
-    if (results > 0) return req.status(200).json(results[0]);
+    if (results.length > 0) return res.status(200).json(results[0]);
     return res.status(404).json({ message: "Constraint Not Found" });
   });
 });

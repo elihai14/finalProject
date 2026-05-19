@@ -1,8 +1,8 @@
 import classes from "./newAppForm.module.css";
-import { getHoursSelect } from "../../../js/mainFunctionView";
+import { getHoursSelect, handleCreateApp } from "../../../js/mainFunctionView";
 import { useState, useEffect } from "react";
 
-export default function NewAppForm() {
+export default function NewAppForm({ onSuccess }) {
   const [barbers, setBarbers] = useState([]); // מצב לשמירת רשימת הספרים
   const [loading, setLoading] = useState(true);
   const [selectedBarber, setSelectedBarber] = useState(""); // הספר שנבחר
@@ -43,23 +43,23 @@ export default function NewAppForm() {
       return;
     }
 
-      const fetchServices = async () => {
-    setLoadingServices(true);
-    try {
-      // תיקון: שולחים את המפתח הנכון שה-Backend וה-DB מצפים לו!
-      const response = await fetch(`http://localhost:5000/services`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ barberMail: selectedBarber }),
-      });
-      const data = await response.json();
-      setServices(Array.isArray(data) ? data : []);
-    } catch (error) {
-      setServices([]);
-    } finally {
-      setLoadingServices(false);
-    }
-  };
+    const fetchServices = async () => {
+      setLoadingServices(true);
+      try {
+        // תיקון: שולחים את המפתח הנכון שה-Backend וה-DB מצפים לו!
+        const response = await fetch(`http://localhost:5000/services`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ barberMail: selectedBarber }),
+        });
+        const data = await response.json();
+        setServices(Array.isArray(data) ? data : []);
+      } catch (error) {
+        setServices([]);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
 
     fetchServices();
   }, [selectedBarber]);
@@ -78,6 +78,22 @@ export default function NewAppForm() {
 
     fetchHours();
   }, [selectedBarber, selectedService, selectedDate]);
+
+  const submitAppointment = async () => {
+    await handleCreateApp(
+      selectedDate,
+      selectedBarber,
+      selectedHour,
+      selectedService,
+      setSelectedBarber,
+      setSelectedService,
+      setSelectedDate,
+      setSelectedHour,
+      setHours
+    );
+
+    onSuccess?.(); // 👈 זה הרענון
+  };
 
   return (
     <div className={classes.container} id="addApp-form">
@@ -126,7 +142,7 @@ export default function NewAppForm() {
             </option>
             {services.map((e) => (
               <option key={e.service_name} value={e.service_name}>
-                {e.service_name}
+                {e.service_name} {e.price}
               </option>
             ))}
           </select>
@@ -166,10 +182,15 @@ export default function NewAppForm() {
         </div>
 
         <button
-          type="submit"
+          type="button"
+          onClick={submitAppointment}
           className={classes.btn_submit}
-          onClick={() => handleCreateApp(selectedDate,selectedBarber,selectedHour,selectedService)}
-          disabled={!selectedBarber || !selectedService || !selectedDate || !selectedHour}
+          disabled={
+            !selectedBarber ||
+            !selectedService ||
+            !selectedDate ||
+            !selectedHour
+          }
         >
           קבע תור
         </button>

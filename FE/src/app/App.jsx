@@ -45,6 +45,11 @@ function App() {
   
       fetchUserName();
     }, [location.pathname]);
+    const [refreshAppointments, setRefreshAppointments] = useState(0);
+
+    const triggerRefresh = () => {
+      setRefreshAppointments((prev) => prev + 1);
+    };
 
   return (
     <div>
@@ -61,19 +66,18 @@ function App() {
         <Route path="/admin-dashboard" element={<AppList />} />
         <Route path="/manage-services" element={<div>
                                                   <ServicesManagement /> <ServiceList />
-                                                </div>}
+                                                </div>}/>
 
   
-          path="/client-dashboard"
+          <Route path="/client-dashboard"
           element={
             <div>
-              <NewAppForm />
-              <AppList />
+              <NewAppForm onSuccess = {triggerRefresh }/>
+              <AppList refresh = {refreshAppointments}/>
             </div>
           }
         />
         <Route path="/barber-dashboard" element={<NewAppForm />} />
-        <Route path="/manage-services" element={<ServicesManagement />} />
       </Routes>
 
       <Footer prog="Elihai & Daniel" year="2026" />
