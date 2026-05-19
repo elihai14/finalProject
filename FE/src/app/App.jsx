@@ -15,6 +15,7 @@ import ServiceList from "../components/serviceList/ServiceList";
 
 function App() {
   const [user, setUser] = useState("");
+  const [status, setStatus] = useState("");
   const location = useLocation();
   const [refresh, setRefresh] = useState(false);
   useEffect(() => {
@@ -42,6 +43,31 @@ function App() {
 
     fetchUserName();
   }, [location.pathname]);
+  useEffect(() => {
+    // פונקציה אסינכרונית למשיכת הנתונים
+    const fetchUserStatus = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/users/get-status", {
+          credentials: "include",
+          method: "POST",
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          console.log(data, "data");
+
+          setStatus("");
+        } else {
+          const statusString = String(data.status);
+
+          setStatus(statusString); // שמירת הנתונים ב-State
+        }
+      } catch (error) {
+        console.error("שגיאה", error);
+      }
+    };
+
+    fetchUserStatus();
+  }, [location.pathname]);
   const [refreshAppointments, setRefreshAppointments] = useState(0);
 
   const triggerRefresh = () => {
@@ -52,7 +78,7 @@ function App() {
     <div>
       <Header />
 
-      <Navbar user={user} setUser={setUser} />
+      <Navbar user={user} setUser={setUser} status={status} setStatus={setStatus}/>
 
       <Routes>
         <Route path="/" element={<LoginForm />} />
@@ -79,7 +105,7 @@ function App() {
             </div>
           }
         />
-        <Route path="/barber-dashboard" element={<NewAppForm />} />
+        <Route path="/barber-dashboard" element= {<div>{<AppList />}{<DashboardStats userStatus={status} />}</div>}  />
       </Routes>
 
       <Footer prog="Elihai & Daniel" year="2026" />

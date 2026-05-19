@@ -3,7 +3,9 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'; // הוספנ
 import classes from './navBar.module.css';
 import UpdateDetailsForm from "../updateDetailsForm/UpdateDetailsForm";
 
-const Navbar = ({ user, setUser }) => {
+const Navbar = ({ user, setUser, status, setStatus}) => {
+  console.log(status);
+  
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
   const location = useLocation(); // מאפשר לנו לדעת באיזה דף אנחנו
@@ -58,10 +60,16 @@ const Navbar = ({ user, setUser }) => {
             <button className={classes.nav_services_btn} onClick={() => navigate('/manage-services')}>
               ניהול שירותים
             </button>
+            <button className={classes.nav_services_btn} onClick={() => status === "לקוח" ?  navigate('/client-dashboard') : status === "ספר" ? navigate('/barber-dashboard') : 
+              navigate('/admin-dashboard')
+            } >
+             דף הבית
+            </button>
         </div>
         )}
       {showPopup && <UpdateDetailsForm  onClose={() => setShowPopup(false)} />}
     </nav>
+
   );
 };
 

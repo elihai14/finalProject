@@ -44,6 +44,26 @@ router.post("/current", (req, res) => {
   });
 });
 
+router.post("/get-status", (req, res) => {
+  if (!req.session || !req.session.user || !req.session.user.email) {
+    return res.status(401).json({ message: "Unauthorized: Please log in" });
+  }
+  const mail = req.session.user.email;
+  const query = "SELECT status FROM users WHERE mail_address = ?";
+
+  db.query(query, [mail], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    if (results.length > 0) {
+      return res.status(200).json(results[0]);
+    } else {
+      return res.status(404).json({ message: "User not found" });
+    }
+  });
+});
+
 router.post("/register", (req, res) => {
   const { fullName, phoneNumber, mailAddress } = req.body;
 

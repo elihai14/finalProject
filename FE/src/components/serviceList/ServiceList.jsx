@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import classes from "./serviceList.module.css";
+import Swal from "sweetalert2"; 
 import { use } from "react";
 
 export default function ServiceList({refresh}) {
@@ -61,8 +62,22 @@ export default function ServiceList({refresh}) {
   };
 
   const handleDelete = async (serviceName) => {
-    if (!window.confirm("למחוק שירות?")) return;
+  const result = await Swal.fire({
+    title: "למחוק שירות?",
+    text: "השירות כולל תורים קיימים במערכת. לאחר ההסרה, השירות יוסר מתפריט השירותים שלך ולא יהיה זמין לקביעת תורים חדשים." ,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "כן, למחוק",
+    cancelButtonText: "ביטול",
+    background: "#1a1a1a",
+    color: "#fff",
+    confirmButtonColor: "#ef4444",
+    cancelButtonColor: "#555",
+  });
 
+  if (!result.isConfirmed) return;
+
+  try {
     await fetch("http://localhost:5000/services/remove-service", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -70,8 +85,28 @@ export default function ServiceList({refresh}) {
       body: JSON.stringify({ serviceName }),
     });
 
+    await Swal.fire({
+      icon: "success",
+      title: "נמחק בהצלחה",
+      timer: 2000,
+      showConfirmButton: false,
+      background: "#1a1a1a",
+      color: "#fff",
+    });
+
     fetchServices();
-  };
+  } catch (err) {
+    console.error(err);
+
+    Swal.fire({
+      icon: "error",
+      title: "שגיאה במחיקה",
+      text: "נסה שוב מאוחר יותר",
+      background: "#1a1a1a",
+      color: "#fff",
+    });
+  }
+};
 
   return (
     <div className={classes.container}>
