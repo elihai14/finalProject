@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import classes from "./serviceList.module.css";
+import { use } from "react";
 
-export default function ServiceList() {
+export default function ServiceList({refresh}) {
   const [myServices, setMyServices] = useState([]);
   const [editingName, setEditingName] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -30,6 +31,9 @@ export default function ServiceList() {
     fetchServices();
   }, []);
 
+  useEffect(()=>{
+    fetchServices();
+}, [refresh]);
 
   const startEditing = (service) => {
     setEditingName(service.service_name);

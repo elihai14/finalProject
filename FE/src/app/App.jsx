@@ -16,6 +16,7 @@ import ServiceList from "../components/serviceList/ServiceList";
 function App() {
   const [user, setUser] = useState("");
   const location = useLocation();
+  const [refresh, setRefresh] = useState(false);
   useEffect(() => {
     // פונקציה אסינכרונית למשיכת הנתונים
     const fetchUserName = async () => {
@@ -64,7 +65,7 @@ function App() {
           path="/manage-services"
           element={
             <div>
-              <ServicesManagement /> <ServiceList />
+              <AddService setRefresh={setRefresh} /> <ServiceList refresh={refresh}/>
             </div>
           }
         />

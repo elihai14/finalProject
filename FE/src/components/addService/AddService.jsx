@@ -214,7 +214,7 @@ import { useEffect, useState } from "react";
 import classes from "./addService.module.css";
 import Swal from 'sweetalert2';
 
-export default function AddService() {
+export default function AddService({setRefresh}) {
   const [globalServices, setGlobalServices] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [newService, setNewService] = useState({
@@ -277,6 +277,7 @@ export default function AddService() {
                     color: '#fff'                 // טקסט לבן
                   });
 
+        setRefresh(prev => !prev);
 
         setNewService((prev) => ({
           ...prev,
