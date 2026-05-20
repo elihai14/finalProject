@@ -12,6 +12,7 @@ import DashboardStats from "../components/dashboardStats/DashboardStats";
 import Navbar from "../components/navBar/NavBar";
 import AddService from "../components/addService/AddService";
 import ServiceList from "../components/serviceList/ServiceList";
+import SideBar from "../components/sideBar/SideBar";
 
 function App() {
   const [user, setUser] = useState("");
@@ -79,11 +80,12 @@ function App() {
       <Header />
 
       <Navbar user={user} setUser={setUser} status={status} setStatus={setStatus}/>
-
+      <SideBar />
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
+        
 
         {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
         <Route path="/admin-dashboard" element={<AppList />} />

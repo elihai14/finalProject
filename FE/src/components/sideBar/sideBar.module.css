@@ -1,0 +1,115 @@
+/* קונטיינר כללי */
+.sideBarContainer {
+  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  direction: rtl; /* מבטיח שהטקסט והכיוון יהיו מימין לשמאל */
+}
+
+/* כפתור ההמבורגר - מקובע עכשיו לצד ימין למעלה */
+.hamburger {
+  position: fixed;
+  top: 20px;
+  right: 20px; /* 👈 שונה ל-right */
+  z-index: 1000;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 25px;
+  padding: 0;
+}
+
+.bar {
+  width: 100%;
+  height: 3px;
+  background-color: #bfa15f; /* זהב */
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+/* אנימציית ה-X בזהב כשהתפריט פתוח */
+.open1 { transform: rotate(45deg) translate(5px, 5px); }
+.open2 { opacity: 0; }
+.open3 { transform: rotate(-45deg) translate(7px, -7px); }
+
+/* תפריט הצד (המגירה) - נשלף מצד ימין */
+.sidebarNav {
+  position: fixed;
+  top: 0;
+  right: -280px; /* 👈 מוחבא מחוץ למסך בצד ימין */
+  width: 280px;
+  height: 100vh;
+  background-color: #111111; /* שחור עמוק */
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+  padding-top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transition: right 0.3s ease; /* 👈 אנימציה חלקה מימין */
+  z-index: 999;
+  border-left: 2px solid #bfa15f; /* 👈 פס זהב דק בצד שמאל של המגירה */
+}
+
+/* כשהתפריט פעיל - הוא נכנס למסך */
+.sidebarNav.active {
+  right: 0; /* 👈 זז לאפס מצד ימין */
+}
+
+/* הקישורים והכפתורים בתוך המגירה */
+.sidebarNav a, .navButton {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* רווח בין האייקון לטקסט */
+  padding: 15px 25px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 18px;
+  text-align: right;
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* אפקט הובר בזהב */
+.sidebarNav a:hover, .navButton:hover {
+  background-color: #1a1a1a;
+  color: #bfa15f;
+  padding-right: 35px; /* תזוזה קטנה ימינה */
+}
+
+/* רקע כהה לשאר האתר כשהתפריט פתוח */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 998;
+}
+.sidebarNav a, .navButton {
+  display: flex;         /* מושיב את האייקון והטקסט באותה שורה */
+  align-items: center;   /* ממקם אותם באותו קו גובה בדיוק */
+  gap: 12px;             /* מייצר רווח קבוע של 12 פיקסלים בין האייקון למילים */
+  padding: 15px 25px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 18px;
+  text-align: right;
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* עיצוב ספציפי לאייקונים (אם תרצה לשנות להם צבע או גודל) */
+.navIcon {
+  font-size: 20px;       /* קובע את הגודל של האייקון */
+  color: #bfa15f;        /* צבע זהב יוקרתי לאייקונים שיתאים בול ללוגו! */
+}

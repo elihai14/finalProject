@@ -4,7 +4,6 @@ import classes from './navBar.module.css';
 import UpdateDetailsForm from "../updateDetailsForm/UpdateDetailsForm";
 
 const Navbar = ({ user, setUser, status, setStatus}) => {
-  console.log(status);
   
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
@@ -54,17 +53,8 @@ const Navbar = ({ user, setUser, status, setStatus}) => {
         </div>
         ) : (
         <div className={classes.userLinks}>
+          <button className={`${classes.navButton} ${classes.logoutBtn}`} onClick={handleLogout}>התנתקות</button>
             <span>שלום, {user}</span>
-            <button className={classes.navButton} onClick={() => setShowPopup(true)}>עדכון פרטים</button>
-            <button className={`${classes.navButton} ${classes.logoutBtn}`} onClick={handleLogout}>התנתקות</button>
-            <button className={classes.nav_services_btn} onClick={() => navigate('/manage-services')}>
-              ניהול שירותים
-            </button>
-            <button className={classes.nav_services_btn} onClick={() => status === "לקוח" ?  navigate('/client-dashboard') : status === "ספר" ? navigate('/barber-dashboard') : 
-              navigate('/admin-dashboard')
-            } >
-             דף הבית
-            </button>
         </div>
         )}
       {showPopup && <UpdateDetailsForm  onClose={() => setShowPopup(false)} />}
