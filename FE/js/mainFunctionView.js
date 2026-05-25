@@ -308,3 +308,32 @@ export async function handleCreateApp(date, barberMail, time, service_name,
   setSelectedHour("");
   setHours([]);
 }
+
+export function getHoursArr(startTime, endTime) {
+    const result = [];
+
+    // המרה לדקות
+    const [startH, startM] = startTime.split(":").map(Number);
+    const [endH, endM] = endTime.split(":").map(Number);
+
+    let current = startH * 60 + startM;
+    const end = endH * 60 + endM;
+
+    while (current <= end) {
+        const hours = Math.floor(current / 60)
+            .toString()
+            .padStart(2, "0");
+
+        const minutes = (current % 60)
+            .toString()
+            .padStart(2, "0");
+
+        result.push(`${hours}:${minutes}`);
+
+        // קפיצה של רבע שעה
+        current += 15;
+    }
+
+    return result;
+}
+

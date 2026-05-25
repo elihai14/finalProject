@@ -88,7 +88,7 @@ router.post("/add-constraint", (req, res) => {
   if (status != "ספר" && status != "מנהל")
     return res.status(403).json({ message: "Not authorized" });
 
-  const mail = req.session.user.mail_address;
+  const mail = req.session.user.email;
   const { date, start_time, end_time } = req.body;
 
   if (start_time >= end_time)

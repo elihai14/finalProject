@@ -16,6 +16,7 @@ import SideBar from "../components/sideBar/SideBar";
 import BusyHours from "../components/busyHours/BusyHours";
 import BusyDays from '../components/busyDays/BusyDays';
 
+import AddConstraintForm from "../components/addConstraintForm/AddConstraintForm";
 
 function App() {
   const [user, setUser] = useState("");
@@ -83,13 +84,19 @@ function App() {
     <div>
       <Header />
 
-      <Navbar user={user} setUser={setUser} status={status} setStatus={setStatus}/>
+      <Navbar
+        user={user}
+        setUser={setUser}
+        status={status}
+        setStatus={setStatus}
+      />
       <SideBar />
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
-        
+
+
         {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
         <Route path="/admin-dashboard" element={<div>{<AppList />} {<BusyHours />} {<BusyDays/>}</div>} />
 
@@ -97,7 +104,8 @@ function App() {
           path="/manage-services"
           element={
             <div>
-              <AddService setRefresh={setRefresh} /> <ServiceList refresh={refresh}/>
+              <AddService setRefresh={setRefresh} />{" "}
+              <ServiceList refresh={refresh} />
             </div>
           }
         />
@@ -111,7 +119,23 @@ function App() {
             </div>
           }
         />
-        <Route path="/barber-dashboard" element= {<div>{<AppList />}{<DashboardStats userStatus={status} />}</div>}  />
+        <Route
+          path="/barber-dashboard"
+          element={
+            <div>
+              {<AppList />}
+              {<DashboardStats userStatus={status} />}
+            </div>
+          }
+        />
+        <Route
+          path="/barbers-constraints"
+          element={
+            <div>
+              {<AddConstraintForm/>}
+            </div>
+          }
+        />
       </Routes>
 
       <Footer prog="Elihai & Daniel" year="2026" />

@@ -9,6 +9,8 @@ const usersRouter = require("./routes/users");
 const appRouter = require("./routes/appointments");
 const servicesRouter = require("./routes/services");
 const constraintsRouter = require("./routes/constraints");
+const daysHoursRouter = require("./routes/daysHours");
+
 
 const port = 5000;
 
@@ -28,7 +30,7 @@ const distPath = path.join(__dirname, "..", "FE", "dist");
 // --- Middleware ---
 app.use(
   cors({
-    origin: "http://localhost:3000", // או 3000 לפי React שלך
+    origin: "http://localhost:3001", // או 3000 לפי React שלך
     credentials: true,
   })
 );
@@ -56,6 +58,9 @@ app.use("/users", usersRouter);
 app.use("/appointments", appRouter);
 app.use("/services", servicesRouter);
 app.use("/constraints", constraintsRouter);
+app.use("/daysHours", daysHoursRouter);
+
+
 
 // --- Catch-all ---
 app.use((req, res, next) => {
