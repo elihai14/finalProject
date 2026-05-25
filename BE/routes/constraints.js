@@ -147,6 +147,32 @@ router.put("/remove-constraint/:id", (req, res) => {
   });
 });
 
+router.get("/business-hours", (req, res) => {
+  const query = "SELECT * FROM business_hours ORDER BY id ASC";
+  db.query(query, (err, results) => {
+    if (err) return res.status(500).json({ error: "Database error" });
+    return res.status(200).json(results);
+  });
+});
+
+router.put("/update-hours/:id", (req, res) => {
+  if (req.session.user.status != "מנהל")
+    return res.status(403).json({ message: "Not authorized" });
+
+  const { id } = req.params;
+  const { start_time, end_time, is_open } = req.body;
+
+  const query =
+    "UPDATE business_hours SET start_time = ? , end_time = ? , is_open = ?           WHERE id = ?";
+
+  db.query(query, [start_time, end_time, is_open, id], (err, results) => {
+    if (err) return res.status(500).json({ message: "Internal Error" });
+    if (results.affectedRows > 0)
+      return res.status(200).json({ message: "שעות הפעילות עודכנו בהצלחה!" });
+    return res.status(404).json({ message: "לא נמצא יום לעדכון" });
+  });
+});
+
 router.post("/get-code", (req, res) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });

@@ -13,6 +13,9 @@ import Navbar from "../components/navBar/NavBar";
 import AddService from "../components/addService/AddService";
 import ServiceList from "../components/serviceList/ServiceList";
 import SideBar from "../components/sideBar/SideBar";
+import BusyHours from "../components/busyHours/BusyHours";
+import BusyDays from '../components/busyDays/BusyDays';
+
 
 function App() {
   const [user, setUser] = useState("");
@@ -27,15 +30,16 @@ function App() {
           credentials: "include",
           method: "POST",
         });
-        const data = await response.json();
-        if (!response.ok) {
-          console.log(data, "data");
 
+        // הגדרה אחת בלבד!
+        const data = await response.json(); 
+
+        if (!response.ok) {
+          if (response.status !== 401) console.log(data, "data");
           setUser("");
         } else {
           const nameString = String(data.user_name);
-
-          setUser(nameString); // שמירת הנתונים ב-State
+          setUser(nameString);
         }
       } catch (error) {
         console.error("שגיאה", error);
@@ -86,9 +90,9 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
         
-
         {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
-        <Route path="/admin-dashboard" element={<AppList />} />
+        <Route path="/admin-dashboard" element={<div>{<AppList />} {<BusyHours />} {<BusyDays/>}</div>} />
+
         <Route
           path="/manage-services"
           element={

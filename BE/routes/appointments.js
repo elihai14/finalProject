@@ -185,6 +185,54 @@ router.post("/analytics/repeat-customers", (req, res) => {
     return res.status(200).json({ repeatPercentage: repeatPercentage });
   });
 });
+
+router.get("/busy-hours", (req, res) => {
+  // השאילתה הזו מושכת תורים רק אם הם נפלו ביום ושעה שהעסק מוגדר כפתוח
+  const query = `
+    SELECT a.appointment_time, COUNT(*) as total_count 
+    FROM appointments a
+    JOIN business_hours bh ON DAYOFWEEK(a.appointment_date) = bh.id
+    WHERE MONTH(a.appointment_date) = MONTH(CURDATE()) 
+      AND YEAR(a.appointment_date) = YEAR(CURDATE())
+      AND a.is_cancel = 0
+      AND bh.is_open = 1
+      -- כאן אנחנו מוודאים שהתור הוא בטווח השעות של אותו יום
+      AND TIME(a.appointment_time) >= bh.start_time 
+      AND TIME(a.appointment_time) < bh.end_time
+    GROUP BY a.appointment_time
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) return res.status(500).json({ error: "Database error" });
+
+    // כאן נמשיך את הלוגיקה שבנינו קודם כדי למלא את האובייקט
+    // ... (המשך הלוגיקה של ה-monthlyTotals)
+    return res.status(200).json(results);
+  });
+});
+
+router.post("/busy-days", async (req, res) => {
+  const query = `
+    SELECT 
+        CASE DAYOFWEEK(appointment_date)
+            WHEN 1 THEN 'ראשון' WHEN 2 THEN 'שני' WHEN 3 THEN 'שלישי'
+            WHEN 4 THEN 'רביעי' WHEN 5 THEN 'חמישי' WHEN 6 THEN 'שישי'
+            WHEN 7 THEN 'שבת'
+        END as day_name,
+        COUNT(*) as total_appointments
+    FROM appointments
+    WHERE is_cancel = 0
+    GROUP BY DAYOFWEEK(appointment_date) -- מקבץ לפי מספר היום בשבוע
+    ORDER BY total_appointments DESC
+    LIMIT 3;
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
 // נתיב לקבלת תור לפי ID (עכשיו הוא אחרון, אז הוא לא יבלע את המילה analytics)
 router.get("/:id", (req, res) => {
   const id = req.params.id;
@@ -200,5 +248,6 @@ router.get("/:id", (req, res) => {
     }
   });
 });
+
 
 module.exports = router;

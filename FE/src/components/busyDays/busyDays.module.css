@@ -1,0 +1,52 @@
+.container {
+  background-color: #1a1a1e; /* אותו רקע כמו של ה-stat_card */
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+  padding: 26px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.container h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #a1a1aa;
+  margin: 0 0 20px 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03); /* שחור שקוף עדין */
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.rank {
+  background: #dfb76c; /* הזהב שלך */
+  color: #1a1a1e; /* השחור של הרקע כדי שיהיה קריא */
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  margin-left: 15px;
+  font-size: 0.9rem;
+}
+
+.dayName {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+}

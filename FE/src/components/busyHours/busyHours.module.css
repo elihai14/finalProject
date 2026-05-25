@@ -1,0 +1,79 @@
+.container { 
+    padding: 15px;
+    font-family: sans-serif;
+}
+
+.hoursGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.hourCard {
+    background-color: #0f172a; 
+    padding: 10px;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid #1e293b;
+    color: #94a3b8;
+    transition: all 0.3s ease;
+    
+    /* סידור הטקסט למניעת הידבקות */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 75px;
+}
+
+/* אפקט ריחוף להוספת חיים לדאשבורד */
+.hourCard:hover {
+    transform: translateY(-3px);
+    border-color: #334155;
+    filter: brightness(1.2);
+    cursor: default;
+}
+
+/* הגדרת הצבעים המשופרת */
+.lowLoad { 
+    background-color: rgba(16, 185, 129, 0.1); 
+    border-color: #10b981; 
+    color: #10b981; 
+}
+.mediumLoad { 
+    background-color: rgba(251, 191, 36, 0.1); 
+    border-color: #fbbf24; 
+    color: #fbbf24; 
+}
+.highLoad { 
+    background-color: rgba(239, 68, 68, 0.1); 
+    border-color: #ef4444; 
+    color: #ef4444; 
+}
+
+/* עיצוב הטקסט בתוך הריבוע */
+.timeLabel { font-weight: bold; font-size: 14px; }
+.countLabel { font-size: 11px; margin-top: 2px; }
+
+/* מקרא למטה */
+.legend_container { 
+    display: flex; 
+    justify-content: center; 
+    gap: 20px; 
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 15px;
+}
+
+.legend_item { display: flex; align-items: center; gap: 6px; }
+
+.legend_dot { 
+    width: 10px; 
+    height: 10px; 
+    border-radius: 50%; 
+}
+
+.red { background-color: #ef4444; }
+.yellow { background-color: #fbbf24; }
+.green { background-color: #10b981; }

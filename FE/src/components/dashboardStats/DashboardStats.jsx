@@ -1,24 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import classes from './dashboardStats.module.css'; // 👈 ייבוא ה-CSS מודול החדש
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
+import classes from './dashboardStats.module.css';
+import BusyHours from '../busyHours/BusyHours';
+import BusyDays from '../busyDays/BusyDays';
 
 const monthNames = {
-  1: 'ינו', 2: 'פבר', 3: 'מרץ', 4: 'אפר', 5: 'מאי', 6: 'יוני',
-  7: 'יולי', 8: 'אוג', 9: 'ספט', 10: 'אוק', 11: 'נוב', 12: 'דצ'
+  1: 'ינו', 2: 'פבר', 3: 'מרץ', 4: 'אפר', 5: 'מאי', 6: 'יוני', 7: 'יולי', 8: 'אוג', 9: 'ספט',
+  10: 'אוק', 11: 'נוב', 12: 'דצ'
 };
 
 function DashboardStats({ userStatus }) {
   const [chartData, setChartData] = useState([]);
   const [repeatPercentage, setRepeatPercentage] = useState(0);
   const [loading, setLoading] = useState(true);
+
   const [dashDates, setDashDates] = useState({
     startDate: '',
     endDate: ''
   });
-  
 
   useEffect(() => {
-    // 1. ה-fetch הראשון שמביא את נתוני הגרפים (כבר עודכן ל-POST)
+    setLoading(true);
+
     fetch('http://localhost:5000/appointments/analytics', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -27,122 +37,144 @@ function DashboardStats({ userStatus }) {
         endDate: dashDates.endDate
       })
     })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return res.json();
-      })
-      .then(data => {
-        const formattedData = data.map(item => ({
-          name: monthNames[item.month_num] || item.month_num,
-          customers: item.total_customers,
-          revenue: item.total_revenue
-        }));
-        setChartData(formattedData);
+      .then((res) => res.json())
+      .then((data) => {
+        setChartData(
+          data.map((item) => ({
+            name: monthNames[item.month_num] || item.month_num,
+            customers: item.total_customers,
+            revenue: item.total_revenue
+          }))
+        );
 
-        // 2. עדכון ה-fetch השני ל-POST (כדי שישלח את התאריכים לחישוב הלקוחות החוזרים)
         if (userStatus === 'מנהל') {
-          return fetch('http://localhost:5000/appointments/analytics/repeat-customers', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              startDate: dashDates.startDate,
-              endDate: dashDates.endDate
-            })
-          })
-            .then(res => res.json())
-            .then(repeatData => {
-              setRepeatPercentage(repeatData.repeatPercentage);
+          fetch(
+            'http://localhost:5000/appointments/analytics/repeat-customers',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                startDate: dashDates.startDate,
+                endDate: dashDates.endDate
+              })
+            }
+          )
+            .then((res) => res.json())
+            .then((repeatData) => {
+              setRepeatPercentage(
+                repeatData.repeatPercentage || 0
+              );
               setLoading(false);
             });
         } else {
           setLoading(false);
         }
       })
-      .catch(err => {
+      .catch((err) => {
+        console.error(err);
         setLoading(false);
       });
-  }, [userStatus, dashDates]); // מאזין לשינויים של הסטטוס והתאריכים ומעדכן אוטומטית
+  }, [userStatus, dashDates]);
 
-  if (loading) return <div className={classes.loading_text}>טוען נתונים סטטיסטיים...</div>;
+  if (loading) {
+    return (
+      <div className={classes.loading_text}>
+        טוען...
+      </div>
+    );
+  }
 
   return (
     <div className={classes.dashboard_wrapper}>
-      
-      {/* שורת סינון התאריכים מעל הגרפים */}
       <div className={classes.dashFilterBar}>
         <div className={classes.dashFilterGroup}>
           <label>מתאריך:</label>
-          <input 
-            type="date" 
+          <input
+            type="date"
             value={dashDates.startDate}
-            onChange={(e) => setDashDates({...dashDates, startDate: e.target.value})} 
+            onChange={(e) =>
+              setDashDates({
+                ...dashDates,
+                startDate: e.target.value
+              })
+            }
           />
         </div>
+
         <div className={classes.dashFilterGroup}>
           <label>עד תאריך:</label>
-          <input 
-            type="date" 
+          <input
+            type="date"
             value={dashDates.endDate}
-            onChange={(e) => setDashDates({...dashDates, endDate: e.target.value})} 
+            onChange={(e) =>
+              setDashDates({
+                ...dashDates,
+                endDate: e.target.value
+              })
+            }
           />
         </div>
       </div>
 
-      {/* מיכל הגרפים הקיים שלך - לא השתנה בו כלום */}
-      <div className={classes.stats_container}>
-        
-        {/* מלבן 1: כמות לקוחות חודשית */}
-        <div className={classes.stat_card}>
-          <h3>כמות לקוחות חודשית</h3>
-          <div className={classes.chart_wrapper}>
-            <ResponsiveContainer width="100%" height={150}>
-              <BarChart data={chartData}>
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
-                <YAxis hide />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #38bdf8', borderRadius: '8px' }}
-                  labelStyle={{ color: '#94a3b8' }}
-                  itemStyle={{ color: '#38bdf8' }}
-                />
-                <Bar dataKey="customers" fill="#38bdf8" barSize={25} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+      <div className={classes.dashboard_layout}>
 
-        {/* מלבן 2: כמות הכנסות חודשית */}
-        <div className={classes.stat_card}>
-          <h3>הכנסות חודשיות</h3>
-          <div className={classes.chart_wrapper}>
-            <ResponsiveContainer width="100%" height={150}>
-              <BarChart data={chartData}>
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
-                <YAxis hide />
-                <Tooltip 
-                  formatter={(value) => `₪${value}`} 
-                  contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #0ea5e9', borderRadius: '8px' }}
-                  labelStyle={{ color: '#94a3b8' }}
-                  itemStyle={{ color: '#0ea5e9' }}
-                />
-                <Bar dataKey="revenue" fill="#0ea5e9" barSize={25} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* מלבן 3: לקוחות חוזרים - מוצג למנהל */}
+        {/* צד ימין - מאוחד: לקוחות חוזרים + ימים עמוסים */}
         {userStatus === 'מנהל' && (
-          <div className={classes.stat_card}>
-            <h3>לקוחות חוזרים</h3>
-            <div className={classes.percentage_wrapper}>
-              <span className={classes.percentage_number}>{repeatPercentage}%</span>
-              <p>מכלל הלקוחות שביקרו במספרה</p>
+          <div className={classes.busy_column}>
+            <div className={classes.stat_card}>
+              <h3>לקוחות חוזרים</h3>
+              <div className={classes.percentage_wrapper}>
+                <span className={classes.percentage_number}>
+                  {repeatPercentage}%
+                </span>
+                <p>מכלל הלקוחות שביקרו במספרה</p>
+              </div>
             </div>
+            {/* BusyDays מתווסף כאן באותה עמודה */}
+            <div className={classes.stat_card} style={{ marginTop: '24px' }}>
+              <BusyDays />
+            </div>
+
+
           </div>
         )}
 
+        {/* צד שמאל - גרפים + BusyHours */}
+        <div className={classes.stats_grid}>
+          <div className={classes.stat_card}>
+            <h3>הכנסות חודשיות</h3>
+            <div className={classes.chart_wrapper}>
+              <ResponsiveContainer width="100%" height={150}>
+                <BarChart data={chartData}>
+                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
+                  <YAxis hide />
+                  <Tooltip formatter={(value) => `₪${value}`} contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #0ea5e9', borderRadius: '8px' }} />
+                  <Bar dataKey="revenue" fill="#0ea5e9" barSize={25} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className={classes.stat_card}>
+            <h3>כמות לקוחות חודשית</h3>
+            <div className={classes.chart_wrapper}>
+              <ResponsiveContainer width="100%" height={150}>
+                <BarChart data={chartData}>
+                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
+                  <YAxis hide />
+                  <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #38bdf8', borderRadius: '8px' }} />
+                  <Bar dataKey="customers" fill="#38bdf8" barSize={25} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {userStatus === 'מנהל' && (
+            <div className={classes.stat_card} style={{ gridColumn: 'span 2' }}>
+              <BusyHours />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
