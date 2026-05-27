@@ -4,36 +4,43 @@ import classes from './busyDays.module.css';
 function BusyDays() {
   const [busyDays, setBusyDays] = useState([]);
 
-  useEffect(() => {
-  fetch("http://localhost:5000/appointments/busy-days", {
-    method: "POST", // חשוב: POST כדי לשלוח תאריכים
-    credentials: "include", // חשוב: כדי שהעוגיות יעברו
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ 
-      startDate: '2026-05-01', // או הדינמי שתרצה
-      endDate: '2026-05-31' 
-    })
-  })
-    .then(res => res.json())
-    .then(data => {
-      // כאן אנחנו מוודאים שזה תמיד מערך, גם אם השרת החזיר שגיאה
-      setBusyDays(Array.isArray(data) ? data : []);
-    })
-    .catch(err => {
-      console.error("שגיאה:", err);
-      setBusyDays([]); 
-    });
-}, []);
+//   useEffect(() => {
+//     // השתמש ב-GET פשוט מול הראוטר המעודכן שלנו
+//     fetch("http://localhost:5000/appointments/busy-days")
+//       .then(res => res.json())
+//       .then(data => {
+//         setBusyDays(Array.isArray(data) ? data : []);
+//       })
+//       .catch(err => {
+//         console.error("שגיאה במשיכת ימים עמוסים:", err);
+//         setBusyDays([]); 
+//       });
+//   }, []);
+        useEffect(() => {
+    const fetchData = async () => {
+        try {
+        const response = await fetch("http://localhost:5000/appointments/busy-days");
+        if (!response.ok) throw new Error("Server error");
+        const data = await response.json();
+        setBusyDays(Array.isArray(data) ? data : []);
+        } catch (err) {
+        console.error("שגיאה במשיכת נתונים:", err);
+        }
+    };
+
+    fetchData();
+    }, []);
 
   return (
     <div className={classes.container}>
-      <h3>ימים עמוסים ביותר</h3>
+      <h3>ימים עמוסים בחודש {new Date().toLocaleString('he-IL', { month: 'long' })}</h3>
       <div className={classes.list}>
         {busyDays.map((day, index) => (
-          <div key={day.day_name} className={classes.item}>
+        <div key={day.day_name} className={classes.item}>
             <span className={classes.rank}>{index + 1}</span>
             <span className={classes.dayName}>{day.day_name}</span>
-          </div>
+            {/* השורה של ה-count נמחקה */}
+        </div>
         ))}
       </div>
     </div>

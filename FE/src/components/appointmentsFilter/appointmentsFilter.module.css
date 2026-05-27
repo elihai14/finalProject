@@ -1,0 +1,62 @@
+.filterBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(223, 183, 108, 0.2);
+  padding: 16px 24px;
+  border-radius: 16px;
+  margin: 24px 0;
+  gap: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.filterBar input[type="date"],
+.filterBar select {
+  background: #1a1a1c;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.filterBar input[type="date"]:focus,
+.filterBar select:focus {
+  border-color: #dfb76c;
+  box-shadow: 0 0 0 2px rgba(223, 183, 108, 0.1);
+}
+
+.filterBar button {
+  background: #dfb76c;
+  color: #121214;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(223, 183, 108, 0.2);
+}
+
+.filterInput {
+  background: #1a1a1c;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 160px;
+}
+
+/* וה-Media Queries של הסינון */
+@media (max-width: 768px) {
+  .filterBar { flex-direction: column; align-items: stretch; padding: 20px; }
+  .filterBar input, .filterBar select, .filterInput { max-width: 100%; width: 100%; }
+}

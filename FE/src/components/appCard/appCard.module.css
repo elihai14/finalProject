@@ -10,6 +10,8 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   direction: rtl;
+  flex-wrap: wrap; 
+  gap: 15px;
 }
 
 /* אפקט ריחוף שנותן הילת אור זהובה ומעלה את הכרטיס */
@@ -24,10 +26,12 @@
 .time_section {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  /* תוריד את ה-border-left אם הוא נראה רע, או שתגדיר גובה */
   border-left: 1px solid rgba(255, 255, 255, 0.08);
   padding-left: 28px;
-  min-width: 140px;
+  min-width: 180px; /* תגדיל את זה קצת כדי שלא יילחץ */
+  justify-content: center; /* מוודא שהכל מיושר אנכית */
 }
 
 .date {
@@ -50,23 +54,26 @@
   font-size: 1rem;
   color: #dfb76c; /* שם הספר בזהב */
   font-weight: 700;
-  margin-top: 6px;
+  margin-top: 10px;
+  display: block;
 }
 
 .clientName {
-  font-size: 0.85rem;
-  color: #71717a;
+  font-size: 0.9rem;       /* גודל קטן יותר מהספר כדי ליצור היררכיה */
+  color: #a1a1aa;          /* צבע אפור עדין שמתאים לעיצוב שלך */
   font-weight: 500;
+  margin-top: 4px;         /* ריווח קטן מהשורה שמעל */
+  display: block;          /* מבטיח שזה ירד שורה */
 }
 
-/* אזור הפירוט */
 .details_section {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-end; /* זה מצמיד הכל לימין (בגלל ה-RTL) */
   justify-content: center;
   gap: 12px;
   flex-grow: 1;
+  text-align: right; /* תוסיף את זה */
 }
 
 .service_name {

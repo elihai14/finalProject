@@ -147,29 +147,30 @@ router.put("/remove-constraint/:id", (req, res) => {
   });
 });
 
-router.get("/business-hours", (req, res) => {
-  const query = "SELECT * FROM business_hours ORDER BY id ASC";
+router.get("/days-activity", (req, res) => {
+  const query =
+    "SELECT * FROM dayshoursactivity ORDER BY FIELD(day, 'ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת')";
   db.query(query, (err, results) => {
     if (err) return res.status(500).json({ error: "Database error" });
     return res.status(200).json(results);
   });
 });
 
-router.put("/update-hours/:id", (req, res) => {
-  if (req.session.user.status != "מנהל")
+router.put("/update-day/:day", (req, res) => {
+  if (req.session.user.status !== "מנהל")
     return res.status(403).json({ message: "Not authorized" });
 
-  const { id } = req.params;
-  const { start_time, end_time, is_open } = req.body;
+  const { day } = req.params;
+  const { start, end } = req.body;
 
-  const query =
-    "UPDATE business_hours SET start_time = ? , end_time = ? , is_open = ?           WHERE id = ?";
+  // אם הוגדרו שעות 00:00:00 זה אומר שהיום סגור
+  const query = "UPDATE dayshoursactivity SET start = ?, end = ? WHERE day = ?";
 
-  db.query(query, [start_time, end_time, is_open, id], (err, results) => {
+  db.query(query, [start, end, day], (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Error" });
     if (results.affectedRows > 0)
-      return res.status(200).json({ message: "שעות הפעילות עודכנו בהצלחה!" });
-    return res.status(404).json({ message: "לא נמצא יום לעדכון" });
+      return res.status(200).json({ message: `יום ${day} עודכן בהצלחה!` });
+    return res.status(404).json({ message: "היום לא נמצא" });
   });
 });
 

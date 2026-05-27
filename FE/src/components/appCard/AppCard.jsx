@@ -8,7 +8,7 @@ export default function AppCard({ app, onCancel }) {
         <span className={classes.date}>{app.date}</span>
         <span className={classes.time}>{app.time}</span>
         {app.barberName && <span className={classes.barberName}>{app.barberName}</span>}
-        {app.clientEmail && <span className={classes.clientName}>לקוח: {app.clientEmail}</span>}
+        {app.customerName && <span className={classes.clientName}>לקוח: {app.customerName}</span>}
       </div>
 
       {/* צד שמאל: שם השירות, מחיר וכפתור ביטול */}
