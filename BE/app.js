@@ -30,7 +30,7 @@ const distPath = path.join(__dirname, "..", "FE", "dist");
 // --- Middleware ---
 app.use(
   cors({
-    origin: "http://localhost:3001", // או 3000 לפי React שלך
+    origin: "http://localhost:3000", // או 3000 לפי React שלך
     credentials: true,
   })
 );
