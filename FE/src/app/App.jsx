@@ -15,6 +15,8 @@ import ServiceList from "../components/serviceList/ServiceList";
 import SideBar from "../components/sideBar/SideBar";
 import BusyHours from "../components/busyHours/BusyHours";
 import BusyDays from '../components/busyDays/BusyDays';
+import ConstraintList from "../components/constraintsList/ConstraintsList";
+import StatisticsExport from "../components/statisticExport/StatisticsExport";
 
 import AddConstraintForm from "../components/addConstraintForm/AddConstraintForm";
 
@@ -83,7 +85,7 @@ function App() {
   return (
     <div>
       <Header />
-
+      <StatisticsExport/>
       <Navbar
         user={user}
         setUser={setUser}
@@ -96,9 +98,15 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
 
-
         {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
-        <Route path="/admin-dashboard" element={<div>{<AppList />} {<BusyHours />} {<BusyDays/>}</div>} />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <div>
+              {<AppList />} {<BusyHours />} {<BusyDays />}
+            </div>
+          }
+        />
 
         <Route
           path="/manage-services"
@@ -132,12 +140,12 @@ function App() {
           path="/barbers-constraints"
           element={
             <div>
-              {<AddConstraintForm/>}
+              {<AddConstraintForm />}
+              {<ConstraintList />}
             </div>
           }
         />
       </Routes>
-
       <Footer prog="Elihai & Daniel" year="2026" />
     </div>
   );

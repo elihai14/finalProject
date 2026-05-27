@@ -31,6 +31,7 @@ const distPath = path.join(__dirname, "..", "FE", "dist");
 app.use(
   cors({
     origin: ["http://localhost:3001","http://localhost:3000"], // או 3000 לפי React שלך
+
     credentials: true,
   })
 );

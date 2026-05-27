@@ -14,10 +14,12 @@ router.get("/", (req, res) => {
   }
 
   const status = req.session.user.status;
+  console.log(status);
+  
   if (status != "ספר" && status != "מנהל")
     return res.status(403).json({ message: "Not authorized" });
 
-  const mail = req.session.user.mail_address;
+  const mail = req.session.user.email;
   const query =
     "SELECT * FROM constraints WHERE mail_address = ? AND status = 'פעיל'";
   db.query(query, [mail], (err, results) => {
@@ -133,9 +135,8 @@ router.put("/remove-constraint/:id", (req, res) => {
   if (status != "ספר" && status != "מנהל")
     return res.status(403).json({ message: "Not authorized" });
 
-  const mail = req.session.user.mail_address;
-  const constraintCode = req.params.id;
-
+  const mail = req.session.user.email;
+const constraintCode = parseInt(req.params.id, 10);
   const query =
     "UPDATE constraints SET status = 'לא פעיל' WHERE constraint_code = ? AND mail_address = ?";
 
