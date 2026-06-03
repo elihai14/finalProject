@@ -14,11 +14,12 @@ import AddService from "../components/addService/AddService";
 import ServiceList from "../components/serviceList/ServiceList";
 import SideBar from "../components/sideBar/SideBar";
 import BusyHours from "../components/busyHours/BusyHours";
-import BusyDays from '../components/busyDays/BusyDays';
+import BusyDays from "../components/busyDays/BusyDays";
 import ConstraintList from "../components/constraintsList/ConstraintsList";
 import StatisticsExport from "../components/statisticExport/StatisticsExport";
 
 import AddConstraintForm from "../components/addConstraintForm/AddConstraintForm";
+import UsersList from "../components/usersList/UsersList";
 
 function App() {
   const [user, setUser] = useState("");
@@ -35,7 +36,7 @@ function App() {
         });
 
         // הגדרה אחת בלבד!
-        const data = await response.json(); 
+        const data = await response.json();
 
         if (!response.ok) {
           if (response.status !== 401) console.log(data, "data");
@@ -85,7 +86,7 @@ function App() {
   return (
     <div>
       <Header />
-      <StatisticsExport/>
+      <StatisticsExport />
       <Navbar
         user={user}
         setUser={setUser}
@@ -145,6 +146,7 @@ function App() {
             </div>
           }
         />
+        <Route path="/manage-users" element={<div>{<UsersList />}</div>} />
       </Routes>
       <Footer prog="Elihai & Daniel" year="2026" />
     </div>

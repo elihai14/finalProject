@@ -337,3 +337,99 @@ export function getHoursArr(startTime, endTime) {
     return result;
 }
 
+export async function handleUpdateStatus(userMail, status, selectedStatus) {
+  if(status === selectedStatus)
+  {
+      Swal.fire({
+        title: "לא בוצע שינוי",
+        text: "למשתמש שבחרת כבר קיים סטטוס זה ",
+        icon: "info",
+        confirmButtonText: "הבנתי",
+        confirmButtonColor: "#3085d6",
+      });
+      return;
+    }
+
+    if(selectedStatus === 'מנהל')
+    {
+            const answer = await Swal.fire({
+              title: "אזהרה",
+              text: "שינוי זה יעניק למשתמש גישה מלאה למערכת, האם להמשיך ?",
+              icon: "warning",
+              showCancelButton:true,
+              confirmButtonText: "כן, להמשיך",
+              confirmButtonColor: "#3085d6",
+              cancelButtonText: 'לא'
+            });
+            if(!answer.isConfirmed)
+              return
+    }
+
+        if (selectedStatus === "ספר") {
+          const answer = await Swal.fire({
+            title: "אזהרה",
+            text: "שינוי זה יעניק למשתמש גישה מורחבת למערכת, האם להמשיך ?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "כן, להמשיך",
+            confirmButtonColor: "#3085d6",
+            cancelButtonText: "לא",
+          });
+          if (!answer.isConfirmed) return;
+        }
+
+        const response = await fetch(
+          `http://localhost:5000/users/updateStatus`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              status: selectedStatus,
+              userEmail: userMail,
+            }),
+          }
+        );
+
+        if(!response.ok)
+        {
+          Swal.fire({
+            title: "שגיאה",
+            text: "אירעה שגיאה בעדכון הסטטוס, נסו שנית מאוחר יותר",
+            icon: "error",
+            confirmButtonText: "הבנתי",
+            confirmButtonColor: "#3085d6",
+          });
+          return;
+
+        }
+
+          Swal.fire({
+            title: "הפעולה הצליחה",
+            text: "שינוי סטטוס המשתמש בוצע בהצלחה",
+            icon: "success",
+            confirmButtonText: "מעולה !",
+            confirmButtonColor: "#3085d6",
+          });
+
+
+}
+
+export async function getUsersList(status, isReverse)
+{
+     const response = await fetch(`http://localhost:5000/users`, {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       credentials: "include",
+       body: JSON.stringify({
+         status: status,
+         isReverse: isReverse,
+       }),
+     });
+     if(!response.ok)
+     {
+      return null;
+     }
+     const data = await response.json();
+     return data;
+}

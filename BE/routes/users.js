@@ -8,9 +8,18 @@ const dbSingleton = require("../dbSingleton");
 const db = dbSingleton.getConnection();
 
 router.post("/", (req, res) => {
-  const query = "SELECT * FROM users";
+  const {status, isReverse} = req.body;
+  let query = "SELECT * FROM users ";
+  let values = [];
+  if(status === 'ספר' || status === 'לקוח' || status === 'מנהל')
+  {
+    query += " WHERE status = ?"
+    values.push(status);
+  }
+  query += "ORDER BY user_name";
+    if (isReverse) query += " DESC";
 
-  db.query(query, (err, results) => {
+  db.query(query,values, (err, results) => {
     if (err) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
@@ -205,11 +214,17 @@ router.get("/:status", (req, res) => {
 });
 
 router.put("/updateStatus", (req, res) => {
+    console.log("UPDATE STATUS ROUTE HIT");
+
   const { status, userEmail } = req.body;
+  console.log(userEmail);
+  
 
   const query = "UPDATE users SET status = ? WHERE mail_address = ?";
   db.query(query, [status, userEmail], (err, results) => {
     if (err) {
+      console.log(err);
+      
       return res.status(500).json({ message: "Internal Server Error" });
     }
 

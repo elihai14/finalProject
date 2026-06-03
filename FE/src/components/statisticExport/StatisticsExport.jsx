@@ -121,7 +121,7 @@ const StatisticsExport = ({statsData}) => {
       className={classes.exportButton}
       type="button"
     >
-      📥 ייצא דוח אנליטיקה לאקסל (.xlsx)
+      📥 ייצא דוח לאקסל (.xlsx)
     </button>
   );
 };
