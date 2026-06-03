@@ -194,6 +194,7 @@ import {
 import classes from './dashboardStats.module.css';
 import BusyHours from '../busyHours/BusyHours';
 import BusyDays from '../busyDays/BusyDays';
+import StatisticsExport from '../statisticExport/StatisticsExport';
 
 const monthNames = {
   1: 'ינו', 2: 'פבר', 3: 'מרץ', 4: 'אפר', 5: 'מאי', 6: 'יוני', 7: 'יולי', 8: 'אוג', 9: 'ספט',
@@ -259,7 +260,9 @@ function DashboardStats({ userStatus }) {
 
   return (
     <div className={classes.dashboard_wrapper}>
+    
       <div className={classes.dashFilterBar}>
+        
         <div className={classes.dashFilterGroup}>
           <label>מתאריך:</label>
           <input type="date" value={dashDates.startDate} onChange={(e) => setDashDates({...dashDates, startDate: e.target.value})} />
@@ -269,7 +272,7 @@ function DashboardStats({ userStatus }) {
           <input type="date" value={dashDates.endDate} onChange={(e) => setDashDates({...dashDates, endDate: e.target.value})} />
         </div>
       </div>
-
+      
       <div className={classes.dashboard_layout}>
         {userStatus === 'מנהל' && (
           <div className={classes.busy_column}>

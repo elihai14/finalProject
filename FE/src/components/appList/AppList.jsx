@@ -3,6 +3,7 @@ import AppCard from '../appCard/AppCard';
 import classes from './appList.module.css';
 import DashboardStats from '../dashboardStats/DashboardStats';  
 import AppointmentsFilter from '../appointmentsFilter/AppointmentsFilter';
+import Swal from 'sweetalert2'; 
 
 export default function AppList({ refresh }) {
   const [appointments, setAppointments] = useState([]);
@@ -58,20 +59,64 @@ export default function AppList({ refresh }) {
     }
   };
 
+  // const handleCancelAppointment = async (id) => {
+  //   try {
+  //     const response = await fetch(`http://localhost:5000/appointments/cancel/${id}`, {
+  //       method: "PUT",
+  //       headers: { "Content-Type": "application/json" },
+  //     });
+  //     if (response.ok) {
+  //       setSuccessMessage("התור בוטל בהצלחה");
+  //       fetchAppointments();
+  //     } else {
+  //       setError("שגיאה בביטול התור");
+  //     }
+  //   } catch (err) {
+  //     setError("שגיאת שרת");
+  //   }
+  // };
   const handleCancelAppointment = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:5000/appointments/cancel/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (response.ok) {
-        setSuccessMessage("התור בוטל בהצלחה");
-        fetchAppointments();
-      } else {
-        setError("שגיאה בביטול התור");
+    // 1. הודעת אישור לפני הביטול
+    const result = await Swal.fire({
+      title: 'האם לבטל את התור?',
+      text: "פעולה זו תבטל את התור ולא ניתן יהיה לשחזרו.",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#d4af37', // הצבע שמשתלב אצלך
+      cancelButtonColor: '#ef4444',
+      confirmButtonText: 'כן, בטל תור',
+      cancelButtonText: 'לא, חזור',
+      background: '#1a1a1a', // תואם לעיצוב הכהה שלך
+      color: '#fff'
+    });
+
+    // 2. אם המשתמש לחץ על "כן"
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`http://localhost:5000/appointments/cancel/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (response.ok) {
+          // הצלחה - הודעה יפה
+          Swal.fire({
+            title: 'בוצע!',
+            text: 'התור בוטל בהצלחה.',
+            icon: 'success',
+            background: '#1a1a1a',
+            color: '#fff',
+            confirmButtonColor: '#d4af37'
+          });
+          
+          // רענון הרשימה אחרי הביטול
+          fetchAppointments();
+        } else {
+          Swal.fire('שגיאה', 'לא הצלחנו לבטל את התור.', 'error');
+        }
+      } catch (err) {
+        Swal.fire('שגיאה', 'יש תקלה בשרת, נסה שוב מאוחר יותר.', 'error');
       }
-    } catch (err) {
-      setError("שגיאת שרת");
     }
   };
 

@@ -49,20 +49,27 @@ export default function SideBar() {
             <span>דף הבית</span>
           </Link>
 
-          <Link to="/manage-services" onClick={toggleMenu}>
-            <FaSlidersH className={classes.navIcon} />
-            <span>ניהול שירותים</span>
-          </Link>
+        {(status === "ספר" || status === "מנהל") && (
+            <>
+                <Link to="/manage-services" onClick={toggleMenu}>
+                <FaSlidersH className={classes.navIcon} />
+                <span>ניהול שירותים</span>
+                </Link>
 
-          <Link to="/barbers-constraints" onClick={toggleMenu}>
-            <FaExchangeAlt className={classes.navIcon} />
-            <span>ניהול אילוצים</span>
-          </Link>
-          <Link to="/manage-users" onClick={toggleMenu}>
+                <Link to="/barbers-constraints" onClick={toggleMenu}>
+                <FaExchangeAlt className={classes.navIcon} />
+                <span>ניהול אילוצים</span>
+                </Link>
+            </>
+        )}
+
+         {(status == "מנהל") && (
+            <Link to="/manage-users" onClick={toggleMenu}>
             <FaExchangeAlt className={classes.navIcon} />
             <span>ניהול משתמשים</span>
           </Link>
-
+         )} 
+          
           {/* 📝 כפתור עדכון פרטים - משנה את showPopup ל-true וסוגר את התפריט */}
           <button
             className={classes.navButton}

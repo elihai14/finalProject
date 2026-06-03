@@ -86,7 +86,7 @@ function App() {
   return (
     <div>
       <Header />
-      <StatisticsExport />
+      
       <Navbar
         user={user}
         setUser={setUser}
@@ -94,6 +94,13 @@ function App() {
         setStatus={setStatus}
       />
       <SideBar />
+      <div className="action_bar_wrapper">
+      {(status === 'מנהל' || status === 'ספר') && (
+        <div className="export_btn_container">
+          <StatisticsExport />
+        </div>
+      )}
+      </div>
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/login" element={<LoginForm />} />
@@ -104,7 +111,7 @@ function App() {
           path="/admin-dashboard"
           element={
             <div>
-              {<AppList />} {<BusyHours />} {<BusyDays />}
+              {<AppList />} 
             </div>
           }
         />
@@ -133,16 +140,15 @@ function App() {
           element={
             <div>
               {<AppList />}
-              {<DashboardStats userStatus={status} />}
             </div>
           }
         />
         <Route
           path="/barbers-constraints"
           element={
-            <div>
-              {<AddConstraintForm />}
-              {<ConstraintList />}
+            <div className={classes.page_container}>           
+              <div className={classes.list_column}>{<ConstraintList />}</div>
+              <div className={classes.form_column}>{<AddConstraintForm />}</div>
             </div>
           }
         />

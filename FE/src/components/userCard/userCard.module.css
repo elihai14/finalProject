@@ -1,0 +1,65 @@
+.user_card {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 700px;
+  margin-bottom: 15px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row-reverse; /* זה מה שיהפוך את הסדר! */
+  text-align: right;
+}
+
+.user_card:hover {
+  border-color: #dfb76c;
+  transform: translateY(-2px);
+}
+
+.time_section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.mail {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+}
+
+.status_select {
+  margin-top: 10px;
+  background: #0f0f0f;
+  border: 1px solid #333;
+  color: #dfb76c;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.update_status_btn {
+  background: linear-gradient(135deg, #dfb76c, #a6862b);
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.update_status_btn:hover {
+  opacity: 0.9;
+}

@@ -1,0 +1,51 @@
+.filterBar {
+  display: flex;
+  justify-content: center; /* יישור לאמצע */
+  align-items: center;
+  gap: 15px;
+  background: #0f0f0f; /* רקע עמוק כמו הטופס */
+  padding: 20px 25px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.filterBar input {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.filterBar input:focus {
+  border-color: #dfb76c;
+  outline: none;
+}
+
+.filterBar button {
+  background: transparent;
+  border: 1px solid #dfb76c;
+  color: #dfb76c;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filterBar button:hover {
+  background: #dfb76c;
+  color: #000;
+}
+.appointments_container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px; /* תעלה את זה מ-15 ל-30 כדי שיהיה מרווח ברור */
+  width: 100%;
+  align-items: center;
+  padding-bottom: 40px; /* קצת אוויר גם בסוף הרשימה */
+}
