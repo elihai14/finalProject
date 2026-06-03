@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import classes from './usersList.module.css';
-import { useEffect } from 'react';
-import { getUsersList } from '../../../js/mainFunctionView';
-import UserCard from '../userCard/UserCard';
+import { useState } from "react";
+import classes from "./usersList.module.css";
+import { useEffect } from "react";
+import { getUsersList } from "../../../js/mainFunctionView";
+import UserCard from "../userCard/UserCard";
 
-
-export default function UsersList(){
+export default function UsersList() {
   const [isReverse, setIsReverse] = useState(false);
   const [status, setStatus] = useState("");
 
@@ -20,10 +19,10 @@ export default function UsersList(){
 
         if (data === null) {
           setError("תקלה בטעינת המשתמשים");
-          setUsers([]); 
+          setUsers([]);
         } else {
           setUsers(data);
-          setError(null); 
+          setError(null);
         }
       } catch (err) {
         console.error(err);
@@ -32,10 +31,33 @@ export default function UsersList(){
     };
 
     fetchUsers();
-  }, [isReverse, status]); 
+  }, [isReverse, status]);
 
   return (
     <div className={classes.users_container}>
+      <div>
+        <select
+          className={classes.status_select}
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          <option value="לקוח">לקוח</option>
+          <option value="ספר">ספר</option>
+          <option value="מנהל">מנהל</option>
+          <option value="" selected>
+            הכל
+          </option>
+        </select>
+
+        <select
+          className={classes.order_select}
+          onChange={(e) => setIsReverse(e.target.value)}
+        >
+          <option value="false" selected>
+            א-ת
+          </option>
+          <option value="true">ת-א</option>
+        </select>
+      </div>
       {/* 2. אם יש שגיאה, נציג אותה */}
       {error && <p className={classes.error_message}>{error}</p>}
 

@@ -4,6 +4,7 @@ import { handleUpdateStatus } from "../../../js/mainFunctionView";
 export default function userCard({ user }) {
   const [selectedStatus, setSelectedStatus] = useState(user.status);
   return (
+    
     <div className={classes.user_card}>
       <div className={classes.time_section}>
         <span className={classes.name}>{user.user_name}</span>
