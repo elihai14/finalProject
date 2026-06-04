@@ -17,7 +17,10 @@ router.post("/", (req, res) => {
     values.push(status);
   }
   query += "ORDER BY user_name";
+  console.log(isReverse);
+  
     if (isReverse) query += " DESC";
+    else query+=" ASC"
 
   db.query(query,values, (err, results) => {
     if (err) {

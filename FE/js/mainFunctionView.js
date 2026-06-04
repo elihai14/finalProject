@@ -449,3 +449,45 @@ export async function getUsersList(status, isReverse)
      const data = await response.json();
      return data;
 }
+
+export async function handleUpdate  (e, setIsLoading, setError, onClose, phone, email)  {
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
+
+  try {
+    const response = await fetch("http://localhost:5000/users/update", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        phoneNumber: phone,
+        newEmail: email,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // הרשמה בוצעה בהצלחה - מעבר ללוגין
+      Swal.fire({
+        title: "פרטיך עודכנו בהצלחה",
+        text: "פרטיך עודכנו בהצלחה !",
+        icon: "success",
+        confirmButtonText: "מעולה",
+        confirmButtonColor: "#3085d6",
+      }).then(() => {
+        onClose();
+      });
+    } else {
+      // כאן נתפסת הבדיקה של הבקאנד (למשל: "משתמש כבר קיים")
+      setError(data.message || "שגיאה בתהליך עדכון הפרטים ");
+    }
+  } catch (err) {
+    setError("שגיאת תקשורת עם השרת");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+

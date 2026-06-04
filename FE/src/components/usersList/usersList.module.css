@@ -1,29 +1,59 @@
+/* הקונטיינר החיצוני ביותר, רק ממרכז את הכל במסך */
 .users_container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
   padding: 40px 20px;
-  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* אזור הפילטרים */
-.users_container > div:first-child {
+/* היחידה האחת שמאחדת את הפילטרים והמשתמשים */
+.main_card {
+  width: 85%; /* תופס את רוב רוחב העמוד */
+  max-width: 1200px; /* מונע הימרחות מוגזמת במסכים ענקיים */
+  background: #0d0d0d; /* רקע כהה אחיד לכל היחידה */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* אזור הפילטרים בתוך הבלוק */
+.filters_area {
   display: flex;
   gap: 15px;
-  background: #0f0f0f;
-  padding: 20px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  margin-bottom: 20px;
+  background: #161616;
+  padding: 15px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  align-self: flex-start; /* שומר על הפילטרים בצד שמאל/ימין ולא נמרחים */
+  font-size: 1.4rem;
 }
 
 .status_select, .order_select {
-  background: #1a1a1a;
+  background: #222;
   border: 1px solid #333;
   color: white;
   padding: 10px 20px;
   border-radius: 10px;
   cursor: pointer;
+  outline: none;
+  font-family: inherit;
+}
+
+.status_select:hover, .order_select:hover {
+  border-color: #555;
+}
+
+/* סידור כרטיסי המשתמשים שורה מתחת לשורה לאורך כל רוחב הכרטיס המרכזי */
+.grid_layout {
+  display: flex;
+  flex-direction: column; /* מסדר אותם אנכית, אחד מתחת לשני */
+  gap: 15px;             /* המרווח בין שורה לשורה */
+  width: 100%;           /* מבטיח שהרשימה תנצל את כל הרוחב הזמין */
 }
 
 .error_message {
@@ -31,4 +61,6 @@
   background: rgba(239, 68, 68, 0.1);
   padding: 15px;
   border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  margin: 0;
 }
