@@ -112,6 +112,20 @@
   width: 100%;
 }
 
+.action_bar_wrapper {
+  width: 100%;
+  max-width: 1400px; /* תואם את הרוחב של שאר הדף שלך */
+  margin: 0 auto;    /* ממקם את הכל בדיוק בקו של הדשבורד */
+  padding: 0 40px;   /* הריווח המדויק מהשמאל */
+  margin-top: 15px;  /* מרווח מהתפריט למעלה */
+  display: flex;
+  justify-content: flex-start; /* מצמיד לשמאל! */
+}
+
+.export_btn_container {
+  /* מונע מהכפתור להימרח */
+  display: inline-block;
+}
 
 /* התאמה למובייל */
 @media (max-width: 992px) {

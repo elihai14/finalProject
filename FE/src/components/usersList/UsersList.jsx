@@ -7,7 +7,7 @@ import UserCard from "../userCard/UserCard";
 export default function UsersList() {
   const [isReverse, setIsReverse] = useState(false);
   const [status, setStatus] = useState("");
-
+  const [refresh, setRefresh] = useState(false);
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
   let arr;
@@ -31,7 +31,7 @@ export default function UsersList() {
     };
 
     fetchUsers();
-  }, [isReverse, status]);
+  }, [isReverse, status, refresh]);
 
   return (
     <div className={classes.users_container}>
@@ -63,7 +63,7 @@ export default function UsersList() {
 
       {/* 3. רינדור רשימת המשתמשים מתוך הסטייט */}
       {!error &&
-        users.map((user) => <UserCard key={user.mail_address} user={user} />)}
+        users.map((user) => <UserCard key={user.mail_address} user={user} refresh={refresh} setRefresh={setRefresh} />)}
     </div>
   );
 }

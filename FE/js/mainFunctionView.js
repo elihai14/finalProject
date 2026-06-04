@@ -337,7 +337,7 @@ export function getHoursArr(startTime, endTime) {
     return result;
 }
 
-export async function handleUpdateStatus(userMail, status, selectedStatus) {
+export async function handleUpdateStatus(userMail, status, selectedStatus, refresh , setRefresh) {
   if(status === selectedStatus)
   {
       Swal.fire({
@@ -345,7 +345,10 @@ export async function handleUpdateStatus(userMail, status, selectedStatus) {
         text: "למשתמש שבחרת כבר קיים סטטוס זה ",
         icon: "info",
         confirmButtonText: "הבנתי",
-        confirmButtonColor: "#3085d6",
+        background: "#1a1a1a",
+        color: "#fff",
+        confirmButtonColor: "#555",
+        cancelButtonColor: "#ef4444",
       });
       return;
     }
@@ -356,10 +359,13 @@ export async function handleUpdateStatus(userMail, status, selectedStatus) {
               title: "אזהרה",
               text: "שינוי זה יעניק למשתמש גישה מלאה למערכת, האם להמשיך ?",
               icon: "warning",
-              showCancelButton:true,
+              showCancelButton: true,
               confirmButtonText: "כן, להמשיך",
-              confirmButtonColor: "#3085d6",
-              cancelButtonText: 'לא'
+              background: "#1a1a1a",
+              color: "#fff",
+              confirmButtonColor: "#555",
+              cancelButtonColor: "#ef4444",
+              cancelButtonText: "לא",
             });
             if(!answer.isConfirmed)
               return
@@ -372,7 +378,10 @@ export async function handleUpdateStatus(userMail, status, selectedStatus) {
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "כן, להמשיך",
-            confirmButtonColor: "#3085d6",
+            background: "#1a1a1a",
+            color: "#fff",
+            confirmButtonColor: "#555",
+            cancelButtonColor: "#ef4444",
             cancelButtonText: "לא",
           });
           if (!answer.isConfirmed) return;
@@ -398,7 +407,9 @@ export async function handleUpdateStatus(userMail, status, selectedStatus) {
             text: "אירעה שגיאה בעדכון הסטטוס, נסו שנית מאוחר יותר",
             icon: "error",
             confirmButtonText: "הבנתי",
-            confirmButtonColor: "#3085d6",
+            background: "#1a1a1a",
+            color: "#fff",
+            confirmButtonColor: "#555",
           });
           return;
 
@@ -409,8 +420,13 @@ export async function handleUpdateStatus(userMail, status, selectedStatus) {
             text: "שינוי סטטוס המשתמש בוצע בהצלחה",
             icon: "success",
             confirmButtonText: "מעולה !",
-            confirmButtonColor: "#3085d6",
+            background: "#1a1a1a",
+            color: "#fff",
+            confirmButtonColor: "#555",
+            cancelButtonColor: "#ef4444",
           });
+
+          setRefresh(!refresh);
 
 
 }

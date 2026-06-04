@@ -1,7 +1,7 @@
 import { useState } from "react";
 import classes from "./userCard.module.css";
 import { handleUpdateStatus } from "../../../js/mainFunctionView";
-export default function userCard({ user }) {
+export default function userCard({ user , refresh , setRefresh }) {
   const [selectedStatus, setSelectedStatus] = useState(user.status);
   return (
     
@@ -26,7 +26,7 @@ export default function userCard({ user }) {
           <button
             className={classes.update_status_btn}
             onClick={() =>
-              handleUpdateStatus(user.mail_address, user.status, selectedStatus)
+              handleUpdateStatus(user.mail_address, user.status, selectedStatus, refresh , setRefresh )
             }
           >
             עדכן סטטוס

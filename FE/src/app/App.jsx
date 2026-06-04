@@ -94,13 +94,7 @@ function App() {
         setStatus={setStatus}
       />
       <SideBar />
-      <div className="action_bar_wrapper">
-      {(status === 'מנהל' || status === 'ספר') && (
-        <div className="export_btn_container">
-          <StatisticsExport />
-        </div>
-      )}
-      </div>
+      
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/login" element={<LoginForm />} />
