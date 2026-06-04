@@ -1,14 +1,13 @@
 .container {
-  max-width: 650px;
+  max-width: 100%; /* שיניתי מ-650px כדי שייכנס בתוך הטור */
   width: 100%;
-  margin: 40px auto;
+  margin: 0;       /* ביטול המרג'ין האוטומטי שתוקע אותו באמצע */
   background: #1a1a1e;
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 24px;
-  padding: 44px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  padding: 30px;   /* צמצמתי קצת פדינג כדי שייכנס יפה */
+  position: relative; /* לוודא שזה לא fixed */
   direction: rtl;
-  font-family: system-ui, -apple-system, sans-serif;
 }
 
 .main_form { display: flex; flex-direction: column; gap: 28px; }

@@ -1,6 +1,10 @@
 .container {
-  max-width: 1000px;
-  margin: 40px auto;
+  /* שינוי: לבטל את המרווחים הסטטיים שישברו את ה-Flex */
+  width: 100%; 
+  max-width: 100%; 
+  margin: 0; 
+  
+  /* שאר העיצוב נשאר אותו דבר */
   padding: 24px;
   background: #18181b;
   border-radius: 16px;
@@ -30,14 +34,21 @@
   border: 1px solid rgba(255,255,255,0.05);
 }
 
+.serviceHeader {
+  display: flex;
+  align-items: center; /* מיישר את הטקסט לקו אחד */
+  gap: 12px;           /* מרווח קטן בין השם למשך הזמן */
+}
+
 .info h4 {
   margin: 0;
   font-size: 1.2rem;
 }
 
 .info p {
-  margin: 4px 0 0;
+  margin: 0;
   color: #a1a1aa;
+  font-size: 0.9rem;
 }
 
 .price {

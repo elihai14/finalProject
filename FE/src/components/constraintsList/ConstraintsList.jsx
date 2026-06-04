@@ -95,20 +95,20 @@ export default function ConstraintList({ refresh }) {
   return (
     <div>
       <div className={classes.filterBar}>
+        {/* ילד 1: הכפתור */}
+        <button className={classes.filterButton} onClick={fetchConstraints}>סנן</button>
 
-        <button onClick={fetchConstraints}>סנן</button>
-
-        <input
-          type="date"
-          onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-          min={filters.startDate}
-        />
-        <input
-          type="date"
-          onChange={(e) =>
-            setFilters({ ...filters, startDate: e.target.value })
-          }
-        />
+        {/* ילד 2: חבילת התאריכים */}
+        <div className={classes.dateWrapper}>
+          <input
+            type="date"
+            onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+          />
+          <input
+            type="date"
+            onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+          />
+        </div>
       </div>
 
       {successMessage && (

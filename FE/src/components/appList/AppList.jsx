@@ -59,22 +59,6 @@ export default function AppList({ refresh }) {
     }
   };
 
-  // const handleCancelAppointment = async (id) => {
-  //   try {
-  //     const response = await fetch(`http://localhost:5000/appointments/cancel/${id}`, {
-  //       method: "PUT",
-  //       headers: { "Content-Type": "application/json" },
-  //     });
-  //     if (response.ok) {
-  //       setSuccessMessage("התור בוטל בהצלחה");
-  //       fetchAppointments();
-  //     } else {
-  //       setError("שגיאה בביטול התור");
-  //     }
-  //   } catch (err) {
-  //     setError("שגיאת שרת");
-  //   }
-  // };
   const handleCancelAppointment = async (id) => {
     // 1. הודעת אישור לפני הביטול
     const result = await Swal.fire({
@@ -82,7 +66,7 @@ export default function AppList({ refresh }) {
       text: "פעולה זו תבטל את התור ולא ניתן יהיה לשחזרו.",
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#d4af37', // הצבע שמשתלב אצלך
+      confirmButtonColor: '#dfb76c', // הצבע שמשתלב אצלך
       cancelButtonColor: '#ef4444',
       confirmButtonText: 'כן, בטל תור',
       cancelButtonText: 'לא, חזור',
@@ -106,7 +90,7 @@ export default function AppList({ refresh }) {
             icon: 'success',
             background: '#1a1a1a',
             color: '#fff',
-            confirmButtonColor: '#d4af37'
+            confirmButtonColor: '#dfb76c'
           });
           
           // רענון הרשימה אחרי הביטול
@@ -142,10 +126,6 @@ export default function AppList({ refresh }) {
 
   return (
     <div className={classes.appList}>
-      {(userStatus === "ספר" || userStatus === "מנהל") && (
-        <DashboardStats userStatus={userStatus} />
-      )}
-
       <AppointmentsFilter 
         filters={filters} 
         setFilters={setFilters} 

@@ -1,115 +1,101 @@
 .appointment_card {
   display: flex;
-  align-items: center;
+  align-items: center; 
   justify-content: space-between;
-  background: #1a1a1e; /* פחם גרפיט עמוק */
+  background: #1a1a1e;
   border: 1px solid rgba(255, 255, 255, 0.04);
-  border-right: 6px solid #dfb76c; /* פס זהב מלכותי דומיננטי מימין */
+  border-right: 6px solid #dfb76c; /* פס הזהב המוכר */
   border-radius: 16px;
-  padding: 24px 30px;
+  padding: 20px 30px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   direction: rtl;
-  flex-wrap: wrap; 
-  gap: 15px;
+  gap: 20px;
+  flex-wrap: nowrap; 
+  transition: all 0.3s ease;
 }
 
-/* אפקט ריחוף שנותן הילת אור זהובה ומעלה את הכרטיס */
 .appointment_card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(223, 183, 108, 0.4);
-  box-shadow: 0 15px 35px rgba(223, 183, 108, 0.12), 0 5px 15px rgba(0, 0, 0, 0.3);
   background: #222227;
+  transform: translateY(-2px);
 }
 
-/* אזור הזמן */
+/* --- עמודה 1: זמן ותאריך --- */
 .time_section {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  /* תוריד את ה-border-left אם הוא נראה רע, או שתגדיר גובה */
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  padding-left: 28px;
-  min-width: 180px; /* תגדיל את זה קצת כדי שלא יילחץ */
-  justify-content: center; /* מוודא שהכל מיושר אנכית */
+  min-width: 100px;
 }
 
-.date {
-  font-size: 0.85rem;
-  color: #a1a1aa; /* אפור מעודן */
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-.time {
-  font-size: 2.2rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, #f3e8ff 0%, #dfb76c 100%); /* גרדיאנט זהב-שמפניה מטריף לשעה */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.time { 
+  font-size: 1.8rem; 
+  font-weight: 900; 
+  color: #dfb76c; 
   line-height: 1.1;
 }
 
+.date { 
+  font-size: 0.9rem; 
+  color: #dfb76c; 
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* --- עמודה 2: פרטים (שם ספר/לקוח) --- */
+.info_section {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 2px;
+}
+
 .barberName {
-  font-size: 1rem;
-  color: #dfb76c; /* שם הספר בזהב */
+  font-size: 1.07rem;
   font-weight: 700;
-  margin-top: 10px;
-  display: block;
+  color: #f4f4f5;
 }
 
 .clientName {
-  font-size: 0.9rem;       /* גודל קטן יותר מהספר כדי ליצור היררכיה */
-  color: #a1a1aa;          /* צבע אפור עדין שמתאים לעיצוב שלך */
-  font-weight: 500;
-  margin-top: 4px;         /* ריווח קטן מהשורה שמעל */
-  display: block;          /* מבטיח שזה ירד שורה */
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f4f4f5;
 }
 
+/* --- עמודה 3: שירות, מחיר וכפתור --- */
 .details_section {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end; /* זה מצמיד הכל לימין (בגלל ה-RTL) */
-  justify-content: center;
-  gap: 12px;
-  flex-grow: 1;
-  text-align: right; /* תוסיף את זה */
+  align-items: center;
+  gap: 15px;
 }
 
-.service_name {
-  font-size: 1.4rem;
-  font-weight: 750;
-  color: #f4f4f5; /* לבן חלק */
-  margin: 0;
-}
-
-.price {
-  font-size: 1.05rem;
+.service_name { 
+  font-size: 1.1rem; 
   font-weight: 700;
-  color: #dfb76c;
-  margin: 0;
-  background: rgba(223, 183, 108, 0.08); /* בועת זהב חצי שקופה */
-  padding: 5px 16px;
-  border-radius: 30px;
+  color: #f4f4f5; 
+  margin: 0; 
+}
+
+.price { 
+  font-weight: 800; 
+  color: #dfb76c; 
+  background: rgba(223, 183, 108, 0.1); 
+  padding: 6px 14px; 
+  border-radius: 20px; 
+  font-size: 0.95rem;
   border: 1px solid rgba(223, 183, 108, 0.2);
 }
 
-/* כפתור ביטול תור */
 .cancel_btn {
   background: transparent;
   color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 10px 22px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 8px 16px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
 .cancel_btn:hover {
-  background-color: #ef4444;
-  color: #ffffff;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-  border-color: #ef4444;
+  background: #ef4444;
+  color: white;
 }

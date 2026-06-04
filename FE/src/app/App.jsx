@@ -113,36 +113,73 @@ function App() {
         <Route
           path="/manage-services"
           element={
-            <div>
-              <AddService setRefresh={setRefresh} />{" "}
-              <ServiceList refresh={refresh} />
+            <div className={classes.page_container}>
+              <div className={classes.form_column}>
+                <div className={classes.card_wrapper}>
+                  <AddService setRefresh={setRefresh}/> 
+                </div>
+              </div>
+
+              <div className={classes.list_column}>
+                <div className={classes.card_wrapper}>
+                  <ServiceList refresh={refresh} /> 
+                </div>
+              </div>
+            </div>
+          }
+        />
+        <Route
+          path="/client-dashboard"
+          element={
+            <div className={classes.page_container}>
+              <div className={classes.form_column}>
+                <div className={classes.card_wrapper}>
+                  <NewAppForm onSuccess={triggerRefresh} />
+                </div>
+              </div>
+
+              <div className={classes.list_column}>
+                <div className={classes.card_wrapper}>
+                  <AppList refresh={refreshAppointments} />
+                </div>
+              </div>
             </div>
           }
         />
 
         <Route
-          path="/client-dashboard"
-          element={
-            <div>
-              <NewAppForm onSuccess={triggerRefresh} />
-              <AppList refresh={refreshAppointments} />
-            </div>
-          }
-        />
-        <Route
           path="/barber-dashboard"
           element={
-            <div>
-              {<AppList />}
+            <div className={classes.page_container}>
+              <div className={classes.form_column}>
+                <div className={classes.card_wrapper}>
+                  <DashboardStats userStatus={status} />
+                </div>
+              </div>
+
+              <div className={classes.list_column}>
+                <div className={classes.card_wrapper}>
+                  <AppList refresh={refreshAppointments} />
+                </div>
+              </div>
             </div>
           }
         />
         <Route
           path="/barbers-constraints"
           element={
-            <div className={classes.page_container}>           
-              <div className={classes.list_column}>{<ConstraintList />}</div>
-              <div className={classes.form_column}>{<AddConstraintForm />}</div>
+            <div className={classes.page_container}>
+              <div className={classes.form_column}>
+                <div className={classes.card_wrapper}>
+                  <AddConstraintForm />
+                </div>
+              </div>
+
+              <div className={classes.list_column}>
+                <div className={classes.card_wrapper}>
+                  <ConstraintList /> 
+                </div>
+              </div>
             </div>
           }
         />

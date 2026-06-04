@@ -1,17 +1,16 @@
 .appList {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 40px 24px;
+  width: 100%;       /* במקום max-width: 900px */
+  margin: 0;         /* חשוב: מאפס את המרג'ין שהיה ממרכז */
+  padding: 0;        /* הסרנו את הפדינג כי הטור (`list_column`) כבר נותן מרווח */
   direction: rtl;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  min-height: 100vh;
-  background-color: #121214;
+  background-color: transparent; /* תן לטור לנהל את הרקע */
+  min-height: auto; 
 }
 
 .appointments_container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px;
   margin-top: 32px;
 }
 

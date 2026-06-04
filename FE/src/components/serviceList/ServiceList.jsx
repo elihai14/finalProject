@@ -122,12 +122,11 @@ export default function ServiceList({refresh}) {
             return (
               <div key={s.service_name} className={classes.card}>
                 <div className={classes.info}>
+                <div className={classes.serviceHeader}>
                   <h4>{s.service_name}</h4>
-
-                  {!isEditing && (
-                    <p>{s.duration} דקות</p>
-                  )}
+                  {!isEditing && <p>{s.duration} דקות</p>}
                 </div>
+              </div>
 
                 <div className={classes.center}>
                   {!isEditing ? (

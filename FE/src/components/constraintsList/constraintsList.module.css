@@ -1,14 +1,12 @@
 .filterBar {
   display: flex;
-  justify-content: center; /* יישור לאמצע */
+  justify-content: space-between; /* הכפתור ילך שמאלה, חבילת התאריכים ימינה */
   align-items: center;
-  gap: 15px;
-  background: #0f0f0f; /* רקע עמוק כמו הטופס */
   padding: 20px 25px;
+  background: #0f0f0f;
   border-radius: 20px;
   margin-bottom: 30px;
   border: 1px solid rgba(212, 175, 55, 0.2);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .filterBar input {
@@ -26,21 +24,32 @@
   outline: none;
 }
 
-.filterBar button {
-  background: transparent;
-  border: 1px solid #dfb76c;
-  color: #dfb76c;
+.filterButton {
+  margin: 0;
+  /* צבע זהב קבוע */
+  background-color: #dfb76c;
+  color: #000;
+  border: none;
   padding: 12px 24px;
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
+  /* מעבר חלק לאפקט הזוהר */
   transition: all 0.3s ease;
 }
-
-.filterBar button:hover {
-  background: #dfb76c;
-  color: #000;
+.filterButton:hover {
+  /* הכפתור נשאר זהב, אבל מוסיפים לו צל זוהר מסביב */
+  box-shadow: 0 0 15px rgba(223, 183, 108, 0.6);
+  /* אפשר גם להגדיל אותו טיפה שירגיש אינטראקטיבי */
+  transform: scale(1.02);
 }
+
+.dateWrapper {
+  display: flex;
+  gap: 15px; /* מרווח בין שני התאריכים */
+}
+
+
 .appointments_container {
   display: flex;
   flex-direction: column;

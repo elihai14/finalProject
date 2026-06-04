@@ -262,21 +262,22 @@ function DashboardStats({ userStatus }) {
     <div className={classes.dashboard_wrapper}>
       
       <div className={classes.dashFilterBar}>
-        <div className={classes.dashFilterGroup}>
-          <label>מתאריך:</label>
-          <input type="date" value={dashDates.startDate} onChange={(e) => setDashDates({...dashDates, startDate: e.target.value})} />
-        </div>
-        <div className={classes.dashFilterGroup}>
-          <label>עד תאריך:</label>
-          <input type="date" value={dashDates.endDate} onChange={(e) => setDashDates({...dashDates, endDate: e.target.value})} />
-        </div>
         {(userStatus === 'מנהל' || userStatus === 'ספר') && (
           <div className={classes.action_bar_wrapper}>
             <div className={classes.export_btn_container}>
               <StatisticsExport />
             </div>
           </div>
-      )}
+        )}
+        <div className={classes.dashFilterGroup}>
+          <label>עד תאריך:</label>
+          <input type="date" value={dashDates.endDate} onChange={(e) => setDashDates({...dashDates, endDate: e.target.value})} />
+        </div>
+        <div className={classes.dashFilterGroup}>
+          <label>מתאריך:</label>
+          <input type="date" value={dashDates.startDate} onChange={(e) => setDashDates({...dashDates, startDate: e.target.value})} />
+        </div>
+        
       </div>
       
       <div className={classes.dashboard_layout}>
