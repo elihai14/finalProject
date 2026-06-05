@@ -216,8 +216,16 @@ export async function getHoursSelect(barberMail, date, serviceName) {
 
   return [...new Set(hours)];
 }
-export async function handleCreateApp(date, barberMail, time, service_name, 
-                                      setSelectedBarber,setSelectedService,setSelectedDate,setSelectedHour,setHours
+export async function handleCreateApp(
+  date,
+  barberMail,
+  time,
+  service_name,
+  setSelectedBarber,
+  setSelectedService,
+  setSelectedDate,
+  setSelectedHour,
+  setHours
 ) {
   const constraint_code_response = await fetch(
     `http://localhost:5000/constraints/get-code`,
@@ -242,7 +250,7 @@ export async function handleCreateApp(date, barberMail, time, service_name,
       confirmButtonText: "הבנתי",
       confirmButtonColor: "#3085d6",
     });
-    return ;
+    return;
   }
   const price_response = await fetch(`http://localhost:5000/services/price`, {
     method: "POST",
@@ -263,7 +271,7 @@ export async function handleCreateApp(date, barberMail, time, service_name,
       confirmButtonText: "הבנתי",
       confirmButtonColor: "#3085d6",
     });
-    return ;
+    return;
   }
 
   const addAppResponse = await fetch(
@@ -283,8 +291,7 @@ export async function handleCreateApp(date, barberMail, time, service_name,
     }
   );
   const addApp = await addAppResponse.json();
-  if(!addAppResponse.ok)
-  {
+  if (!addAppResponse.ok) {
     console.error(addApp.message);
     Swal.fire({
       title: "שגיאה !",
@@ -293,7 +300,7 @@ export async function handleCreateApp(date, barberMail, time, service_name,
       confirmButtonText: "הבנתי",
       confirmButtonColor: "#3085d6",
     });
-    return ;
+    return;
   }
   Swal.fire({
     title: "התור נקבע בהצלחה",
@@ -310,147 +317,146 @@ export async function handleCreateApp(date, barberMail, time, service_name,
 }
 
 export function getHoursArr(startTime, endTime) {
-    const result = [];
+  const result = [];
 
-    // המרה לדקות
-    const [startH, startM] = startTime.split(":").map(Number);
-    const [endH, endM] = endTime.split(":").map(Number);
+  // המרה לדקות
+  const [startH, startM] = startTime.split(":").map(Number);
+  const [endH, endM] = endTime.split(":").map(Number);
 
-    let current = startH * 60 + startM;
-    const end = endH * 60 + endM;
+  let current = startH * 60 + startM;
+  const end = endH * 60 + endM;
 
-    while (current <= end) {
-        const hours = Math.floor(current / 60)
-            .toString()
-            .padStart(2, "0");
+  while (current <= end) {
+    const hours = Math.floor(current / 60)
+      .toString()
+      .padStart(2, "0");
 
-        const minutes = (current % 60)
-            .toString()
-            .padStart(2, "0");
+    const minutes = (current % 60).toString().padStart(2, "0");
 
-        result.push(`${hours}:${minutes}`);
+    result.push(`${hours}:${minutes}`);
 
-        // קפיצה של רבע שעה
-        current += 15;
-    }
+    // קפיצה של רבע שעה
+    current += 15;
+  }
 
-    return result;
+  return result;
 }
 
-export async function handleUpdateStatus(userMail, status, selectedStatus, refresh , setRefresh) {
-  if(status === selectedStatus)
-  {
-      Swal.fire({
-        title: "לא בוצע שינוי",
-        text: "למשתמש שבחרת כבר קיים סטטוס זה ",
-        icon: "info",
-        confirmButtonText: "הבנתי",
-        background: "#1a1a1a",
-        color: "#fff",
-        confirmButtonColor: "#555",
-        cancelButtonColor: "#ef4444",
-      });
-      return;
-    }
+export async function handleUpdateStatus(
+  userMail,
+  status,
+  selectedStatus,
+  refresh,
+  setRefresh
+) {
+  if (status === selectedStatus) {
+    Swal.fire({
+      title: "לא בוצע שינוי",
+      text: "למשתמש שבחרת כבר קיים סטטוס זה ",
+      icon: "info",
+      confirmButtonText: "הבנתי",
+      background: "#1a1a1a",
+      color: "#fff",
+      confirmButtonColor: "#555",
+      cancelButtonColor: "#ef4444",
+    });
+    return;
+  }
 
-    if(selectedStatus === 'מנהל')
-    {
-            const answer = await Swal.fire({
-              title: "אזהרה",
-              text: "שינוי זה יעניק למשתמש גישה מלאה למערכת, האם להמשיך ?",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonText: "כן, להמשיך",
-              background: "#1a1a1a",
-              color: "#fff",
-              confirmButtonColor: "#555",
-              cancelButtonColor: "#ef4444",
-              cancelButtonText: "לא",
-            });
-            if(!answer.isConfirmed)
-              return
-    }
+  if (selectedStatus === "מנהל") {
+    const answer = await Swal.fire({
+      title: "אזהרה",
+      text: "שינוי זה יעניק למשתמש גישה מלאה למערכת, האם להמשיך ?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "כן, להמשיך",
+      background: "#1a1a1a",
+      color: "#fff",
+      confirmButtonColor: "#555",
+      cancelButtonColor: "#ef4444",
+      cancelButtonText: "לא",
+    });
+    if (!answer.isConfirmed) return;
+  }
 
-        if (selectedStatus === "ספר") {
-          const answer = await Swal.fire({
-            title: "אזהרה",
-            text: "שינוי זה יעניק למשתמש גישה מורחבת למערכת, האם להמשיך ?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "כן, להמשיך",
-            background: "#1a1a1a",
-            color: "#fff",
-            confirmButtonColor: "#555",
-            cancelButtonColor: "#ef4444",
-            cancelButtonText: "לא",
-          });
-          if (!answer.isConfirmed) return;
-        }
+  if (selectedStatus === "ספר") {
+    const answer = await Swal.fire({
+      title: "אזהרה",
+      text: "שינוי זה יעניק למשתמש גישה מורחבת למערכת, האם להמשיך ?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "כן, להמשיך",
+      background: "#1a1a1a",
+      color: "#fff",
+      confirmButtonColor: "#555",
+      cancelButtonColor: "#ef4444",
+      cancelButtonText: "לא",
+    });
+    if (!answer.isConfirmed) return;
+  }
 
-        const response = await fetch(
-          `http://localhost:5000/users/updateStatus`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-              status: selectedStatus,
-              userEmail: userMail,
-            }),
-          }
-        );
+  const response = await fetch(`http://localhost:5000/users/updateStatus`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      status: selectedStatus,
+      userEmail: userMail,
+    }),
+  });
 
-        if(!response.ok)
-        {
-          Swal.fire({
-            title: "שגיאה",
-            text: "אירעה שגיאה בעדכון הסטטוס, נסו שנית מאוחר יותר",
-            icon: "error",
-            confirmButtonText: "הבנתי",
-            background: "#1a1a1a",
-            color: "#fff",
-            confirmButtonColor: "#555",
-          });
-          return;
+  if (!response.ok) {
+    Swal.fire({
+      title: "שגיאה",
+      text: "אירעה שגיאה בעדכון הסטטוס, נסו שנית מאוחר יותר",
+      icon: "error",
+      confirmButtonText: "הבנתי",
+      background: "#1a1a1a",
+      color: "#fff",
+      confirmButtonColor: "#555",
+    });
+    return;
+  }
 
-        }
+  Swal.fire({
+    title: "הפעולה הצליחה",
+    text: "שינוי סטטוס המשתמש בוצע בהצלחה",
+    icon: "success",
+    confirmButtonText: "מעולה !",
+    background: "#1a1a1a",
+    color: "#fff",
+    confirmButtonColor: "#555",
+    cancelButtonColor: "#ef4444",
+  });
 
-          Swal.fire({
-            title: "הפעולה הצליחה",
-            text: "שינוי סטטוס המשתמש בוצע בהצלחה",
-            icon: "success",
-            confirmButtonText: "מעולה !",
-            background: "#1a1a1a",
-            color: "#fff",
-            confirmButtonColor: "#555",
-            cancelButtonColor: "#ef4444",
-          });
-
-          setRefresh(!refresh);
-
-
+  setRefresh(!refresh);
 }
 
-export async function getUsersList(status, isReverse)
-{
-     const response = await fetch(`http://localhost:5000/users`, {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       credentials: "include",
-       body: JSON.stringify({
-         status: status,
-         isReverse: isReverse,
-       }),
-     });
-     if(!response.ok)
-     {
-      return null;
-     }
-     const data = await response.json();
-     return data;
+export async function getUsersList(status, isReverse) {
+  const response = await fetch(`http://localhost:5000/users`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      status: status,
+      isReverse: isReverse,
+    }),
+  });
+  if (!response.ok) {
+    return null;
+  }
+  const data = await response.json();
+  return data;
 }
 
-export async function handleUpdate  (e, setIsLoading, setError, onClose, phone, email)  {
+export async function handleUpdate(
+  e,
+  setIsLoading,
+  setError,
+  onClose,
+  phone,
+  email
+) {
   e.preventDefault();
   setIsLoading(true);
   setError("");
@@ -488,6 +494,155 @@ export async function handleUpdate  (e, setIsLoading, setError, onClose, phone, 
   } finally {
     setIsLoading(false);
   }
-};
+}
+
+export async function fetchUser(setUser) {
+  try {
+    const response = await fetch("http://localhost:5000/users/current", {
+      credentials: "include",
+      method: "POST",
+    });
+
+    // הגדרה אחת בלבד!
+    const data = await response.json();
+
+    if (!response.ok) {
+      setUser({});
+    } else {
+      setUser(data);
+    }
+  } catch (error) {
+    console.error("שגיאה", error);
+  }
+}
+
+export async function loadStartHours(day, setHours, setEndtTime) {
+  try {
+    const response = await fetch("http://localhost:5000/daysHours/get-day", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        day: day,
+      }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      setHours([]);
+    } else {
+      console.log(data);
+
+      setHours(getHoursArr(data.start, data.end));
+      setEndtTime(data.end);
+    }
+  } catch (error) {
+    console.error("שגיאה בטעינת השעות:", error);
+  }
+}
+
+export async function handleAddConstraint(
+  e,
+  selectedDate,
+  setSelectedDate,
+  setHours,
+  startTime,
+  setStartTime,
+  setEndtTime,
+  selectedEndTime,
+  setSelectedEndTime,
+  setEndHours,
+  setRefresh
+) {
+  e.preventDefault();
+  try {
+    const response = await fetch(
+      "http://localhost:5000/constraints/add-constraint",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          date: selectedDate,
+          start_time: startTime,
+          end_time: selectedEndTime,
+        }),
+      }
+    );
+    const data = await response.json();
+    if (!response.ok) {
+      console.error("שגיאה בהוספת האילוץ:", data.message);
+    } else {
+      setSelectedDate("");
+      setHours([]);
+      setStartTime("");
+      setEndtTime("");
+      setSelectedEndTime("");
+      setEndHours([]);
+      setRefresh(true);
+    }
+  } catch (error) {
+    console.error("שגיאה בהוספת האילוץ:", error);
+  }
+}
 
 
+  export async function fetchConstraints(setIsLoading, setConstraints, setError) {
+    setIsLoading(true);
+    // const requestBody = { ...filters };
+    try {
+      const response = await fetch(`http://localhost:5000/constraints`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        // body: JSON.stringify(requestBody),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setConstraints(data);
+      } else {
+        setConstraints([]);
+      }
+    } catch (err) {
+      setError("שגיאה");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+    export async function handleCancelConstraint (
+      id,
+      setError,
+      setSuccessMessage,
+      setConstraints,
+      constraints,
+
+    ) {
+      setError("");
+      setSuccessMessage("");
+
+      try {
+        const response = await fetch(
+          `http://localhost:5000/constraints/remove-constraint/${id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          }
+        );
+        console.log("Status:", response.status, "ID sent:", id);
+        if (response.ok) {
+          setSuccessMessage("האילוץ בוטל בהצלחה!");
+          setConstraints(
+            constraints.filter((cons) => cons.constraint_code !== id)
+          );
+
+          setTimeout(() => {
+            setSuccessMessage("");
+          }, 3000);
+        } else {
+          setError("לא ניתן לבטל את התור כרגע");
+        }
+      } catch (err) {
+        setError("שגיאת תקשורת בביטול התור");
+      }
+    };

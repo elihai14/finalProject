@@ -13,102 +13,34 @@ import Navbar from "../components/navBar/NavBar";
 import AddService from "../components/addService/AddService";
 import ServiceList from "../components/serviceList/ServiceList";
 import SideBar from "../components/sideBar/SideBar";
-import BusyHours from "../components/busyHours/BusyHours";
-import BusyDays from "../components/busyDays/BusyDays";
+import { fetchUser } from "../../js/mainFunctionView";
 import ConstraintList from "../components/constraintsList/ConstraintsList";
-import StatisticsExport from "../components/statisticExport/StatisticsExport";
-
 import AddConstraintForm from "../components/addConstraintForm/AddConstraintForm";
 import UsersList from "../components/usersList/UsersList";
 
-function App() {
-  const [user, setUser] = useState("");
-  const [status, setStatus] = useState("");
+export default function App() {
+  const [user, setUser] = useState({});
   const location = useLocation();
   const [refresh, setRefresh] = useState(false);
-  useEffect(() => {
-    // פונקציה אסינכרונית למשיכת הנתונים
-    const fetchUserName = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/users/current", {
-          credentials: "include",
-          method: "POST",
-        });
-
-        // הגדרה אחת בלבד!
-        const data = await response.json();
-
-        if (!response.ok) {
-          if (response.status !== 401) console.log(data, "data");
-          setUser("");
-        } else {
-          const nameString = String(data.user_name);
-          setUser(nameString);
-        }
-      } catch (error) {
-        console.error("שגיאה", error);
-      }
-    };
-
-    fetchUserName();
-  }, [location.pathname]);
-  useEffect(() => {
-    // פונקציה אסינכרונית למשיכת הנתונים
-    const fetchUserStatus = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/users/get-status", {
-          credentials: "include",
-          method: "POST",
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          console.log(data, "data");
-
-          setStatus("");
-        } else {
-          const statusString = String(data.status);
-
-          setStatus(statusString); // שמירת הנתונים ב-State
-        }
-      } catch (error) {
-        console.error("שגיאה", error);
-      }
-    };
-
-    fetchUserStatus();
-  }, [location.pathname]);
   const [refreshAppointments, setRefreshAppointments] = useState(0);
 
-  const triggerRefresh = () => {
-    setRefreshAppointments((prev) => prev + 1);
-  };
-
+  useEffect(() => {
+    fetchUser(setUser);
+  }, [location.pathname]);
   return (
     <div>
       <Header />
-      
-      <Navbar
-        user={user}
-        setUser={setUser}
-        status={status}
-        setStatus={setStatus}
-      />
+
+      <Navbar user={user} setUser={setUser} />
       <SideBar />
-      
+
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
 
         {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
-        <Route
-          path="/admin-dashboard"
-          element={
-            <div>
-              {<AppList />} 
-            </div>
-          }
-        />
+        <Route path="/admin-dashboard" element={<div>{<AppList />}</div>} />
 
         <Route
           path="/manage-services"
@@ -116,13 +48,13 @@ function App() {
             <div className={classes.page_container}>
               <div className={classes.form_column}>
                 <div className={classes.card_wrapper}>
-                  <AddService setRefresh={setRefresh}/> 
+                  <AddService setRefresh={setRefresh} />
                 </div>
               </div>
 
               <div className={classes.list_column}>
                 <div className={classes.card_wrapper}>
-                  <ServiceList refresh={refresh} /> 
+                  <ServiceList refresh={refresh} />
                 </div>
               </div>
             </div>
@@ -134,7 +66,9 @@ function App() {
             <div className={classes.page_container}>
               <div className={classes.form_column}>
                 <div className={classes.card_wrapper}>
-                  <NewAppForm onSuccess={triggerRefresh} />
+                  <NewAppForm
+                    onSuccess={() => setRefreshAppointments((prev) => prev + 1)}
+                  />
                 </div>
               </div>
 
@@ -153,7 +87,7 @@ function App() {
             <div className={classes.page_container}>
               <div className={classes.form_column}>
                 <div className={classes.card_wrapper}>
-                  <DashboardStats userStatus={status} />
+                  <DashboardStats userStatus={user.status} />
                 </div>
               </div>
 
@@ -171,13 +105,13 @@ function App() {
             <div className={classes.page_container}>
               <div className={classes.form_column}>
                 <div className={classes.card_wrapper}>
-                  <AddConstraintForm />
+                  <AddConstraintForm setRefresh ={setRefresh}/>
                 </div>
               </div>
 
               <div className={classes.list_column}>
                 <div className={classes.card_wrapper}>
-                  <ConstraintList /> 
+                  <ConstraintList refresh={refresh} />
                 </div>
               </div>
             </div>
@@ -190,4 +124,3 @@ function App() {
   );
 }
 
-export default App;

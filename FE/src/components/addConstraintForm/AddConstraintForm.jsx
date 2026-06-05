@@ -1,9 +1,10 @@
-import {  useState } from "react";
+import { useState } from "react";
 import classes from "./addConstraintForm.module.css";
-import Swal from "sweetalert2";
-import {getHoursArr} from '../../../js/mainFunctionView'
+import { getHoursArr } from "../../../js/mainFunctionView";
+import { loadStartHours } from "../../../js/mainFunctionView";
+import { handleAddConstraint } from "../../../js/mainFunctionView";
 
-export default function AddConstraintForm() {
+export default function AddConstraintForm({setRefresh}) {
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState("");
   const [hours, setHours] = useState([]);
@@ -13,98 +14,47 @@ export default function AddConstraintForm() {
   const [endHours, setEndHours] = useState([]);
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
 
-
-
-
-
-
-
   const handleDateChange = (e) => {
     const value = e.target.value;
     setSelectedDate(value); // הפונקציה המקורית שמעדכנת את הסטייט
     if (value) {
       const dateObj = new Date(value);
       const dayIndex = dateObj.getDay();
-      loadStartHours(days[dayIndex]);
+      loadStartHours(days[dayIndex], setHours, setEndtTime);
     }
+  };
 
-};
+  const handleStartTimeChange = (e) => {
+    const value = e.target.value;
+    setStartTime(value);
+    loadEndHours(value);
+  };
 
-    const loadStartHours = async (date) =>{
-        try {
-        const response = await fetch(
-          "http://localhost:5000/daysHours/get-day",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-              day: date
-            }),
-          }
-        );
-        const data = await response.json();
-        if (!response.ok) {
-          setHours([]);
-        } else {
-          setHours(getHoursArr(data.start, data.end));
-          setEndtTime(data.end);
-        }
-      } catch (error) {
-        console.error("שגיאה בטעינת השעות:", error);
-      }
-    }
+  const loadEndHours = (start) => {
+    setEndHours(getHoursArr(start, endTime));
+  };
 
-    const handleStartTimeChange = (e) => {
-      const value = e.target.value;
-      setStartTime(value) 
-      loadEndHours(value);
-    };
-
-    const loadEndHours = (start) =>{
-        setEndHours(getHoursArr(start, endTime))
-    }
-
-
-    const handleAddConstraint = async (e) =>{
-        e.preventDefault();
-         try {
-           const response = await fetch(
-             "http://localhost:5000/constraints/add-constraint",
-             {
-               method: "POST",
-               headers: { "Content-Type": "application/json" },
-               credentials: "include",
-               body: JSON.stringify({
-                 date: selectedDate,
-                 start_time: startTime,
-                 end_time: selectedEndTime,
-               }),
-             }
-           );
-           const data = await response.json();
-           if (!response.ok) {
-            console.error("שגיאה בהוספת האילוץ:", data.message);
-           } else {
-                setSelectedDate("");
-                setHours([]);
-                setStartTime("");
-                setEndtTime("");
-                setSelectedEndTime("");
-                setEndHours([]);
-
-           }
-         } catch (error) {
-           console.error("שגיאה בהוספת האילוץ:", error);
-         }
-    }
-
+  const addCons = async(e)=>{
+    handleAddConstraint(
+      e,
+      selectedDate,
+      setSelectedDate,
+      setHours,
+      startTime,
+      setStartTime,
+      setEndtTime,
+      selectedEndTime,
+      setSelectedEndTime,
+      setEndHours,
+      setRefresh
+    );
+  }
 
   return (
     <div className={classes.container}>
       <h3 className={classes.title}>הוספת אילוץ</h3>
 
-      <form onSubmit={handleAddConstraint} className={classes.form}>
+      <form onSubmit={(e) => addCons(e)} className={classes.form}>
         <label htmlFor="dateInput">בחר תאריך</label>
         <input
           type="date"

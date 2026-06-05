@@ -41,7 +41,7 @@ router.post("/current", (req, res) => {
     return res.status(401).json({ message: "Unauthorized: Please log in" });
   }
   const mail = req.session.user.email;
-  const query = "SELECT user_name FROM users WHERE mail_address = ?";
+  const query = "SELECT * FROM users WHERE mail_address = ?";
 
   db.query(query, [mail], (err, results) => {
     if (err) {

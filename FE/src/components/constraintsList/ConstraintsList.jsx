@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ConstraintCard from "../constraintCard/ConstraintsCard";
 import classes from "./constraintsList.module.css";
+import { fetchConstraints,handleCancelConstraint } from "../../../js/mainFunctionView";
 
 export default function ConstraintList({ refresh }) {
   const [constraints, setConstraints] = useState([]);
@@ -10,67 +11,21 @@ export default function ConstraintList({ refresh }) {
 
   const [filters, setFilters] = useState({
     startDate: "",
-    endDate: ""
+    endDate: "",
   });
 
   useEffect(() => {
-    fetchConstraints();
+    fetchConstraints(setIsLoading, setConstraints, setError);
   }, [refresh]);
-
-  const fetchConstraints = async () => {
-    setIsLoading(true);
-    // const requestBody = { ...filters };
-    try {
-      const response = await fetch(`http://localhost:5000/constraints`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        credentials:"include"
-        // body: JSON.stringify(requestBody),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setConstraints(data);
-        
-      } else {
-        setConstraints([]);
-      }
-    } catch (err) {
-      setError("שגיאה");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCancelConstraint = async (id) => {
-    setError("");
-    setSuccessMessage("");
-
-    try {
-      const response = await fetch(
-        `http://localhost:5000/constraints/remove-constraint/${id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include"
-        }
-      );
-      console.log("Status:", response.status, "ID sent:", id);
-      if (response.ok) {
-        setSuccessMessage("התור בוטל בהצלחה!");
-        setConstraints(
-          constraints.filter((cons) => cons.constraint_code !== id)
-        );
-
-        setTimeout(() => {
-          setSuccessMessage("");
-        }, 3000);
-      } else {
-        setError("לא ניתן לבטל את התור כרגע");
-      }
-    } catch (err) {
-      setError("שגיאת תקשורת בביטול התור");
-    }
-  };
+const cancleCons = async (id) => {
+  handleCancelConstraint(
+    id,
+    setError,
+    setSuccessMessage,
+    setConstraints,
+    constraints
+  );
+}
 
   // רינדור התורים בצורה חכמה ואחידה דרך ה-AppCard המעוצב!
   let arr = constraints.map((cons) => {
@@ -79,15 +34,15 @@ export default function ConstraintList({ refresh }) {
     let formattedCons = {
       id: cons.constraint_code,
       date: constDate,
-      startTime: cons.start_time.slice(0,5),
-      endTime: cons.end_time.slice(0,5),
+      startTime: cons.start_time.slice(0, 5),
+      endTime: cons.end_time.slice(0, 5),
     };
 
     return (
       <ConstraintCard
         key={cons.constraint_code}
         cons={formattedCons}
-        onCancel={() => handleCancelConstraint(cons.constraint_code)}
+        onCancel={() => cancleCons(cons.constraint_code)}
       />
     );
   });
@@ -96,17 +51,23 @@ export default function ConstraintList({ refresh }) {
     <div>
       <div className={classes.filterBar}>
         {/* ילד 1: הכפתור */}
-        <button className={classes.filterButton} onClick={fetchConstraints}>סנן</button>
+        <button className={classes.filterButton} onClick={fetchConstraints}>
+          סנן
+        </button>
 
         {/* ילד 2: חבילת התאריכים */}
         <div className={classes.dateWrapper}>
           <input
             type="date"
-            onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+            onChange={(e) =>
+              setFilters({ ...filters, startDate: e.target.value })
+            }
           />
           <input
             type="date"
-            onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+            onChange={(e) =>
+              setFilters({ ...filters, endDate: e.target.value })
+            }
           />
         </div>
       </div>
