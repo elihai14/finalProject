@@ -19,20 +19,45 @@ import AddConstraintForm from "../components/addConstraintForm/AddConstraintForm
 import UsersList from "../components/usersList/UsersList";
 
 export default function App() {
-  const [user, setUser] = useState({});
+  // const [user, setUser] = useState({});
+  // const location = useLocation();
+  // const [refresh, setRefresh] = useState(false);
+  // const [refreshAppointments, setRefreshAppointments] = useState(0);
+
+  // useEffect(() => {
+  //   fetchUser(setUser);
+  // }, [location.pathname]);
+  // return (
+  //   <div>
+  //     <Header />
+
+  //     <Navbar user={user} setUser={setUser} />
+  //     <SideBar />
+  const [user, setUser] = useState(null); // התחל עם null ולא {}
+  const [isLoading, setIsLoading] = useState(true); // מצב טעינה
   const location = useLocation();
-  const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useState(false); 
   const [refreshAppointments, setRefreshAppointments] = useState(0);
+  const hideSidebarRoutes = ["/", "/login", "/register"];
+  const shouldShowSidebar = !hideSidebarRoutes.includes(location.pathname);
 
   useEffect(() => {
-    fetchUser(setUser);
+    const checkAuth = async () => {
+      setIsLoading(true);
+      await fetchUser(setUser);
+      setIsLoading(false);
+    };
+    checkAuth();
   }, [location.pathname]);
+
+  // אם הנתונים בטעינה, לא נציג את הנאבבר או נציג משהו ריק
+  if (isLoading) return <div>טוען...</div>; 
+
   return (
     <div>
       <Header />
-
       <Navbar user={user} setUser={setUser} />
-      <SideBar />
+      {shouldShowSidebar && <SideBar/>}
 
       <Routes>
         <Route path="/" element={<LoginForm />} />

@@ -13,7 +13,8 @@ export default function AppList({ refresh }) {
   const [successMessage, setSuccessMessage] = useState("");
   const [barbers, setBarbers] = useState([]);
   const [customers, setCustomers] = useState([]);
-  
+
+
   const [filters, setFilters] = useState({
     startDate: "",
     endDate: "",
