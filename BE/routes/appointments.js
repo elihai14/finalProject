@@ -11,6 +11,7 @@ const db = dbSingleton.getConnection();
 router.post("/", (req, res) => {
   let { user_name, clientMail, service, startDate, endDate, barber_mail } =
     req.body;
+  console.log(req.body);
   let query =
     "SELECT appointments.*, u1.user_name AS barberName, u2.user_name AS customerName           FROM appointments LEFT JOIN users u1 ON appointments.barber_mail_address =                 u1.mail_address LEFT JOIN users u2 ON appointments.client_mail_address = u2.mail_address  WHERE appointments.is_cancel = 0";
   const values = [];
@@ -27,7 +28,7 @@ router.post("/", (req, res) => {
     query += " AND service_name = ? ";
     values.push(service);
   }
-  
+
   if (startDate) {
     query += " AND appointment_date >= ? ";
     values.push(startDate);
@@ -43,7 +44,7 @@ router.post("/", (req, res) => {
   }
 
   if (barber_mail) {
-    query += " AND u1.user_name = ? ";
+    query += " AND appointments.barber_mail_address = ? ";
     values.push(barber_mail);
   }
 
@@ -86,15 +87,41 @@ router.post("/add-appointment", (req, res) => {
 });
 
 // נתיב המחזיר את השעות הפנויות לפי תאריך ושירות מבוקשים
-router.post("/existing-apps", (req, res) => {
-  const { date } = req.body;
-  const appQuery =
-    "SELECT a.appointment_time , s.duration FROM appointments a join barber_services s ON a.service_name = s.service_name WHERE a.appointment_date = ? ORDER BY a.appointment_time ASC";
+// router.post("/existing-apps", (req, res) => {
+//   const { date } = req.body;
+//   const appQuery =
+//     "SELECT a.appointment_time , s.duration FROM appointments a join barber_services s ON a.service_name = s.service_name WHERE a.appointment_date = ? ORDER BY a.appointment_time ASC";
 
-  db.query(appQuery, [date], (err, results) => {
-    // שאילתה לקבלת שעת תור ומשך זמן שירות לכל תור בתאריך המבוקש
+//   db.query(appQuery, [date], (err, results) => {
+//     // שאילתה לקבלת שעת תור ומשך זמן שירות לכל תור בתאריך המבוקש
+//     if (err) {
+//       return res.status(400).json({ message: "Internal Server Error" });
+//     }
+
+//     return res.status(200).json(results);
+//   });
+// });
+router.post("/existing-apps", (req, res) => {
+  const { date, barberMail } = req.body;
+
+  const appQuery = `
+    SELECT 
+      a.appointment_time,
+      s.duration
+    FROM appointments a
+    JOIN barber_services s
+      ON a.service_name = s.service_name
+    WHERE a.appointment_date = ?
+      AND a.barber_mail_address = ?
+      AND a.is_cancel = 0
+    ORDER BY a.appointment_time ASC
+  `;
+
+  db.query(appQuery, [date, barberMail], (err, results) => {
     if (err) {
-      return res.status(400).json({ message: "Internal Server Error" });
+      return res.status(400).json({
+        message: "Internal Server Error",
+      });
     }
 
     return res.status(200).json(results);

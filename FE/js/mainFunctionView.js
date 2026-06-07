@@ -192,9 +192,12 @@ export async function getHoursSelect(barberMail, date, serviceName) {
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date: date }),
+      body: JSON.stringify({
+        date: date,
+        barberMail: barberMail,
+      }),
       credentials: "include",
-    }
+    },
   );
 
   const existingApp = await appsRes.json();
@@ -587,7 +590,11 @@ export async function handleAddConstraint(
 }
 
 
-  export async function fetchConstraints(setIsLoading, setConstraints, setError) {
+  export async function fetchConstraints(
+    setIsLoading,
+    setConstraints,
+    setError,
+  ) {
     setIsLoading(true);
     // const requestBody = { ...filters };
     try {

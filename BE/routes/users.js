@@ -8,30 +8,26 @@ const dbSingleton = require("../dbSingleton");
 const db = dbSingleton.getConnection();
 
 router.post("/", (req, res) => {
-  const {status, isReverse} = req.body;
+  const { status, isReverse } = req.body;
   let query = "SELECT * FROM users ";
   let values = [];
-  if(status === 'ספר' || status === 'לקוח' || status === 'מנהל')
-  {
-    query += " WHERE status = ?"
+
+  // כאן השינוי: אם ביקשו 'ספר', נחזיר את כל מי שמוגדר כספר או כמנהל
+  if (status === "ספר") {
+    query += " WHERE status IN ('ספר', 'מנהל')";
+  } else if (status === "לקוח" || status === "מנהל") {
+    query += " WHERE status = ?";
     values.push(status);
   }
-  query += "ORDER BY user_name";
-  console.log(isReverse);
-  
-    if (isReverse) query += " DESC";
-    else query+=" ASC"
 
-  db.query(query,values, (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
+  query += " ORDER BY user_name";
+  if (isReverse) query += " DESC";
+  else query += " ASC";
 
-    if (results.length > 0) {
-      return res.status(200).json(results);
-    } else {
-      return res.status(404).json({ message: "User not found" });
-    }
+  db.query(query, values, (err, results) => {
+    if (err) return res.status(500).json({ message: "Internal Server Error" });
+    if (results.length > 0) return res.status(200).json(results);
+    else return res.status(404).json({ message: "User not found" });
   });
 });
 

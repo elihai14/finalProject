@@ -142,18 +142,24 @@
         {(userStatus === "מנהל" ||
           userStatus === "לקוח") && (
           <select
-            value={filters.barber_mail} // השם ב-state
+            value={filters.barber_mail}
             onChange={(e) =>
               setFilters((prev) => ({
                 ...prev,
-                barber_mail: e.target.value // זה מה שנשלח ב-body
+                barber_mail: e.target.value
               }))
             }
           >
-            <option value="">כל הספרים</option>
-            {barbers.map((name, index) => (
-              <option key={index} value={name}>
-                {name}
+            <option value="">
+              כל הספרים
+            </option>
+
+            {barbers.map((barber, index) => (
+              <option
+                key={index}
+                value={barber.mail_address}
+              >
+                {barber.user_name}
               </option>
             ))}
           </select>

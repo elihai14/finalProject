@@ -30,7 +30,7 @@ export default function AppList({ refresh }) {
     setError("");
 
     const requestBody = { ...customFilters };
-    if (userStatus === "ספר") requestBody.barberMail = userEmail;
+    if (userStatus === "ספר") requestBody.barber_mail  = userEmail;
     else if (userStatus === "לקוח") requestBody.clientMail = userEmail;
 
     try {
@@ -54,7 +54,7 @@ export default function AppList({ refresh }) {
   const fetchFilterOptions = async () => {
     try {
       const requestBody = {};
-      if (userStatus === "ספר") requestBody.barberMail = userEmail;
+      if (userStatus === "ספר") requestBody.barber_mail  = userEmail;
       else if (userStatus === "לקוח") requestBody.clientMail = userEmail;
 
       const response = await fetch("http://localhost:5000/appointments", {
@@ -66,7 +66,20 @@ export default function AppList({ refresh }) {
       const data = await response.json();
       if (response.ok) {
         setServices([...new Set(data.map(app => app.service_name).filter(Boolean))]);
-        setBarbers([...new Set(data.map(app => app.barberName).filter(Boolean))]);
+        setBarbers(
+          data
+            .map(app => ({
+              user_name: app.barberName,
+              mail_address: app.barber_mail_address
+            }))
+            .filter(
+              (barber, index, self) =>
+                barber.mail_address &&
+                index === self.findIndex(
+                  b => b.mail_address === barber.mail_address
+                )
+            )
+        );
         setCustomers([...new Set(data.map(app => app.customerName).filter(Boolean))]);
       }
     } catch (err) {

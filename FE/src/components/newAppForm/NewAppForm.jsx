@@ -17,19 +17,22 @@ export default function NewAppForm({ onSuccess }) {
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
-    // פונקציה אסינכרונית למשיכת הנתונים
     const fetchBarbers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/users/ספר");
+        const response = await fetch("http://localhost:5000/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: 'ספר' }) // זה יחזיר גם מנהלים בזכות השינוי בשרת
+        });
+        
         const data = await response.json();
-        if (!response.ok) {
-          setLoading(false);
-        } else {
-          setBarbers(data); // שמירת הנתונים ב-State
-          setLoading(false);
+        if (response.ok) {
+          setBarbers(data);
         }
+        setLoading(false);
       } catch (error) {
         console.error("שגיאה בטעינת הספרים:", error);
+        setLoading(false);
       }
     };
 
