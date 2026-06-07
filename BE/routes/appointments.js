@@ -9,7 +9,7 @@ const db = dbSingleton.getConnection();
 
 // מחזיר רשימת תורים של המשתמש שמחובר
 router.post("/", (req, res) => {
-  let { user_name, clientMail, service, startDate, endDate, barberMail } =
+  let { user_name, clientMail, service, startDate, endDate, barber_mail } =
     req.body;
   let query =
     "SELECT appointments.*, u1.user_name AS barberName, u2.user_name AS customerName           FROM appointments LEFT JOIN users u1 ON appointments.barber_mail_address =                 u1.mail_address LEFT JOIN users u2 ON appointments.client_mail_address = u2.mail_address  WHERE appointments.is_cancel = 0";
@@ -19,25 +19,34 @@ router.post("/", (req, res) => {
     values.push(clientMail);
   }
   if (user_name) {
-    query += " AND u2.user_name LIKE ? ";
-    values.push(`%${user_name}%`);
+    query +=
+      " AND client_mail_address IN (SELECT mail_address FROM users WHERE user_name = ?) ";
+    values.push(user_name);
   }
   if (service) {
     query += " AND service_name = ? ";
     values.push(service);
   }
+  
   if (startDate) {
     query += " AND appointment_date >= ? ";
     values.push(startDate);
   }
-  if (endDate) {
+
+  if (endDate) 
+  {
     query += " AND appointment_date <= ? ";
-    values.push(endDate);
+    const nextDay = new Date(endDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    values.push(nextDay.toISOString().slice(0, 10));
   }
-  if (barberMail) {
-    query += " AND barber_mail_address = ? ";
-    values.push(barberMail);
+
+  if (barber_mail) {
+    query += " AND u1.user_name = ? ";
+    values.push(barber_mail);
   }
+
   db.query(query, values, (err, results) => {
     if (err) return res.status(400).json({ message: "Internal Server Error" });
     if (results.length > 0) {
@@ -51,7 +60,6 @@ router.post("/", (req, res) => {
 
 // נתיב להוספת תור
 router.post("/add-appointment", (req, res) => {
-  console.log("innnnnnnnnnnn");
   
   // 1. בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {

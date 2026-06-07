@@ -36,7 +36,9 @@ function RegisterForm() {
               text: 'כעת תוכל להתחבר למערכת',
               icon: 'success',
               confirmButtonText: 'מעולה',
-              confirmButtonColor: '#38bdf8' // 👈 צבע כחול-ציאן מותאם אישית
+              confirmButtonColor: '#dfb76c', // צבע הזהב העקבי
+              background: '#1a1a1a',        // רקע כהה
+              color: '#fff'
             }).then(() => {
                     navigate("/"); 
         });

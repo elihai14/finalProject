@@ -155,6 +155,8 @@ export default function ServiceList({refresh}) {
                         <option value="45">45</option>
                         <option value="60">60</option>
                         <option value="90">90</option>
+                        <option value="120">120</option>
+                        <option value="180">180</option>
                       </select>
                     </div>
                   )}

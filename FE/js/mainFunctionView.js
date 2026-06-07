@@ -507,12 +507,13 @@ export async function fetchUser(setUser) {
     const data = await response.json();
 
     if (!response.ok) {
-      setUser({});
+      setUser(null);
     } else {
       setUser(data);
     }
   } catch (error) {
     console.error("שגיאה", error);
+    setUser(null);
   }
 }
 

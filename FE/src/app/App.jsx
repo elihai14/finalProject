@@ -65,7 +65,21 @@ export default function App() {
         <Route path="/register" element={<RegisterForm />} />
 
         {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
-        <Route path="/admin-dashboard" element={<div>{<AppList />}</div>} />
+        <Route path="/admin-dashboard" element={
+            <div className={classes.page_container}>
+              <div className={classes.form_column}>
+                <div className={classes.card_wrapper}>
+                  <DashboardStats userStatus={user?.status} />
+                </div>
+              </div>
+
+              <div className={classes.list_column}>
+                <div className={classes.card_wrapper}>
+                  <AppList refresh={refreshAppointments} />
+                </div>
+              </div>
+            </div>
+          } />
 
         <Route
           path="/manage-services"
@@ -112,7 +126,7 @@ export default function App() {
             <div className={classes.page_container}>
               <div className={classes.form_column}>
                 <div className={classes.card_wrapper}>
-                  <DashboardStats userStatus={user.status} />
+                  <DashboardStats userStatus={user?.status} />
                 </div>
               </div>
 

@@ -79,7 +79,7 @@
 }
 
 .saveBtn {
-  background: #10b981;
+  background: #dfb76c;
   border: none;
   padding: 8px 14px;
   color: white;
@@ -88,8 +88,8 @@
 
 .cancelBtn {
   background: transparent;
-  border: 1px solid #999;
-  color: #999;
+  border: 1px solid #ef4444;
+  color: #ef4444;
   padding: 8px 14px;
   border-radius: 8px;
 }

@@ -201,7 +201,7 @@ const monthNames = {
   10: 'אוק', 11: 'נוב', 12: 'דצ'
 };
 
-function DashboardStats({ userStatus }) {
+function DashboardStats({ appointments,userStatus, totalRevenue }) {
   const [chartData, setChartData] = useState([]);
   const [repeatPercentage, setRepeatPercentage] = useState(0);
   const [loading, setLoading] = useState(true);

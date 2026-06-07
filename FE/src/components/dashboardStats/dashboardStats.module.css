@@ -127,6 +127,8 @@
   display: inline-block;
 }
 
+
+
 /* התאמה למובייל */
 @media (max-width: 992px) {
   .dashboard_layout {
