@@ -2,7 +2,7 @@ import React from "react";
 import * as XLSX from "xlsx";
 import classes from "./statisticsExport.module.css";
 
-const StatisticsExport = ({statsData}) => {
+const StatisticsExport = ({ statsData, startDate, endDate }) => {
   // דוגמה למבנה הנתונים שהקומפוננטה מצפה לקבל ב-statsData:
 
   // const statsData = {
@@ -70,10 +70,14 @@ const StatisticsExport = ({statsData}) => {
         נתון: "",
       });
       statsData.busyDays.forEach((item) => {
+        // חילוץ בטוח של מספר התורים - בדיקה של appointments או count והפיכה למספר
+        const appointmentsCount =
+          parseInt(item.appointments || item.count, 10) || 0;
+
         analyticsRows.push({
           "נתוני עומסים ודירוגים": `מקום ${item.rank}`,
           פרטים: item.day,
-          נתון: `${item.appointments || item.count} תורים`,
+          נתון: `${appointmentsCount} תורים`,
         });
       });
 
@@ -113,7 +117,7 @@ const StatisticsExport = ({statsData}) => {
     const currentDate = new Date()
       .toLocaleDateString("he-IL")
       .replace(/\./g, "-");
-    XLSX.writeFile(workbook, `דוח_סטטיסטיקה_עסקית_${currentDate}.xlsx`);
+    XLSX.writeFile(workbook, `דוח_סטטיסטיקה_עסקית_${startDate}-${endDate}.xlsx`);
   };
   return (
     <button

@@ -148,31 +148,19 @@ router.put("/cancel/:id", (req, res) => {
 // 1. ראוטר לגרפים החודשיים - משותף לספר ולמנהל (שונה ל-POST)
 router.post("/analytics", (req, res) => {
   const { startDate, endDate } = req.body;
-  const values = [];
 
   let query = `
     SELECT 
-      MONTH(appointment_date) AS month_num, 
       COUNT(appointment_id) AS total_customers, 
       SUM(price) AS total_revenue 
     FROM appointments 
-    WHERE YEAR(appointment_date) = 2026 
+    WHERE  appointment_date >= ?
+      AND appointment_date <= ?
       AND is_cancel = 0 
       AND appointment_date <= NOW()`;
 
-  // הוספת סינון דינמי לפי תאריכים אם נבחרו בדשבורד
-  if (startDate) {
-    query += " AND appointment_date >= ? ";
-    values.push(startDate);
-  }
-  if (endDate) {
-    query += " AND appointment_date <= ? ";
-    values.push(endDate);
-  }
 
-  query += ` GROUP BY MONTH(appointment_date) ORDER BY month_num ASC`;
-
-  db.query(query, values, (err, results) => {
+  db.query(query, [startDate, endDate], (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Server Error" });
     return res.status(200).json(results);
   });
@@ -224,21 +212,22 @@ router.post("/analytics/repeat-customers", (req, res) => {
 router.get("/busy-hours", (req, res) => {
   // שאילתה שמביאה רק את שעות הפעילות
   const hoursQuery = `SELECT MIN(start) as min_start, MAX(end) as max_end FROM dayshoursactivity WHERE start != '00:00:00'`;
-
+  const {startDate, endDate} = req.query;
   // שאילתה שמביאה את כמות התורים לכל שעה
   const appointmentsQuery = `
     SELECT HOUR(appointment_time) as hour, COUNT(*) as total 
     FROM appointments 
-    WHERE MONTH(appointment_date) = MONTH(CURDATE()) 
-      AND YEAR(appointment_date) = YEAR(CURDATE())
+    WHERE appointment_date >= ?
+      AND appointment_date <= ?
       AND is_cancel = 0 
     GROUP BY HOUR(appointment_time)
+    ORDER BY total
   `;
 
   db.query(hoursQuery, (err, hoursRes) => {
     if (err) return res.status(500).json({ error: "Database error hours" });
 
-    db.query(appointmentsQuery, (err, apptsRes) => {
+    db.query(appointmentsQuery,[startDate,endDate] ,(err, apptsRes) => {
       if (err)
         return res.status(500).json({ error: "Database error appointments" });
 
@@ -253,6 +242,8 @@ router.get("/busy-hours", (req, res) => {
 });
 
 router.get("/busy-days", (req, res) => {
+    const { startDate, endDate } = req.query;
+
   // השאילתה המדויקת לפי ה-dayshoursactivity
   const query = `
     SELECT 
@@ -269,8 +260,8 @@ router.get("/busy-days", (req, res) => {
           (DAYNAME(a.appointment_date) = 'Friday' AND d.day = 'שישי') OR
           (DAYNAME(a.appointment_date) = 'Saturday' AND d.day = 'שבת')
         )
-        AND MONTH(a.appointment_date) = MONTH(CURDATE()) 
-        AND YEAR(a.appointment_date) = YEAR(CURDATE())
+        AND appointment_date >= ?
+        AND appointment_date <= ?
         AND a.is_cancel = 0
     WHERE d.start != '00:00:00' 
       AND d.end != '00:00:00'
@@ -279,7 +270,7 @@ router.get("/busy-days", (req, res) => {
     LIMIT 3
   `;
 
-  db.query(query, (err, results) => {
+  db.query(query, [startDate,endDate],(err, results) => {
     if (err) {
       console.error("SQL Error:", err);
       return res.status(500).json({ error: err.message });

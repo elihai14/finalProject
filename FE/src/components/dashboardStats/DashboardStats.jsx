@@ -1,249 +1,98 @@
-// import React, { useState, useEffect } from 'react';
-// import {
-//   BarChart,
-//   Bar,
-//   XAxis,
-//   YAxis,
-//   Tooltip,
-//   ResponsiveContainer
-// } from 'recharts';
-// import classes from './dashboardStats.module.css';
-// import BusyHours from '../busyHours/BusyHours';
-// import BusyDays from '../busyDays/BusyDays';
-
-// const monthNames = {
-//   1: 'ינו', 2: 'פבר', 3: 'מרץ', 4: 'אפר', 5: 'מאי', 6: 'יוני', 7: 'יולי', 8: 'אוג', 9: 'ספט',
-//   10: 'אוק', 11: 'נוב', 12: 'דצ'
-// };
-
-// function DashboardStats({ userStatus }) {
-//   const [chartData, setChartData] = useState([]);
-//   const [repeatPercentage, setRepeatPercentage] = useState(0);
-//   const [loading, setLoading] = useState(true);
-
-//   const [dashDates, setDashDates] = useState({
-//     startDate: '',
-//     endDate: ''
-//   });
-
-//   useEffect(() => {
-//     setLoading(true);
-
-//     fetch('http://localhost:5000/appointments/analytics', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({
-//         startDate: dashDates.startDate,
-//         endDate: dashDates.endDate
-//       })
-//     })
-//       .then((res) => res.json())
-//       .then((data) => {
-//         setChartData(
-//           data.map((item) => ({
-//             name: monthNames[item.month_num] || item.month_num,
-//             customers: item.total_customers,
-//             revenue: item.total_revenue
-//           }))
-//         );
-
-//         if (userStatus === 'מנהל') {
-//           fetch(
-//             'http://localhost:5000/appointments/analytics/repeat-customers',
-//             {
-//               method: 'POST',
-//               headers: { 'Content-Type': 'application/json' },
-//               body: JSON.stringify({
-//                 startDate: dashDates.startDate,
-//                 endDate: dashDates.endDate
-//               })
-//             }
-//           )
-//             .then((res) => res.json())
-//             .then((repeatData) => {
-//               setRepeatPercentage(
-//                 repeatData.repeatPercentage || 0
-//               );
-//               setLoading(false);
-//             });
-//         } else {
-//           setLoading(false);
-//         }
-//       })
-//       .catch((err) => {
-//         console.error(err);
-//         setLoading(false);
-//       });
-//   }, [userStatus, dashDates]);
-
-//   if (loading) {
-//     return (
-//       <div className={classes.loading_text}>
-//         טוען...
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className={classes.dashboard_wrapper}>
-//       <div className={classes.dashFilterBar}>
-//         <div className={classes.dashFilterGroup}>
-//           <label>מתאריך:</label>
-//           <input
-//             type="date"
-//             value={dashDates.startDate}
-//             onChange={(e) =>
-//               setDashDates({
-//                 ...dashDates,
-//                 startDate: e.target.value
-//               })
-//             }
-//           />
-//         </div>
-
-//         <div className={classes.dashFilterGroup}>
-//           <label>עד תאריך:</label>
-//           <input
-//             type="date"
-//             value={dashDates.endDate}
-//             onChange={(e) =>
-//               setDashDates({
-//                 ...dashDates,
-//                 endDate: e.target.value
-//               })
-//             }
-//           />
-//         </div>
-//       </div>
-
-//       <div className={classes.dashboard_layout}>
-
-//         {/* צד ימין - מאוחד: לקוחות חוזרים + ימים עמוסים */}
-//         {userStatus === 'מנהל' && (
-//           <div className={classes.busy_column}>
-//             <div className={classes.stat_card}>
-//               <h3>לקוחות חוזרים</h3>
-//               <div className={classes.percentage_wrapper}>
-//                 <span className={classes.percentage_number}>
-//                   {repeatPercentage}%
-//                 </span>
-//                 <p>מכלל הלקוחות שביקרו במספרה</p>
-//               </div>
-//             </div>
-//             {/* BusyDays מתווסף כאן באותה עמודה */}
-//             <div className={classes.stat_card} style={{ marginTop: '24px' }}>
-//               <BusyDays />
-//             </div>
-
-
-//           </div>
-//         )}
-
-//         {/* צד שמאל - גרפים + BusyHours */}
-//         <div className={classes.stats_grid}>
-//           <div className={classes.stat_card}>
-//             <h3>הכנסות חודשיות</h3>
-//             <div className={classes.chart_wrapper}>
-//               <ResponsiveContainer width="100%" height={150}>
-//                 <BarChart data={chartData}>
-//                   <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
-//                   <YAxis hide />
-//                   <Tooltip formatter={(value) => `₪${value}`} contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #0ea5e9', borderRadius: '8px' }} />
-//                   <Bar dataKey="revenue" fill="#0ea5e9" barSize={25} radius={[4, 4, 0, 0]} />
-//                 </BarChart>
-//               </ResponsiveContainer>
-//             </div>
-//           </div>
-
-//           <div className={classes.stat_card}>
-//             <h3>כמות לקוחות חודשית</h3>
-//             <div className={classes.chart_wrapper}>
-//               <ResponsiveContainer width="100%" height={150}>
-//                 <BarChart data={chartData}>
-//                   <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
-//                   <YAxis hide />
-//                   <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #38bdf8', borderRadius: '8px' }} />
-//                   <Bar dataKey="customers" fill="#38bdf8" barSize={25} radius={[4, 4, 0, 0]} />
-//                 </BarChart>
-//               </ResponsiveContainer>
-//             </div>
-//           </div>
-
-//           {userStatus === 'מנהל' && (
-//             <div className={classes.stat_card} style={{ gridColumn: 'span 2' }}>
-//               <BusyHours />
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default DashboardStats;
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer
-} from 'recharts';
-import classes from './dashboardStats.module.css';
-import BusyHours from '../busyHours/BusyHours';
-import BusyDays from '../busyDays/BusyDays';
-import StatisticsExport from '../statisticExport/StatisticsExport';
+  ResponsiveContainer,
+} from "recharts";
+import classes from "./dashboardStats.module.css";
+import BusyHours from "../busyHours/BusyHours";
+import BusyDays from "../busyDays/BusyDays";
+import StatisticsExport from "../statisticExport/StatisticsExport";
 
 const monthNames = {
-  1: 'ינו', 2: 'פבר', 3: 'מרץ', 4: 'אפר', 5: 'מאי', 6: 'יוני', 7: 'יולי', 8: 'אוג', 9: 'ספט',
-  10: 'אוק', 11: 'נוב', 12: 'דצ'
+  1: "ינו",
+  2: "פבר",
+  3: "מרץ",
+  4: "אפר",
+  5: "מאי",
+  6: "יוני",
+  7: "יולי",
+  8: "אוג",
+  9: "ספט",
+  10: "אוק",
+  11: "נוב",
+  12: "דצ",
 };
 
-function DashboardStats({ appointments,userStatus, totalRevenue }) {
+function DashboardStats({ appointments, userStatus, totalRevenue }) {
   const [chartData, setChartData] = useState([]);
   const [repeatPercentage, setRepeatPercentage] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [dashDates, setDashDates] = useState({ startDate: '', endDate: '' });
+  const [dashDates, setDashDates] = useState({ startDate: "", endDate: "" });
+  const [daysRank, setDaysRank] = useState([]);
+  const [hoursRank, setHoursRank] = useState([]);
+
+
+
+  // --- פורמט תאריכים בטוח ומניעת קריסות (ללא ISOString הרגיש) ---
+  const today = new Date().toLocaleDateString("fr-CA"); // מחזיר YYYY-MM-DD מקומי
+
+  // חישוב חודש קדימה בטוח: מבוסס על ה-startDate אם קיים, אחרת על היום
+  const getNextMonthSafe = () => {
+    const base = dashDates.startDate
+      ? new Date(dashDates.startDate.replace(/-/g, "/"))
+      : new Date();
+
+    if (isNaN(base.getTime())) return today; // הגנה ממצבי קצה של אינפוט ריק
+
+    base.setMonth(base.getMonth() + 1);
+    return base.toLocaleDateString("fr-CA");
+  };
+
+  const nextMonth = getNextMonthSafe();
 
   useEffect(() => {
     setLoading(true);
 
     // חישוב ברירת מחדל: 3 חודשים אחורה אם לא הוכנס תאריך
+    let finalEndDate = dashDates.endDate || today;
     let finalStartDate = dashDates.startDate;
-    let finalEndDate = dashDates.endDate;
 
-    if (!finalEndDate) {
-      finalEndDate = new Date().toISOString().split('T')[0];
-    }
     if (!finalStartDate) {
       const date = new Date();
-      date.setMonth(date.getMonth() - 2); // שני חודשים אחורה מהחודש הנוכחי = טווח של 3 חודשים
-      finalStartDate = date.toISOString().split('T')[0];
+      date.setMonth(date.getMonth() - 2); // שני חודשים אחורה
+      finalStartDate = date.toLocaleDateString("fr-CA");
     }
 
-    fetch('http://localhost:5000/appointments/analytics', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ startDate: finalStartDate, endDate: finalEndDate })
+    fetch("http://localhost:5000/appointments/analytics", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        startDate:dashDates.startDate || today,
+        endDate:dashDates.endDate || nextMonth
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
         setChartData(
-          (data || []).map((item) => ({
-            name: monthNames[item.month_num] || item.month_num,
-            customers: item.total_customers,
-            revenue: item.total_revenue
-          }))
+          data
         );
 
-        if (userStatus === 'מנהל') {
-          return fetch('http://localhost:5000/appointments/analytics/repeat-customers', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ startDate: finalStartDate, endDate: finalEndDate })
-          }).then((res) => res.json());
+        if (userStatus === "מנהל") {
+          return fetch(
+            "http://localhost:5000/appointments/analytics/repeat-customers",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                startDate: finalStartDate,
+                endDate: finalEndDate,
+              }),
+            }
+          ).then((res) => res.json());
         }
       })
       .then((repeatData) => {
@@ -251,47 +100,92 @@ function DashboardStats({ appointments,userStatus, totalRevenue }) {
         setLoading(false);
       })
       .catch((err) => {
-        console.error(err);
+        console.error("שגיאה בטעינת הנתונים:", err);
         setLoading(false);
       });
-  }, [userStatus, dashDates]);
+  }, [userStatus, dashDates, today ]);
 
   if (loading) return <div className={classes.loading_text}>טוען...</div>;
 
+  // עיבוד בטוח של ימי העומס ללא לולאות מסורבלות
+  const daysArr = (daysRank || []).map((item, i) => ({
+    rank: i + 1,
+    day: item.day_name,
+    appointments: parseInt(item.total_appointments, 10) || 0,
+  }));
+
+  // --- חילוץ וסיכום נתונים עבור ה-Excel מתוך מערך ה-chartData ---
+  const totalRevenueSum = chartData.reduce(
+    (sum, item) => sum + item.revenue,
+    0
+  );
+  const totalCustomersSum = chartData.reduce(
+    (sum, item) => sum + item.customers,
+    0
+  );
+
+  const statsData = {
+    monthlyRevenue: chartData[0].total_revenue || 0,
+    monthlyCustomers: totalCustomersSum,
+    returningCustomersPercent: repeatPercentage,
+    busyDays: daysArr,
+    busyHours: [
+      { rank: 1, hour: hoursRank[0], load: "גבוה מאוד" },
+      { rank: 2, hour: hoursRank[1], load: "גבוה" },
+      { rank: 3, hour: hoursRank[2], load: "בינוני" },
+    ],
+  };
+
   return (
     <div className={classes.dashboard_wrapper}>
-      
       <div className={classes.dashFilterBar}>
-        {(userStatus === 'מנהל' || userStatus === 'ספר') && (
+        {(userStatus === "מנהל" || userStatus === "ספר") && (
           <div className={classes.action_bar_wrapper}>
             <div className={classes.export_btn_container}>
-              <StatisticsExport />
+              <StatisticsExport statsData={statsData} startDate={dashDates.startDate || today} endDate={dashDates.endDate|| nextMonth}/>
             </div>
           </div>
         )}
         <div className={classes.dashFilterGroup}>
           <label>עד תאריך:</label>
-          <input type="date" value={dashDates.endDate} onChange={(e) => setDashDates({...dashDates, endDate: e.target.value})} />
+          <input
+            type="date"
+            value={dashDates.endDate}
+            onChange={(e) => {
+              e.preventDefault(); // מניעת רענון דפדפן לא רצוי
+              setDashDates((prev) => ({ ...prev, endDate: e.target.value }));
+            }}
+          />
         </div>
         <div className={classes.dashFilterGroup}>
           <label>מתאריך:</label>
-          <input type="date" value={dashDates.startDate} onChange={(e) => setDashDates({...dashDates, startDate: e.target.value})} />
+          <input
+            type="date"
+            value={dashDates.startDate}
+            onChange={(e) => {
+              e.preventDefault(); // מניעת רענון דפדפן לא רצוי
+              setDashDates((prev) => ({ ...prev, startDate: e.target.value }));
+            }}
+          />
         </div>
-        
       </div>
-      
+
       <div className={classes.dashboard_layout}>
-        {userStatus === 'מנהל' && (
+        {userStatus === "מנהל" && (
           <div className={classes.busy_column}>
             <div className={classes.stat_card}>
               <h3>לקוחות חוזרים</h3>
               <div className={classes.percentage_wrapper}>
-                <span className={classes.percentage_number}>{repeatPercentage}%</span>
+                <span className={classes.number}>{repeatPercentage}%</span>
                 <p>מכלל הלקוחות שביקרו במספרה</p>
               </div>
             </div>
-            <div className={classes.stat_card} style={{ marginTop: '24px' }}>
-              <BusyDays />
+            <div className={classes.stat_card} style={{ marginTop: "24px" }}>
+              <BusyDays
+                setDaysRank={setDaysRank}
+                startDate={dashDates.startDate || today}
+                endDate={dashDates.endDate || nextMonth}
+              />
             </div>
           </div>
         )}
@@ -300,34 +194,29 @@ function DashboardStats({ appointments,userStatus, totalRevenue }) {
           <div className={classes.stat_card}>
             <h3>הכנסות חודשיות</h3>
             <div className={classes.chart_wrapper}>
-              <ResponsiveContainer width="100%" height={150}>
-                <BarChart data={chartData}>
-                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
-                  <YAxis hide />
-                  <Tooltip formatter={(value) => `₪${value}`} contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #0ea5e9', borderRadius: '8px' }} />
-                  <Bar dataKey="revenue" fill="#0ea5e9" barSize={25} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <span className={classes.number}>
+                {chartData[0].total_revenue || 0}
+              </span>
             </div>
           </div>
 
           <div className={classes.stat_card}>
             <h3>כמות לקוחות חודשית</h3>
             <div className={classes.chart_wrapper}>
-              <ResponsiveContainer width="100%" height={150}>
-                <BarChart data={chartData}>
-                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
-                  <YAxis hide />
-                  <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #38bdf8', borderRadius: '8px' }} />
-                  <Bar dataKey="customers" fill="#38bdf8" barSize={25} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <span className={classes.number}>
+                {chartData[0].total_customers || 0}
+              </span>
             </div>
           </div>
 
-          {userStatus === 'מנהל' && (
-            <div className={classes.stat_card} style={{ gridColumn: 'span 2' }}>
-              <BusyHours />
+          {userStatus === "מנהל" && (
+            <div className={classes.stat_card} style={{ gridColumn: "span 2" }}>
+              {/* שליחת התאריכים המעודכנים לקומפוננטת העומס */}
+              <BusyHours
+                startDate={dashDates.startDate || today}
+                endDate={dashDates.endDate || nextMonth}
+                setHoursRank={setHoursRank}
+              />
             </div>
           )}
         </div>

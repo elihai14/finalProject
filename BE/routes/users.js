@@ -141,13 +141,13 @@ router.post("/login", (req, res) => {
         // 4. שליחה בפועל
         await transporter.sendMail(mailOptions);
         console.log(`OTP ${otpCode} sent to ${mailAddress}`);
-        return res.status(200).json({ message: "Code sent to email" });
+        return res.status(200).json({ message: "הקוד נשלח לכתובת המייל" });
       } catch (mailErr) {
         console.error("Mail Error:", mailErr);
-        return res.status(500).json({ message: "Error sending email" });
+        return res.status(500).json({ message: "שגיאה בשליחת המייל" });
       }
     } else {
-      return res.status(400).json({ message: "User Not Exists" });
+      return res.status(400).json({ message: "משתמש לא קיים" });
     }
   });
 });

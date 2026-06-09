@@ -62,13 +62,14 @@
   height: 160px;
 }
 
-.percentage_number {
+.number {
   font-size: 4.5rem;
   font-weight: 900;
   background: linear-gradient(135deg, #ffffff 0%, #dfb76c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1;
+  
 }
 
 .percentage_wrapper p {
