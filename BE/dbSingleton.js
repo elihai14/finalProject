@@ -12,6 +12,7 @@ const dbSingleton = {
         user: "root",
         password: "",
         database: "finalprojectdb",
+        timezone: "Z"
       });
 
       // Connect to the database

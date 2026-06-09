@@ -12,17 +12,43 @@ router.get("/", (req, res) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
   }
+  const {startDate, endDate} = req.query;
 
   const status = req.session.user.status;
   console.log(status);
   
   if (status != "ספר" && status != "מנהל")
     return res.status(403).json({ message: "Not authorized" });
-
+  let values = [];
   const mail = req.session.user.email;
-  const query =
+  values.push(mail)
+  let query =
     "SELECT * FROM constraints WHERE mail_address = ? AND status = 'פעיל'";
-  db.query(query, [mail], (err, results) => {
+  if(startDate)
+  {
+    query += " AND date >= ?"
+    values.push(startDate);
+  }
+  else 
+  {
+        const date = new Date();
+
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+
+        const today = `${yyyy}-${mm}-${dd}`;
+        query += " AND date >= ?";
+        values.push(today);
+  }
+
+  if (endDate)
+  {
+      query += " AND date <= ?";
+      values.push(endDate);
+
+  }
+  db.query(query, values , (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Error" });
 
     return res.status(200).json(results);

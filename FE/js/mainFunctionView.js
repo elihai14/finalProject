@@ -594,16 +594,23 @@ export async function handleAddConstraint(
     setIsLoading,
     setConstraints,
     setError,
+    filters
   ) {
     setIsLoading(true);
     // const requestBody = { ...filters };
     try {
-      const response = await fetch(`http://localhost:5000/constraints`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        // body: JSON.stringify(requestBody),
-      });
+      // בניית ה-URL בצורה דינמית כדי לא לשלוח פרמטרים ריקים
+      const params = new URLSearchParams();
+      if (filters.startDate) params.append("startDate", filters.startDate);
+      if (filters.endDate) params.append("endDate", filters.endDate);
+
+      const response = await fetch(
+        `http://localhost:5000/constraints?${params.toString()}`,
+        {
+          method: "GET",
+          credentials: "include", // שומר על ה-session והעוגיות
+        }
+      );
       const data = await response.json();
       if (response.ok) {
         setConstraints(data);
@@ -611,6 +618,8 @@ export async function handleAddConstraint(
         setConstraints([]);
       }
     } catch (err) {
+      console.log(err);
+      
       setError("שגיאה");
     } finally {
       setIsLoading(false);

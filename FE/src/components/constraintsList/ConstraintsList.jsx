@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import ConstraintCard from "../constraintCard/ConstraintsCard";
 import classes from "./constraintsList.module.css";
-import { fetchConstraints,handleCancelConstraint } from "../../../js/mainFunctionView";
+import {
+  fetchConstraints,
+  handleCancelConstraint,
+} from "../../../js/mainFunctionView";
 
 export default function ConstraintList({ refresh }) {
   const [constraints, setConstraints] = useState([]);
@@ -15,17 +18,17 @@ export default function ConstraintList({ refresh }) {
   });
 
   useEffect(() => {
-    fetchConstraints(setIsLoading, setConstraints, setError);
+    fetchConstraints(setIsLoading, setConstraints, setError, filters);
   }, [refresh]);
-const cancleCons = async (id) => {
-  handleCancelConstraint(
-    id,
-    setError,
-    setSuccessMessage,
-    setConstraints,
-    constraints
-  );
-}
+  const cancleCons = async (id) => {
+    handleCancelConstraint(
+      id,
+      setError,
+      setSuccessMessage,
+      setConstraints,
+      constraints
+    );
+  };
 
   // רינדור התורים בצורה חכמה ואחידה דרך ה-AppCard המעוצב!
   let arr = constraints.map((cons) => {
@@ -51,24 +54,63 @@ const cancleCons = async (id) => {
     <div>
       <div className={classes.filterBar}>
         {/* ילד 1: הכפתור */}
-        <button className={classes.filterButton} onClick={fetchConstraints}>
+        {/* <button
+          className={classes.filterButton}
+          onClick={() =>
+            fetchConstraints(setIsLoading, setConstraints, setError, filters)
+          }
+        >
           סנן
-        </button>
+        </button> */}
 
         {/* ילד 2: חבילת התאריכים */}
         <div className={classes.dateWrapper}>
-          <input
-            type="date"
-            onChange={(e) =>
-              setFilters({ ...filters, startDate: e.target.value })
-            }
-          />
-          <input
-            type="date"
-            onChange={(e) =>
-              setFilters({ ...filters, endDate: e.target.value })
-            }
-          />
+          <div>
+            <input
+              id="endDate"
+              min={filters.startDate ? filters.startDate : ""}
+              type="date"
+              onChange={(e) => {
+                const updatedValue = e.target.value;
+                const updatedFilters = { ...filters, endDate: updatedValue };
+
+                setFilters(updatedFilters); // מעדכן את המסך
+                fetchConstraints(
+                  setIsLoading,
+                  setConstraints,
+                  setError,
+                  updatedFilters
+                ); // שולח את המידע המעודכן לשרת
+              }}
+            />
+            <label htmlFor="endDate" style={{ fontSize: "14px" }}>
+              {" "}
+              :עד{" "}
+            </label>
+          </div>
+
+          <div>
+            <input
+              id="startDate"
+              type="date"
+              onChange={(e) => {
+                const updatedValue = e.target.value;
+                const updatedFilters = { ...filters, startDate: updatedValue };
+
+                setFilters(updatedFilters); // מעדכן את המסך
+                fetchConstraints(
+                  setIsLoading,
+                  setConstraints,
+                  setError,
+                  updatedFilters
+                ); // שולח את המידע המעודכן לשרת
+              }}
+            />
+            <label htmlFor="startDate" style={{ fontSize: "14px" }}>
+              {" "}
+              :מ
+            </label>
+          </div>
         </div>
       </div>
 
@@ -79,7 +121,7 @@ const cancleCons = async (id) => {
 
       <div className={classes.appointments_container}>
         {isLoading ? (
-          <div className={classes.loading_text}>טוען תורים...</div>
+          <div className={classes.loading_text}>טוען אילוצים...</div>
         ) : (
           arr
         )}
