@@ -41,18 +41,18 @@ function DashboardStats({ appointments, userStatus, totalRevenue }) {
   const today = new Date().toLocaleDateString("fr-CA"); // מחזיר YYYY-MM-DD מקומי
 
   // חישוב חודש קדימה בטוח: מבוסס על ה-startDate אם קיים, אחרת על היום
-  const getNextMonthSafe = () => {
+  const getPrevMonthSafe = () => {
     const base = dashDates.startDate
       ? new Date(dashDates.startDate.replace(/-/g, "/"))
       : new Date();
 
     if (isNaN(base.getTime())) return today; // הגנה ממצבי קצה של אינפוט ריק
 
-    base.setMonth(base.getMonth() + 1);
+    base.setMonth(base.getMonth() - 1);
     return base.toLocaleDateString("fr-CA");
   };
 
-  const nextMonth = getNextMonthSafe();
+  const prevMonth = getPrevMonthSafe();
 
   useEffect(() => {
     setLoading(true);
@@ -71,8 +71,8 @@ function DashboardStats({ appointments, userStatus, totalRevenue }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        startDate:dashDates.startDate || today,
-        endDate:dashDates.endDate || nextMonth
+        startDate:dashDates.startDate || prevMonth,
+        endDate:dashDates.endDate || today
       }),
     })
       .then((res) => res.json())
@@ -88,8 +88,8 @@ function DashboardStats({ appointments, userStatus, totalRevenue }) {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                startDate: finalStartDate,
-                endDate: finalEndDate,
+                startDate:dashDates.startDate || prevMonth,
+                endDate:dashDates.endDate || today
               }),
             }
           ).then((res) => res.json());
@@ -142,7 +142,7 @@ function DashboardStats({ appointments, userStatus, totalRevenue }) {
         {(userStatus === "מנהל" || userStatus === "ספר") && (
           <div className={classes.action_bar_wrapper}>
             <div className={classes.export_btn_container}>
-              <StatisticsExport statsData={statsData} startDate={dashDates.startDate || today} endDate={dashDates.endDate|| nextMonth}/>
+              <StatisticsExport statsData={statsData} startDate={dashDates.startDate || prevMonth} endDate={dashDates.endDate|| today}/>
             </div>
           </div>
         )}
@@ -183,8 +183,8 @@ function DashboardStats({ appointments, userStatus, totalRevenue }) {
             <div className={classes.stat_card} style={{ marginTop: "24px" }}>
               <BusyDays
                 setDaysRank={setDaysRank}
-                startDate={dashDates.startDate || today}
-                endDate={dashDates.endDate || nextMonth}
+                startDate={dashDates.startDate || prevMonth}
+                endDate={dashDates.endDate || today}
               />
             </div>
           </div>
@@ -213,8 +213,8 @@ function DashboardStats({ appointments, userStatus, totalRevenue }) {
             <div className={classes.stat_card} style={{ gridColumn: "span 2" }}>
               {/* שליחת התאריכים המעודכנים לקומפוננטת העומס */}
               <BusyHours
-                startDate={dashDates.startDate || today}
-                endDate={dashDates.endDate || nextMonth}
+                startDate={dashDates.startDate || prevMonth}
+                endDate={dashDates.endDate || today}
                 setHoursRank={setHoursRank}
               />
             </div>

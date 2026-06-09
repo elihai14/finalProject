@@ -457,7 +457,7 @@ export async function handleUpdate(
   setIsLoading,
   setError,
   phone,
-  email
+  name
 ) {
   e.preventDefault();
   setIsLoading(true);
@@ -470,7 +470,7 @@ export async function handleUpdate(
       credentials: "include",
       body: JSON.stringify({
         phoneNumber: phone,
-        newEmail: email,
+        newName: name,
       }),
     });
 

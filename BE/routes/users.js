@@ -243,70 +243,46 @@ router.put("/update", (req, res) => {
   }
 
   const oldEmail = req.session.user.email;
-  const { newEmail, phoneNumber } = req.body;
+  const { newName, phoneNumber } = req.body;
 
+  // וולידציה לטלפון
   if (phoneNumber) {
-    const isOnlyNumbers = !isNaN(phoneNumber);
-    const isStartingCorrect = phoneNumber.startsWith("05");
-    const isLengthCorrect = phoneNumber.length === 10;
-
-    if (!isStartingCorrect || !isLengthCorrect || !isOnlyNumbers) {
-      return res
-        .status(400)
-        .json({ message: "מספר טלפון לא תקין. צריך 10 ספרות שמתחילות ב-05" });
+    if (!/^\d{10}$/.test(phoneNumber) || !phoneNumber.startsWith("05")) {
+      return res.status(400).json({ message: "מספר טלפון לא תקין" });
     }
   }
 
-  if (!newEmail && !phoneNumber) {
-    return res
-      .status(400)
-      .json({ message: "נא להזין מייל חדש או מספר טלפון לעדכון" });
-  }
-  if (newEmail) {
-    const checkIsExistQuery = "SELECT * FROM users WHERE mail_address = ?";
-    db.query(checkIsExistQuery, [newEmail], (err, result) => {
-      if (err) return res.status(500).json({ message: "תקלת שרת פנימית" });
-
-      if (result.length > 0)
-        return res
-          .status(500)
-          .json({ message: "כתובת המייל שהזנת שייכת למשתמש קיים" });
-    });
+  if (!newName && !phoneNumber) {
+    return res.status(400).json({ message: "נא להזין פרטים לעדכון" });
   }
 
   let query = "UPDATE users SET ";
   let values = [];
-  if (newEmail && phoneNumber) {
-    query += "mail_address = ?, phone_number = ?";
-    values.push(newEmail);
-    values.push(phoneNumber);
-  } else if (newEmail) {
-    query += "mail_address = ?";
-    values.push(newEmail);
+
+  if (newName && phoneNumber) {
+    query += "user_name = ?, phone_number = ?";
+    values.push(newName, phoneNumber);
+  } else if (newName) {
+    query += "user_name = ?";
+    values.push(newName);
   } else {
     query += "phone_number = ?";
     values.push(phoneNumber);
   }
+
   query += " WHERE mail_address = ?";
   values.push(oldEmail);
 
   db.query(query, values, (err, results) => {
     if (err) {
-      return res.status(500).json({ message: "תקלה בתהליך עדכון הפרטים" });
-    }
-
-    if (results.affectedRows === 0) {
-      return res.status(500).json({ message: "תקלה בתהליך עדכון הפרטים" });
-    }
-    if (newEmail) {
-      req.session.user.email = newEmail;
+      return res.status(500).json({
+        message: "תקלה בעדכון הפרטים",
+      });
     }
 
     return res.status(200).json({
-      message: "Profile updated successfully",
-      updatedEmail: newEmail,
+      message: "עודכן בהצלחה",
     });
   });
 });
-
 module.exports = router;

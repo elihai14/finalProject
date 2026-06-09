@@ -289,8 +289,12 @@ router.put("/update-service", (req, res) => {
 
 router.post("/price", (req, res) => {
   const { barberMail, serviceName } = req.body;
+  console.log(serviceName);
+  console.log(barberMail);
+  
+  
   const query =
-    "SELECT price from appointments WHERE barber_mail_address = ? AND service_name = ?";
+    "SELECT price from barber_services WHERE mail_address = ? AND service_name = ?";
   db.query(query, [barberMail, serviceName], (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Server Error" });
     if (results.length === 0) {

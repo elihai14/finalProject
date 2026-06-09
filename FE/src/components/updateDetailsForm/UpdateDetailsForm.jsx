@@ -7,12 +7,14 @@ export default function UpdateDetailsForm() { // 2. הסרנו את onClose
     const navigate = useNavigate(); // 3. אתחול הניווט
 
     const [phone, setPhone] = useState("");
-    const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
     const handleSubmit = async (e) => {
       e.preventDefault();
+      setName("");
+      setPhone("");
         if (phone) {
           const isStartingCorrect = phone.startsWith("05");
           const isLengthCorrect = phone.length === 10;
@@ -28,7 +30,7 @@ export default function UpdateDetailsForm() { // 2. הסרנו את onClose
             setIsLoading, 
             setError, 
             phone, 
-            email
+            name
         );
         
     };
@@ -50,10 +52,11 @@ export default function UpdateDetailsForm() { // 2. הסרנו את onClose
               className={classes.input}
             />
             <input
-              type="email"
-              placeholder="כתובת מייל"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="שם "
+              value={name}
+              minLength={2}
+              onChange={(e) => setName(e.target.value)}
               className={classes.input}
             />
 
