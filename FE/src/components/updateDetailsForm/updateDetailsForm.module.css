@@ -1,126 +1,83 @@
-/* updateDetailsForm.module.css */
-
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+.pageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 40px; /* הגדלנו פדינג מסביב */
+  background: #0f0f0f;
 }
 
-.popup {
-    background-color: #1a1a1a;
-    padding: 2.5rem;
-    border-radius: 12px;
-    border: 2px solid #dfb76c;
-    width: 90%;
-    max-width: 450px;
-    position: relative;
-    direction: rtl;
-    color: white;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+.formWrapper {
+  background: #1a1a1a;
+  padding: 3.5rem; /* הגדלנו פדינג פנימי משמעותית */
+  border-radius: 28px; /* עיגול פינות מעט יותר רך */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 55, 0.15);
+  width: 100%;
+  max-width: 600px; /* הגדלנו את הרוחב מ-450 ל-600 */
+  border: 1px solid #333;
+  text-align: center;
 }
 
 .title {
-    text-align: center;
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 2rem;
-    color: #ffffff;
+  color: #dfb76c; /* צבע זהב/יוקרתי */
+  margin-bottom: 2rem;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
-
 .form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem; /* יותר מרווח בין השדות */
 }
 
 .input {
-    background-color: #2a2a2a;
-    border: 1px solid #3d3d3d;
-    border-radius: 8px;
-    padding: 12px 15px;
-    color: #ffffff;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.3s;
+  background: #252525;
+  border: 1px solid #444;
+  padding: 18px 22px; /* שדות גבוהים ורחבים יותר */
+  border-radius: 16px;
+  color: #fff;
+  font-size: 1.2rem; /* כתב גדול יותר בשדות */
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.input::placeholder {
+  font-size: 1.1rem; /* הגדלת ה-placeholder */
 }
 
 .input:focus {
-    border-color: #dfb76c;
+  border-color: #dfb76c;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
 }
-
-/* סידור הכפתורים בשורה אחת */
-.form > button[type="submit"],
-.cancelButton {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
 .button {
-    background-color: #dfb76c;
-    color: #000000;
-    border: none;
-    margin-top: 0.5rem;
+  background: linear-gradient(135deg, #dfb76c, #d4af37);
+  color: #000;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+  margin-top: 0.5rem;
 }
 
 .button:hover:not(:disabled) {
-    background-color: #e9bc66;
-    transform: translateY(-1px);
+  transform: translateY(-2px);
+  opacity: 0.9;
 }
 
 .button:disabled {
-    background-color: #555;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.cancelButton {
-    background-color: transparent;
-    color: #ffffff;
-    border: 1px solid #3d3d3d;
-    margin-top: -0.5rem; /* מצמיד אותו קצת יותר לשמור שינויים */
-}
-
-.cancelButton:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: #888;
+  background: #555;
+  cursor: not-allowed;
 }
 
 .errorMessage {
-    color: #ff4444;
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-    text-align: center;
-    background: rgba(255, 68, 68, 0.1);
-    padding: 8px;
-    border-radius: 4px;
-}.cancelButton {
-    background-color: transparent;
-    color: #ff4d4d; /* אדום בהיר מספיק לקריאה על רקע כהה */
-    border: 1px solid #ff4d4d;
-    margin-top: -0.5rem;
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.cancelButton:hover {
-    background-color: rgba(255, 77, 77, 0.1); /* רקע אדמדם עדין בריחופ */
-    border-color: #ff1a1a;
-    color: #ff1a1a;
+  color: #ff4d4d;
+  background: rgba(255, 77, 77, 0.1);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem; /* טקסט שגיאה קריא יותר */
 }

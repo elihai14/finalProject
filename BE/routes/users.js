@@ -245,10 +245,22 @@ router.put("/update", (req, res) => {
   const oldEmail = req.session.user.email;
   const { newEmail, phoneNumber } = req.body;
 
+  if (phoneNumber) {
+    const isOnlyNumbers = !isNaN(phoneNumber);
+    const isStartingCorrect = phoneNumber.startsWith("05");
+    const isLengthCorrect = phoneNumber.length === 10;
+
+    if (!isStartingCorrect || !isLengthCorrect || !isOnlyNumbers) {
+      return res
+        .status(400)
+        .json({ message: "מספר טלפון לא תקין. צריך 10 ספרות שמתחילות ב-05" });
+    }
+  }
+
   if (!newEmail && !phoneNumber) {
     return res
       .status(400)
-      .json({ message: "New email or phone number are required" });
+      .json({ message: "נא להזין מייל חדש או מספר טלפון לעדכון" });
   }
   if (newEmail) {
     const checkIsExistQuery = "SELECT * FROM users WHERE mail_address = ?";

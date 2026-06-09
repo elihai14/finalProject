@@ -1,0 +1,65 @@
+/* globalServiceList.module.css */
+
+.container {
+  width: 100%; 
+  max-width: 100%; 
+  margin: 0; 
+  padding: 24px;
+  background: #18181b;
+  border-radius: 16px;
+  color: white;
+  direction: rtl;
+}
+
+.title {
+  font-size: 1.8rem;
+  color: #dfb76c;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #27272a;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.info h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #ffffff;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.deleteBtn {
+  background: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.empty {
+  text-align: center;
+  color: #a1a1aa;
+  padding: 20px;
+}

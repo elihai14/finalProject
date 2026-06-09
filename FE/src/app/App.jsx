@@ -17,22 +17,12 @@ import { fetchUser } from "../../js/mainFunctionView";
 import ConstraintList from "../components/constraintsList/ConstraintsList";
 import AddConstraintForm from "../components/addConstraintForm/AddConstraintForm";
 import UsersList from "../components/usersList/UsersList";
+import UpdateDetailsForm from "../components/updateDetailsForm/UpdateDetailsForm";
+import AdminServiceManager from "../components/adminServiceManager/AdminServiceManager";
+import GlobalServicesList from "../components/globalServiceList/GlobalServiceList";
 
 export default function App() {
-  // const [user, setUser] = useState({});
-  // const location = useLocation();
-  // const [refresh, setRefresh] = useState(false);
-  // const [refreshAppointments, setRefreshAppointments] = useState(0);
 
-  // useEffect(() => {
-  //   fetchUser(setUser);
-  // }, [location.pathname]);
-  // return (
-  //   <div>
-  //     <Header />
-
-  //     <Navbar user={user} setUser={setUser} />
-  //     <SideBar />
   const [user, setUser] = useState(null); // התחל עם null ולא {}
   const [isLoading, setIsLoading] = useState(true); // מצב טעינה
   const location = useLocation();
@@ -45,6 +35,8 @@ export default function App() {
     const checkAuth = async () => {
       setIsLoading(true);
       await fetchUser(setUser);
+      console.log(user);
+      
       setIsLoading(false);
     };
     checkAuth();
@@ -55,14 +47,16 @@ export default function App() {
 
   return (
     <div>
+      
       <Header />
       <Navbar user={user} setUser={setUser} />
-      {shouldShowSidebar && <SideBar/>}
 
+      {shouldShowSidebar && <SideBar/>}
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
+        <Route path="/update" element={<UpdateDetailsForm />} />
 
         {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
         <Route path="/admin-dashboard" element={
@@ -88,12 +82,14 @@ export default function App() {
               <div className={classes.form_column}>
                 <div className={classes.card_wrapper}>
                   <AddService setRefresh={setRefresh} />
+                  {(user?.status === "מנהל") && <AdminServiceManager setRefresh={setRefresh}/>}
                 </div>
               </div>
 
               <div className={classes.list_column}>
                 <div className={classes.card_wrapper}>
                   <ServiceList refresh={refresh} />
+                  {(user?.status === "מנהל") && <GlobalServicesList refresh={refresh}/>}
                 </div>
               </div>
             </div>
