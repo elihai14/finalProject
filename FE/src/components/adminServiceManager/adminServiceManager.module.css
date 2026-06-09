@@ -1,0 +1,66 @@
+/* adminServiceManager.module.css */
+
+.container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 24px;
+  background: #18181b;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: white;
+  direction: rtl;
+}
+
+.title {
+  color: #dfb76c;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #27272a;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.select {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  background: #18181b;
+  border: 1px solid #3f3f46;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.select:focus {
+  border-color: #dfb76c;
+}
+
+.button {
+  background: #dfb76c;
+  color: #121214;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.button:hover {
+  background: #c59b4e;
+  transform: translateY(-1px);
+}
+
+.button:disabled {
+  background: #71717a;
+  cursor: not-allowed;
+  transform: none;
+}

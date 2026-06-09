@@ -456,7 +456,6 @@ export async function handleUpdate(
   e,
   setIsLoading,
   setError,
-  onClose,
   phone,
   email
 ) {
@@ -480,13 +479,14 @@ export async function handleUpdate(
     if (response.ok) {
       // הרשמה בוצעה בהצלחה - מעבר ללוגין
       Swal.fire({
-        title: "פרטיך עודכנו בהצלחה",
-        text: "פרטיך עודכנו בהצלחה !",
+        title: "העדכון הצליח!",
+        text: "פרטיך עודכנו במערכת בהצלחה",
         icon: "success",
         confirmButtonText: "מעולה",
-        confirmButtonColor: "#3085d6",
-      }).then(() => {
-        onClose();
+        confirmButtonColor: "#dfb76c", // צבע הזהב שלך
+        background: "#1a1a1a", // רקע כהה תואם לאתר
+        color: "#ffffff", // טקסט לבן שיהיה קריא
+        iconColor: "#dfb76c",
       });
     } else {
       // כאן נתפסת הבדיקה של הבקאנד (למשל: "משתמש כבר קיים")

@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom"; 
 import classes from "./sideBar.module.css";
 import { FaHome, FaSlidersH, FaExchangeAlt, FaUserEdit } from "react-icons/fa";
-import UpdateDetailsForm from "../updateDetailsForm/UpdateDetailsForm"; 
+// import UpdateDetailsForm from "../updateDetailsForm/UpdateDetailsForm"; 
 
 export default function SideBar() {
     const [isOpen, setIsOpen] = useState(false);
-    const [showPopup, setShowPopup] = useState(false); // 👈 סטייט לשליטה בפופ-אפ
+    // const [showPopup, setShowPopup] = useState(false); // 👈 סטייט לשליטה בפופ-אפ
     
     const status = localStorage.getItem("userStatus");
 
@@ -71,7 +71,7 @@ export default function SideBar() {
          )} 
           
           {/* 📝 כפתור עדכון פרטים - משנה את showPopup ל-true וסוגר את התפריט */}
-          <button
+          {/* <button
             className={classes.navButton}
             onClick={() => {
               setShowPopup(true);
@@ -80,14 +80,18 @@ export default function SideBar() {
           >
             <FaUserEdit className={classes.navIcon} />
             <span>עדכון פרטים</span>
-          </button>
+          </button> */}
+          <Link to="/update" onClick={toggleMenu} className={classes.navButton}>
+              <FaUserEdit className={classes.navIcon} />
+              <span>עדכון פרטים</span>
+          </Link>
         </nav>
 
         {/* רקע כהה לסגירה בלחיצה מחוץ לתפריט צד */}
         {isOpen && <div className={classes.overlay} onClick={toggleMenu}></div>}
 
         {/* 👑 הקסם קורה פה: אם לחצו על הכפתור, נרנדר את הפופ-אפ של הטופס */}
-        {showPopup && <UpdateDetailsForm onClose={() => setShowPopup(false)} />}
+        {/* {showPopup && <UpdateDetailsForm onClose={() => setShowPopup(false)} />} */}
       </div>
     );
 }

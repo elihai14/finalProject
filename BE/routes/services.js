@@ -167,31 +167,23 @@ router.put("/admin/remove-service", (req, res) => {
   }
 
   const { serviceName } = req.body;
-
   if (!serviceName) {
     return res.status(400).json({ message: "נא לספק את שם השירות למחיקה" });
   }
 
   db.beginTransaction((err) => {
-    if (err) {
+    if (err)
       return res.status(500).json({ message: "Failed to start transaction" });
-    }
 
     const updateGlobalQuery =
       "UPDATE services SET status_service = 0 WHERE service_name = ?";
 
     db.query(updateGlobalQuery, [serviceName], (err, globalResult) => {
-      if (err) {
+      if (err || globalResult.affectedRows === 0) {
         return db.rollback(() => {
           res
-            .status(500)
-            .json({ message: "Internal Server Error (Global Update Failed)" });
-        });
-      }
-
-      if (globalResult.affectedRows === 0) {
-        return db.rollback(() => {
-          res.status(404).json({ message: "השירות לא נמצא בקטלוג המערכת" });
+            .status(err ? 500 : 404)
+            .json({ message: err ? "Error" : "Service not found" });
         });
       }
 
@@ -201,29 +193,27 @@ router.put("/admin/remove-service", (req, res) => {
       db.query(updateBarbersQuery, [serviceName], (err, barbersResult) => {
         if (err) {
           return db.rollback(() => {
-            res.status(500).json({
-              message: "Internal Server Error (Barbers Update Failed)",
-            });
+            res
+              .status(500)
+              .json({
+                message: "Internal Server Error (Barbers Update Failed)",
+              });
           });
         }
 
+        // --- התיקון החשוב: ביצוע ה-COMMIT ---
         db.commit((err) => {
           if (err) {
             return db.rollback(() => {
-              res.status(500).json({ message: "Failed to commit transaction" });
+              res.status(500).json({ message: "Failed to commit" });
             });
           }
-
-          return res.status(200).json({
-            message:
-              "השירות הוסר בהצלחה מהקטלוג הכללי ומכל תפריטי הספרים במערכת",
-          });
+          return res.status(200).json({ message: "הוסר בהצלחה" });
         });
       });
     });
   });
 });
-
 // router.put("/update-service", (req, res) => {
 //   if (!req.session || !req.session.user) {
 //     return res.status(401).json({ message: "User not logged in" });

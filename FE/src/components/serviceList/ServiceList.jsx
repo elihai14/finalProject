@@ -28,9 +28,7 @@ export default function ServiceList({refresh}) {
     }
   };
 
-  useEffect(() => {
-    fetchServices();
-  }, []);
+
 
   useEffect(()=>{
     fetchServices();
