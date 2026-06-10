@@ -1,177 +1,100 @@
-  // import React from 'react';
-  // import classes from './appointmentsFilter.module.css';
+import React from "react";
+import classes from "./appointmentsFilter.module.css";
 
-  // export default function AppointmentsFilter({ filters, setFilters, onSearch, services, barbers, customers, userStatus }) {
-  //   return (
-  //     <div className={classes.filterBar}>
-  //       <input 
-  //         type="date" 
-  //         value={filters.startDate}
-  //         onChange={(e) => setFilters({ ...filters, startDate: e.target.value })} 
-  //       />
-  //       <input 
-  //         type="date" 
-  //         value={filters.endDate}
-  //         onChange={(e) => setFilters({ ...filters, endDate: e.target.value })} 
-  //         min={filters.startDate} 
-  //       />
-        
-  //       {/* סלקטור שירותים */}
-  //       <select 
-  //         value={filters.service}
-  //         onChange={(e) => setFilters({ ...filters, service: e.target.value })}
-  //       >
-  //         <option value="">כל השירותים</option>
-  //         {services.map((service_name, index) => (
-  //           <option key={index} value={service_name}>{service_name}</option>
-  //         ))}
-  //       </select>
+export default function AppointmentsFilter({
+  filters,
+  setFilters,
+  services,
+  barbers,
+  customers,
+  userStatus,
+}) {
+  return (
+    <div className={classes.filterBar}>
+      <input
+        type="date"
+        value={filters.startDate}
+        onChange={(e) => {
+          setFilters((prev) => ({
+            ...prev,
+            startDate: e.target.value,
+            endDate: e.target.value,
+          }));
+        }}
+      />
 
-  //       {/* סלקטור לקוחות (למנהל או לספר) */}
-  //       {(userStatus === "מנהל" || userStatus === "ספר") && (
-  //         <select 
-  //           value={filters.user_name}
-  //           onChange={(e) => setFilters({ ...filters, user_name: e.target.value })}
-  //         >
-  //           <option value="">כל הלקוחות</option>
-  //           {customers.map((name, index) => (
-  //             <option key={index} value={name}>{name}</option>
-  //           ))}
-  //         </select>
-  //       )}
+      <input
+        type="date"
+        value={filters.endDate}
+        min={filters.startDate}
+        onChange={(e) => {
+          setFilters((prev) => ({
+            ...prev,
+            endDate: e.target.value,
+          }));
+        }}
+      />
 
-  //       {/* סלקטור ספרים (למנהל או ללקוח) */}
-  //       {(userStatus === "מנהל" || userStatus === "לקוח") && (
-  //         <select 
-  //           value={filters.barber_name}
-  //           onChange={(e) => setFilters({ ...filters, barber_name: e.target.value })}
-  //         >
-  //           <option value="">כל הספרים</option>
-  //           {barbers.map((name, index) => (
-  //             <option key={index} value={name}>{name}</option>
-  //           ))}
-  //         </select>
-  //       )}
-        
-  //       <button onClick={onSearch}>סנן</button>
-  //     </div>
-  //   );
-  // }
-  import React from 'react';
-  import classes from './appointmentsFilter.module.css';
+      {/* שירותים */}
+      <select
+        value={filters.service}
+        onChange={(e) => {
+          setFilters((prev) => ({
+            ...prev,
+            service: e.target.value,
+          }));
+        }}
+      >
+        <option value="">כל השירותים</option>
 
-  export default function AppointmentsFilter({
-    filters,
-    setFilters,
-    onSearch,
-    services,
-    barbers,
-    customers,
-    userStatus
-  }) {
+        {services.map((service_name, index) => (
+          <option key={index} value={service_name}>
+            {service_name}
+          </option>
+        ))}
+      </select>
 
-    return (
-      <div className={classes.filterBar}>
-        <input
-          type="date"
-          value={filters.startDate}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              startDate: e.target.value
-            }))
-          }
-        />
-
-        <input
-          type="date"
-          value={filters.endDate}
-          min={filters.startDate}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              endDate: e.target.value
-            }))
-          }
-        />
-
-        {/* שירותים */}
+      {/* לקוחות */}
+      {(userStatus === "מנהל" || userStatus === "ספר") && (
         <select
-          value={filters.service}
-          onChange={(e) =>
+          value={filters.user_name}
+          onChange={(e) => {
             setFilters((prev) => ({
               ...prev,
-              service: e.target.value
-            }))
-          }
+              user_name: e.target.value,
+            }));
+          }}
         >
-          <option value="">כל השירותים</option>
+          <option value="">כל הלקוחות</option>
 
-          {services.map((service_name, index) => (
-            <option key={index} value={service_name}>
-              {service_name}
+          {customers.map((name, index) => (
+            <option key={index} value={name}>
+              {name}
             </option>
           ))}
         </select>
+      )}
 
-        {/* לקוחות */}
-        {(userStatus === "מנהל" ||
-          userStatus === "ספר") && (
-          <select
-            value={filters.user_name}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                user_name: e.target.value
-              }))
-            }
-          >
-            <option value="">
-              כל הלקוחות
-            </option>
-
-            {customers.map((name, index) => (
-              <option key={index} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
-        )}
-
-        {/* ספרים */}
-        {(userStatus === "מנהל" ||
-          userStatus === "לקוח") && (
-          <select
-            value={filters.barber_mail}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                barber_mail: e.target.value
-              }))
-            }
-          >
-            <option value="">
-              כל הספרים
-            </option>
-
-            {barbers.map((barber, index) => (
-              <option
-                key={index}
-                value={barber.mail_address}
-              >
-                {barber.user_name}
-              </option>
-            ))}
-          </select>
-        )}
-
-        <button
-          onClick={() =>
-            onSearch()
-          }
+      {/* ספרים */}
+      {(userStatus === "מנהל" || userStatus === "לקוח") && (
+        <select
+          value={filters.barber_mail}
+          onChange={(e) => {
+            setFilters((prev) => ({
+              ...prev,
+              barber_mail: e.target.value,
+            }));
+          }}
         >
-          סנן
-        </button>
-      </div>
-    );
-  }
+          <option value="">כל הספרים</option>
+
+          {barbers.map((barber, index) => (
+            <option key={index} value={barber.mail_address}>
+              {barber.user_name}
+            </option>
+          ))}
+        </select>
+      )}
+    </div>
+  );
+}

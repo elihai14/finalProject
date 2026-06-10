@@ -197,7 +197,7 @@ export async function getHoursSelect(barberMail, date, serviceName) {
         barberMail: barberMail,
       }),
       credentials: "include",
-    },
+    }
   );
 
   const existingApp = await appsRes.json();
@@ -452,13 +452,7 @@ export async function getUsersList(status, isReverse) {
   return data;
 }
 
-export async function handleUpdate(
-  e,
-  setIsLoading,
-  setError,
-  phone,
-  name
-) {
+export async function handleUpdate(e, setIsLoading, setError, phone, name) {
   e.preventDefault();
   setIsLoading(true);
   setError("");
@@ -589,77 +583,237 @@ export async function handleAddConstraint(
   }
 }
 
+export async function fetchConstraints(
+  setIsLoading,
+  setConstraints,
+  setError,
+  filters
+) {
+  setIsLoading(true);
+  // const requestBody = { ...filters };
+  try {
+    // בניית ה-URL בצורה דינמית כדי לא לשלוח פרמטרים ריקים
+    const params = new URLSearchParams();
+    if (filters.startDate) params.append("startDate", filters.startDate);
+    if (filters.endDate) params.append("endDate", filters.endDate);
 
-  export async function fetchConstraints(
-    setIsLoading,
-    setConstraints,
-    setError,
-    filters
-  ) {
-    setIsLoading(true);
-    // const requestBody = { ...filters };
-    try {
-      // בניית ה-URL בצורה דינמית כדי לא לשלוח פרמטרים ריקים
-      const params = new URLSearchParams();
-      if (filters.startDate) params.append("startDate", filters.startDate);
-      if (filters.endDate) params.append("endDate", filters.endDate);
-
-      const response = await fetch(
-        `http://localhost:5000/constraints?${params.toString()}`,
-        {
-          method: "GET",
-          credentials: "include", // שומר על ה-session והעוגיות
-        }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        setConstraints(data);
-      } else {
-        setConstraints([]);
+    const response = await fetch(
+      `http://localhost:5000/constraints?${params.toString()}`,
+      {
+        method: "GET",
+        credentials: "include", // שומר על ה-session והעוגיות
       }
-    } catch (err) {
-      console.log(err);
-      
-      setError("שגיאה");
-    } finally {
-      setIsLoading(false);
+    );
+    const data = await response.json();
+    if (response.ok) {
+      setConstraints(data);
+    } else {
+      setConstraints([]);
     }
-  };
+  } catch (err) {
+    console.log(err);
 
-    export async function handleCancelConstraint (
-      id,
-      setError,
-      setSuccessMessage,
-      setConstraints,
-      constraints,
+    setError("שגיאה");
+  } finally {
+    setIsLoading(false);
+  }
+}
 
-    ) {
-      setError("");
-      setSuccessMessage("");
+export async function handleCancelConstraint(
+  id,
+  setError,
+  setSuccessMessage,
+  setConstraints,
+  constraints
+) {
+  setError("");
+  setSuccessMessage("");
 
+  try {
+    const response = await fetch(
+      `http://localhost:5000/constraints/remove-constraint/${id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      }
+    );
+    console.log("Status:", response.status, "ID sent:", id);
+    if (response.ok) {
+      setSuccessMessage("האילוץ בוטל בהצלחה!");
+      setConstraints(constraints.filter((cons) => cons.constraint_code !== id));
+
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+    } else {
+      setError("לא ניתן לבטל את התור כרגע");
+    }
+  } catch (err) {
+    setError("שגיאת תקשורת בביטול התור");
+  }
+}
+
+export async function getStatisticData(
+  today,
+  dashDates,
+  prevMonth,
+  setChartData,
+  userStatus,
+  setRepeatPercentage,
+  setLoading
+) {
+  setLoading(true);
+
+  fetch("http://localhost:5000/appointments/analytics", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      startDate: dashDates.startDate || prevMonth,
+      endDate: dashDates.endDate || today,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+
+      setChartData(data);
+
+      if (userStatus === "מנהל") {
+        return fetch(
+          "http://localhost:5000/appointments/analytics/repeat-customers",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              startDate: dashDates.startDate || prevMonth,
+              endDate: dashDates.endDate || today,
+            }),
+          }
+        ).then((res) => res.json());
+      }
+    })
+    .then((repeatData) => {
+      if (repeatData) setRepeatPercentage(repeatData.repeatPercentage || 0);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("שגיאה בטעינת הנתונים:", err);
+      setLoading(false);
+    });
+}
+
+// 1. פונקציה להבאת תורים (הפונקציה המרכזית)
+export async function fetchAppointments(
+  customFilters,
+  setIsLoading,
+  setError,
+  user,
+  setAppointments
+) {
+  setIsLoading(true);
+  setError("");
+
+  const requestBody = { ...customFilters };
+  if (user.status === "ספר") requestBody.barber_mail = user.mail_address;
+  else if (user.status === "לקוח") requestBody.clientMail = user.mail_address;
+
+  try {
+    const response = await fetch("http://localhost:5000/appointments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+    });
+
+    const data = await response.json();
+    setAppointments(response.ok ? data : []);
+  } catch (err) {
+    setError("שגיאה בטעינת הנתונים");
+    setAppointments([]);
+  } finally {
+    setIsLoading(false);
+  }
+}
+export async function fetchFilterOptions(user, setServices,setBarbers,setCustomers) {
+  try {
+    const requestBody = {};
+    if (user.status === "ספר") requestBody.barber_mail = user.mail_address;
+    else if (user.status === "לקוח") requestBody.clientMail = user.mail_address;
+
+    const response = await fetch("http://localhost:5000/appointments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      setServices([
+        ...new Set(data.map((app) => app.service_name).filter(Boolean)),
+      ]);
+      setBarbers(
+        data
+          .map((app) => ({
+            user_name: app.barberName,
+            mail_address: app.barber_mail_address,
+          }))
+          .filter(
+            (barber, index, self) =>
+              barber.mail_address &&
+              index ===
+                self.findIndex((b) => b.mail_address === barber.mail_address)
+          )
+      );
+      setCustomers([
+        ...new Set(data.map((app) => app.customerName).filter(Boolean)),
+      ]);
+    }
+  } catch (err) {
+    console.error("Filter options error:", err);
+  }
+}
+
+
+  // פונקציית ביטול תור
+  export async function handleCancelAppointment(id, getApps, filters, setReloadApps) {
+    const result = await Swal.fire({
+      title: "האם לבטל את התור?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#dfb76c",
+      cancelButtonColor: "#ef4444",
+      confirmButtonText: "כן, בטל תור",
+      cancelButtonText: "לא, חזור",
+      background: "#1a1a1a",
+      color: "#fff",
+    });
+
+    if (result.isConfirmed) {
       try {
         const response = await fetch(
-          `http://localhost:5000/constraints/remove-constraint/${id}`,
+          `http://localhost:5000/appointments/cancel/${id}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            credentials: "include",
           }
         );
-        console.log("Status:", response.status, "ID sent:", id);
-        if (response.ok) {
-          setSuccessMessage("האילוץ בוטל בהצלחה!");
-          setConstraints(
-            constraints.filter((cons) => cons.constraint_code !== id)
-          );
 
-          setTimeout(() => {
-            setSuccessMessage("");
-          }, 3000);
+        if (response.ok) {
+          await Swal.fire({
+            title: "בוצע!",
+            text: "התור בוטל בהצלחה.",
+            icon: "success",
+            background: "#1a1a1a",
+            color: "#fff",
+            confirmButtonColor: "#dfb76c",
+          });
+          getApps(filters); // רענון רשימה
+          setReloadApps(false);
         } else {
-          setError("לא ניתן לבטל את התור כרגע");
+          Swal.fire("שגיאה", "לא הצלחנו לבטל את התור.", "error");
         }
       } catch (err) {
-        setError("שגיאת תקשורת בביטול התור");
+        Swal.fire("שגיאה", "תקלה בשרת.", "error");
       }
-    };
+    }
+  };
