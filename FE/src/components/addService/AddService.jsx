@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import classes from "./addService.module.css";
 import Swal from 'sweetalert2';
-
-export default function AddService({setRefresh}) {
+import { fetchUser } from "../../../js/mainFunctionView";
+export default function AddService({ refresh , setRefresh}) {
+  const [user , setUser] = useState({});
   const [globalServices, setGlobalServices] = useState([]);
-  const [userEmail, setUserEmail] = useState("");
   const [newService, setNewService] = useState({
     serviceName: "",
     price: "",
@@ -12,11 +12,9 @@ export default function AddService({setRefresh}) {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-
   useEffect(() => {
-    const email = localStorage.getItem("userEmail");
-    setUserEmail(email);
 
+    fetchUser(setUser);
     fetch("http://localhost:5000/services/global")
       .then((res) => res.json())
       .then((data) => {
@@ -29,7 +27,7 @@ export default function AddService({setRefresh}) {
           }));
         }
       });
-  }, []);
+  }, [refresh]);
 
   const handleAddService = async (e) => {
     e.preventDefault();
@@ -46,7 +44,7 @@ export default function AddService({setRefresh}) {
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({
-            barberMail: userEmail,
+            barberMail: user.mail_address,
             serviceName: newService.serviceName,
             price: newService.price,
             duration: newService.duration,
@@ -142,8 +140,7 @@ export default function AddService({setRefresh}) {
           <option value="90">שעה וחצי</option>
         </select>
 
-        <button type="submit" className={classes.button} disabled={isLoading} >
-         {isLoading ? "מוסיף..." : "הוסף +"}
+        <button type="submit" className={classes.button} disabled={isLoading} > {isLoading ? "מוסיף..." : "הוסף +"} 
         </button>
       </form>
     </div>
