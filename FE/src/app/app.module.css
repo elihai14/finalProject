@@ -60,6 +60,14 @@
     margin-top: 20px;
   }
 
+  .column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+   align-items: stretch;
+}
+
   .form_column {
     flex: 0 0 600px;
     display: flex;

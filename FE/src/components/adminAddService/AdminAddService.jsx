@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import classes from "./adminServiceManager.module.css";
+import classes from "./adminAddService.module.css";
 import Swal from 'sweetalert2';
-
-export default function AdminServiceManager({ setRefresh }) {
-  const [userEmail, setUserEmail] = useState("");
+import { fetchUser } from "../../../js/mainFunctionView";
+import { use } from "react";
+export default function AdminAddService({ setRefresh }) {
+  const [user , setUser] = useState({});
   const [newService, setNewService] = useState({ serviceName: "" });
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const email = localStorage.getItem("userEmail");
-    setUserEmail(email);
+    fetchUser(setUser);
   }, []);
 
   const handleAddService = async (e) => {
@@ -23,7 +23,7 @@ export default function AdminServiceManager({ setRefresh }) {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          barberMail: userEmail,
+          barberMail: user.mail_address,
           serviceName: newService.serviceName,
         }),
       });

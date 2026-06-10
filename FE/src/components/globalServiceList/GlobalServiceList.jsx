@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import classes from "./globalServiceList.module.css";
 import Swal from "sweetalert2";
 
-export default function GlobalServicesList({ refresh }) {
+export default function GlobalServicesList({ refresh , setRefresh}) {
   const [services, setServices] = useState([]);
 
   // פונקציה להבאת כל השירותים מהמערכת
@@ -48,7 +48,7 @@ export default function GlobalServicesList({ refresh }) {
       if (res.ok) {
         Swal.fire({ icon: "success", title: "נמחק בהצלחה", background: "#1a1a1a", color: "#fff", timer: 2000, showConfirmButton: false });
         fetchGlobalServices();
-        if (setRefresh) setRefresh(prev => !prev);
+        setRefresh(prev => !prev);
       } else {
         throw new Error("Failed to delete");
       }

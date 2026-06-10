@@ -18,7 +18,7 @@ import ConstraintList from "../components/constraintsList/ConstraintsList";
 import AddConstraintForm from "../components/addConstraintForm/AddConstraintForm";
 import UsersList from "../components/usersList/UsersList";
 import UpdateDetailsForm from "../components/updateDetailsForm/UpdateDetailsForm";
-import AdminServiceManager from "../components/adminServiceManager/AdminServiceManager";
+import AdminAddService from "../components/adminAddService/AdminAddService";
 import GlobalServicesList from "../components/globalServiceList/GlobalServiceList";
 
 export default function App() {
@@ -81,15 +81,16 @@ export default function App() {
             <div className={classes.page_container}>
               <div className={classes.form_column}>
                 <div className={classes.card_wrapper}>
-                  <AddService setRefresh={setRefresh} />
-                  {(user?.status === "מנהל") && <AdminServiceManager setRefresh={setRefresh}/>}
+                  <AddService refresh={refresh} setRefresh={setRefresh} />
+                  {(user?.status === "מנהל") && <AdminAddService setRefresh={setRefresh}/>}
                 </div>
               </div>
 
               <div className={classes.list_column}>
                 <div className={classes.card_wrapper}>
                   <ServiceList refresh={refresh} />
-                  {(user?.status === "מנהל") && <GlobalServicesList refresh={refresh}/>}
+                  {(user?.status === "מנהל") && 
+                  <GlobalServicesList refresh={refresh} setRefresh={setRefresh}/>}
                 </div>
               </div>
             </div>

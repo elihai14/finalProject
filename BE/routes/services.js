@@ -105,36 +105,104 @@ router.post("/barber/add-service", (req, res) => {
   });
 });
 
+// router.post("/admin/add-service", (req, res) => {
+//   if (!req.session || !req.session.user) {
+//     return res.status(401).json({ message: "User not logged in" });
+//   }
+//   const { serviceName } = req.body;
+//   console.log(serviceName);
+  
+
+//   const checkQuery = "SELECT * FROM services WHERE service_name = ? AND status_service = 1";
+
+//   db.query(checkQuery, [serviceName], (err, results) => {
+//     if (err) return res.status(500).json({ message: "Internal Error" });
+
+//     if (results.length > 0) {
+//       return res.status(400).json({ message: "השירות כבר קיים בקטלוג המערכת" });
+//     }
+
+//     const insertQuery =
+//       "INSERT INTO services (service_name, status_service) VALUES (?, 1)";
+
+//     db.query(insertQuery, [serviceName], (err) => {
+//       if (err)
+//         return res
+//           .status(500)
+//           .json({ message: "Error adding to global services" });
+
+//       return res.status(200).json({ message: "השירות נוסף למערכת בהצלחה" });
+//     });
+//   });
+// });
+
+// 👈 3. עדכון: משנה סטטוס ל-0 רק עבור הספר הספציפי בטבלת barber_services ולא לכל המערכת!
 router.post("/admin/add-service", (req, res) => {
   if (!req.session || !req.session.user) {
-    return res.status(401).json({ message: "User not logged in" });
+    return res.status(401).json({
+      message: "User not logged in",
+    });
   }
+
   const { serviceName } = req.body;
 
   const checkQuery = "SELECT * FROM services WHERE service_name = ?";
 
   db.query(checkQuery, [serviceName], (err, results) => {
-    if (err) return res.status(500).json({ message: "Internal Error" });
-
-    if (results.length > 0) {
-      return res.status(400).json({ message: "השירות כבר קיים בקטלוג המערכת" });
+    if (err) {
+      return res.status(500).json({
+        message: "Internal Error",
+      });
     }
 
+    // השירות כבר קיים במערכת
+    if (results.length > 0) {
+      const service = results[0];
+
+      // כבר פעיל
+      if (service.status_service === 1) {
+        return res.status(400).json({
+          message: "השירות כבר קיים בקטלוג המערכת",
+        });
+      }
+
+      // קיים אבל כבוי → מפעילים מחדש
+      const updateQuery =
+        "UPDATE services SET status_service = 1 WHERE service_name = ?";
+
+      db.query(updateQuery, [serviceName], (err) => {
+        if (err) {
+          return res.status(500).json({
+            message: "Error updating service",
+          });
+        }
+
+        return res.status(200).json({
+          message: "השירות הוחזר למערכת בהצלחה",
+        });
+      });
+
+      return;
+    }
+
+    // שירות חדש לגמרי
     const insertQuery =
       "INSERT INTO services (service_name, status_service) VALUES (?, 1)";
 
     db.query(insertQuery, [serviceName], (err) => {
-      if (err)
-        return res
-          .status(500)
-          .json({ message: "Error adding to global services" });
+      if (err) {
+        return res.status(500).json({
+          message: "Error adding service",
+        });
+      }
 
-      return res.status(200).json({ message: "השירות נוסף למערכת בהצלחה" });
+      return res.status(200).json({
+        message: "השירות נוסף למערכת בהצלחה",
+      });
     });
   });
 });
 
-// 👈 3. עדכון: משנה סטטוס ל-0 רק עבור הספר הספציפי בטבלת barber_services ולא לכל המערכת!
 router.put("/remove-service", (req, res) => {
   
   if (!req.session || !req.session.user) {
