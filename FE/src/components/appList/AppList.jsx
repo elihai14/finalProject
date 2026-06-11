@@ -6,31 +6,33 @@ import {
   fetchAppointments,
   fetchUser,
   fetchFilterOptions,
-  handleCancelAppointment
+  handleCancelAppointment,
 } from "../../../js/mainFunctionView";
 
-export default function AppList({ refresh }) {
+export default function AppList({ refresh, setReloadApps, reloadApps }) {
   const [appointments, setAppointments] = useState([]);
   const [services, setServices] = useState([]);
   const [barbers, setBarbers] = useState([]);
   const [customers, setCustomers] = useState([]);
-  const [user, setUser] = useState({})
-  const [reloadApps, setReloadApps] = useState(true); 
+  const [user, setUser] = useState(null); // שינוי ל-null כדי לדעת מתי המשתמש עוד לא נטען
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [filters, setFilters] = useState({
     startDate: "",
-    endDate: "",
-    service: "",
-    user_name: "",
-    barber_name: "",
   });
 
-  fetchUser(setUser);
-  // 1. פונקציה להבאת תורים (הפונקציה המרכזית)
+  // תיקון 1: הבאת המשתמש בתוך useEffect שירוץ רק פעם אחת בטעינה
+  useEffect(() => {
+    fetchUser(setUser);
+  }, []);
+
+  // 1. פונקציה להבאת תורים
   const getApps = async (customFilters) => {
+    // אם המשתמש עדיין לא נטען, אל תשלח בקשה לשרת
+    if (!user || !user.mail_address) return;
+
     fetchAppointments(
       customFilters,
       setIsLoading,
@@ -40,18 +42,17 @@ export default function AppList({ refresh }) {
     );
   };
 
-
-  // טעינת וטעינת אפשרויות פעם אחת
+  // טעינת אפשרויות פילטר (רץ רק כשהמשתמש קיים ומשתנה)
   useEffect(() => {
-    fetchFilterOptions(user, setServices, setBarbers, setCustomers);
-  }, [refresh, user.mail_address, user.status]);
+    if (user && user.mail_address) {
+      fetchFilterOptions(user, setServices, setBarbers, setCustomers);
+    }
+  }, [refresh, user?.mail_address, user?.status]);
 
-
-
-
+  // טעינת התורים (רץ כשהפילטרים משתנים, או כשיש reload, או כשהמשתמש סוף סוף נטען)
   useEffect(() => {
     getApps(filters);
-  }, [filters, reloadApps]);
+  }, [filters, reloadApps, user]); // הוספנו את user כתרחשות משפיעה
 
   return (
     <div className={classes.appList}>
@@ -61,7 +62,7 @@ export default function AppList({ refresh }) {
         services={services}
         barbers={barbers}
         customers={customers}
-        userStatus={user.status}
+        userStatus={user?.status}
       />
 
       {error && <div className={classes.error_message}>{error}</div>}

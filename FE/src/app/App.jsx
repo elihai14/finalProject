@@ -30,6 +30,8 @@ export default function App() {
   const [refreshAppointments, setRefreshAppointments] = useState(0);
   const hideSidebarRoutes = ["/", "/login", "/register"];
   const shouldShowSidebar = !hideSidebarRoutes.includes(location.pathname);
+    const [reloadApps, setReloadApps] = useState(true);
+
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -47,11 +49,10 @@ export default function App() {
 
   return (
     <div>
-      
       <Header />
       <Navbar user={user} setUser={setUser} />
 
-      {shouldShowSidebar && <SideBar/>}
+      {shouldShowSidebar && <SideBar />}
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/login" element={<LoginForm />} />
@@ -59,7 +60,9 @@ export default function App() {
         <Route path="/update" element={<UpdateDetailsForm />} />
 
         {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
-        <Route path="/admin-dashboard" element={
+        <Route
+          path="/admin-dashboard"
+          element={
             <div className={classes.page_container}>
               <div className={classes.form_column}>
                 <div className={classes.card_wrapper}>
@@ -69,11 +72,16 @@ export default function App() {
 
               <div className={classes.list_column}>
                 <div className={classes.card_wrapper}>
-                  <AppList refresh={refreshAppointments} />
+                  <AppList
+                    refresh={refreshAppointments}
+                    reloadApps={reloadApps}
+                    setReloadApps={setReloadApps}
+                  />
                 </div>
               </div>
             </div>
-          } />
+          }
+        />
 
         <Route
           path="/manage-services"
@@ -82,15 +90,21 @@ export default function App() {
               <div className={classes.form_column}>
                 <div className={classes.card_wrapper}>
                   <AddService refresh={refresh} setRefresh={setRefresh} />
-                  {(user?.status === "מנהל") && <AdminAddService setRefresh={setRefresh}/>}
+                  {user?.status === "מנהל" && (
+                    <AdminAddService setRefresh={setRefresh} />
+                  )}
                 </div>
               </div>
 
               <div className={classes.list_column}>
                 <div className={classes.card_wrapper}>
                   <ServiceList refresh={refresh} />
-                  {(user?.status === "מנהל") && 
-                  <GlobalServicesList refresh={refresh} setRefresh={setRefresh}/>}
+                  {user?.status === "מנהל" && (
+                    <GlobalServicesList
+                      refresh={refresh}
+                      setRefresh={setRefresh}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -103,6 +117,7 @@ export default function App() {
               <div className={classes.form_column}>
                 <div className={classes.card_wrapper}>
                   <NewAppForm
+                    setReloadApps={setReloadApps}
                     onSuccess={() => setRefreshAppointments((prev) => prev + 1)}
                   />
                 </div>
@@ -110,7 +125,11 @@ export default function App() {
 
               <div className={classes.list_column}>
                 <div className={classes.card_wrapper}>
-                  <AppList refresh={refreshAppointments} />
+                  <AppList
+                    refresh={refreshAppointments}
+                    reloadApps={reloadApps}
+                    setReloadApps={setReloadApps}
+                  />
                 </div>
               </div>
             </div>
@@ -129,7 +148,11 @@ export default function App() {
 
               <div className={classes.list_column}>
                 <div className={classes.card_wrapper}>
-                  <AppList refresh={refreshAppointments} />
+                  <AppList
+                    refresh={refreshAppointments}
+                    reloadApps={reloadApps}
+                    setReloadApps={setReloadApps}
+                  />
                 </div>
               </div>
             </div>
@@ -141,7 +164,7 @@ export default function App() {
             <div className={classes.page_container}>
               <div className={classes.form_column}>
                 <div className={classes.card_wrapper}>
-                  <AddConstraintForm setRefresh ={setRefresh}/>
+                  <AddConstraintForm setRefresh={setRefresh} />
                 </div>
               </div>
 

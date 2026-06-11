@@ -2,7 +2,7 @@ import classes from "./newAppForm.module.css";
 import { getHoursSelect, handleCreateApp } from "../../../js/mainFunctionView";
 import { useState, useEffect } from "react";
 
-export default function NewAppForm({ onSuccess }) {
+export default function NewAppForm({ onSuccess, setReloadApps }) {
   const [barbers, setBarbers] = useState([]); // מצב לשמירת רשימת הספרים
   const [loading, setLoading] = useState(true);
   const [selectedBarber, setSelectedBarber] = useState(""); // הספר שנבחר
@@ -22,9 +22,9 @@ export default function NewAppForm({ onSuccess }) {
         const response = await fetch("http://localhost:5000/users", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: 'ספר' }) // זה יחזיר גם מנהלים בזכות השינוי בשרת
+          body: JSON.stringify({ status: "ספר" }), // זה יחזיר גם מנהלים בזכות השינוי בשרת
         });
-        
+
         const data = await response.json();
         if (response.ok) {
           setBarbers(data);
@@ -92,7 +92,8 @@ export default function NewAppForm({ onSuccess }) {
       setSelectedService,
       setSelectedDate,
       setSelectedHour,
-      setHours
+      setHours,
+      setReloadApps
     );
 
     onSuccess?.(); // 👈 זה הרענון

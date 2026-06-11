@@ -228,7 +228,8 @@ export async function handleCreateApp(
   setSelectedService,
   setSelectedDate,
   setSelectedHour,
-  setHours
+  setHours,
+  setReloadApps
 ) {
   const constraint_code_response = await fetch(
     `http://localhost:5000/constraints/get-code`,
@@ -317,6 +318,7 @@ export async function handleCreateApp(
   setSelectedDate("");
   setSelectedHour("");
   setHours([]);
+  setReloadApps((prev) => !prev);
 }
 
 export function getHoursArr(startTime, endTime) {
