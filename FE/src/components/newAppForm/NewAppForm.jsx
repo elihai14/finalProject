@@ -1,5 +1,5 @@
 import classes from "./newAppForm.module.css";
-import { getHoursSelect, handleCreateApp } from "../../../js/mainFunctionView";
+import { fetchUser, getHoursSelect, handleCreateApp } from "../../../js/mainFunctionView";
 import { useState, useEffect } from "react";
 
 export default function NewAppForm({ onSuccess, setReloadApps }) {
@@ -8,7 +8,7 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
   const [selectedBarber, setSelectedBarber] = useState(""); // הספר שנבחר
   const [services, setServices] = useState([]); // שירותי הספר שנבחר
   const [loadingServices, setLoadingServices] = useState(false);
-  const [constraints, setConstraints] = useState([]); // ימי העבודה של הספר הנבחר
+  const [user, setUser] = useState({}); // ימי העבודה של הספר הנבחר
   const [selectedService, setSelectedService] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [hours, setHours] = useState([]);
@@ -34,8 +34,9 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
         console.error("שגיאה בטעינת הספרים:", error);
         setLoading(false);
       }
+    
     };
-
+    fetchUser(setUser);
     fetchBarbers();
   }, []);
 
@@ -73,7 +74,8 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
       const result = await getHoursSelect(
         selectedBarber,
         selectedDate,
-        selectedService
+        selectedService,
+        user.mail_address
       );
 
       setHours(result);

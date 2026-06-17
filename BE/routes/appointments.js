@@ -102,7 +102,7 @@ router.post("/add-appointment", (req, res) => {
 //   });
 // });
 router.post("/existing-apps", (req, res) => {
-  const { date, barberMail } = req.body;
+  const { date, barberMail, clientMail } = req.body;
 
   const appQuery = `
     SELECT 
@@ -112,12 +112,13 @@ router.post("/existing-apps", (req, res) => {
     JOIN barber_services s
       ON a.service_name = s.service_name
     WHERE a.appointment_date = ?
-      AND a.barber_mail_address = ?
+      AND (a.barber_mail_address = ?
+            OR a.client_mail_address=?)
       AND a.is_cancel = 0
     ORDER BY a.appointment_time ASC
   `;
 
-  db.query(appQuery, [date, barberMail], (err, results) => {
+  db.query(appQuery, [date, barberMail, clientMail], (err, results) => {
     if (err) {
       return res.status(400).json({
         message: "Internal Server Error",

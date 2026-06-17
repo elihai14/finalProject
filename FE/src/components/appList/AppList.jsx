@@ -19,8 +19,19 @@ export default function AppList({ refresh, setReloadApps, reloadApps }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // 1. תאריך ההתחלה - היום
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0];
+
+  // 2. תאריך הסיום - חודש קדימה
+  const nextMonth = new Date();
+  nextMonth.setMonth(today.getMonth() + 1);
+  const nextMonthStr = nextMonth.toISOString().split("T")[0];
+
+  // 3. הגדרת הסטייט עם שני התאריכים בדיפולט
   const [filters, setFilters] = useState({
-    startDate: "",
+    startDate: todayStr,
+    endDate: nextMonthStr, // 👈 הוספת תאריך סיום דיפולטי
   });
 
   // תיקון 1: הבאת המשתמש בתוך useEffect שירוץ רק פעם אחת בטעינה
