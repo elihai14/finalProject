@@ -70,9 +70,7 @@ export default function AddConstraintForm({setRefresh}) {
           disabled={!selectedDate}
         >
           <option value="">
-            {hours.length === 0
-              ? "המספרה אינה פעילה בתאריך ביום זה "
-              : "-- בחר שעה --"}
+            { "-- בחר שעה --"}
           </option>
 
           {hours.map((h, i) => (
@@ -88,12 +86,10 @@ export default function AddConstraintForm({setRefresh}) {
           disabled={!startTime}
         >
           <option value="">
-            {hours.length === 0
-              ? "המספרה אינה פעילה ביום זה "
-              : "-- בחר שעה --"}
+            { "-- בחר שעה --"}
           </option>
 
-          {endHours.map((h, i) => (
+          {endHours.slice(1).map((h, i) => (
             <option key={i} value={h}>
               {h}
             </option>

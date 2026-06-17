@@ -69,8 +69,10 @@ export default function ConstraintList({ refresh }) {
             <input
               id="endDate"
               min={filters.startDate ? filters.startDate : ""}
+              value={filters.endDate}
               type="date"
               onChange={(e) => {
+                
                 const updatedValue = e.target.value;
                 const updatedFilters = { ...filters, endDate: updatedValue };
 
@@ -95,7 +97,7 @@ export default function ConstraintList({ refresh }) {
               type="date"
               onChange={(e) => {
                 const updatedValue = e.target.value;
-                const updatedFilters = { ...filters, startDate: updatedValue };
+                const updatedFilters = { ...filters, startDate: updatedValue, endDate:updatedValue };
 
                 setFilters(updatedFilters); // מעדכן את המסך
                 fetchConstraints(

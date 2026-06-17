@@ -64,8 +64,8 @@ export default function AdminAddService({ setRefresh }) {
 
   return (
     <div className={classes.container}>
-      <h3 className={classes.title}>הוספת שירות</h3>
-
+      <h3 className={classes.title}>הוספת שירות למערכת</h3>
+    
       <form onSubmit={handleAddService} className={classes.form}>
         <input
           type="text"

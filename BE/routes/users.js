@@ -74,6 +74,12 @@ router.post("/get-status", (req, res) => {
 
 router.post("/register", (req, res) => {
   const { fullName, phoneNumber, mailAddress } = req.body;
+  
+  if (phoneNumber) {
+    if (!/^\d{10}$/.test(phoneNumber) || !phoneNumber.startsWith("05")) {
+      return res.status(400).json({ message: "מספר טלפון לא תקין" });
+    }
+  }
 
   if (!fullName || !phoneNumber || !mailAddress) {
     return res.status(400).json({ message: "נא למלא את כל השדות" });

@@ -252,7 +252,7 @@ export async function handleCreateApp(
       text: "מצטערים, קרתה שגיאה בקביעת התור",
       icon: "error",
       confirmButtonText: "הבנתי",
-      confirmButtonColor: "#3085d6",
+      confirmButtonColor: "#dfb76c",
     });
     return;
   }
@@ -273,7 +273,7 @@ export async function handleCreateApp(
       text: "מצטערים, קרתה שגיאה בקביעת התור",
       icon: "error",
       confirmButtonText: "הבנתי",
-      confirmButtonColor: "#3085d6",
+      confirmButtonColor: "#dfb76c",
     });
     return;
   }
@@ -302,7 +302,7 @@ export async function handleCreateApp(
       text: "מצטערים, קרתה שגיאה בקביעת התור",
       icon: "error",
       confirmButtonText: "הבנתי",
-      confirmButtonColor: "#3085d6",
+      confirmButtonColor: "#dfb76c",
     });
     return;
   }
@@ -311,7 +311,7 @@ export async function handleCreateApp(
     text: "התור נקבע בהצלחה ויופיע מייד ברשימת התורים",
     icon: "success",
     confirmButtonText: "מעולה !",
-    confirmButtonColor: "#3085d6",
+    confirmButtonColor: "#dfb76c",
   });
   setSelectedBarber("");
   setSelectedService("");
@@ -578,7 +578,7 @@ export async function handleAddConstraint(
       setEndtTime("");
       setSelectedEndTime("");
       setEndHours([]);
-      setRefresh(true);
+      setRefresh(prev => !prev);
     }
   } catch (error) {
     console.error("שגיאה בהוספת האילוץ:", error);
@@ -626,33 +626,77 @@ export async function handleCancelConstraint(
   setError,
   setSuccessMessage,
   setConstraints,
-  constraints
+  constraints,
 ) {
   setError("");
   setSuccessMessage("");
 
-  try {
-    const response = await fetch(
-      `http://localhost:5000/constraints/remove-constraint/${id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      }
-    );
-    console.log("Status:", response.status, "ID sent:", id);
-    if (response.ok) {
-      setSuccessMessage("האילוץ בוטל בהצלחה!");
-      setConstraints(constraints.filter((cons) => cons.constraint_code !== id));
+  // 1. נפתח קודם כל את מודאל השאלה של Swal
+  const result = await Swal.fire({
+    title: "לבטל את האילוץ?",
+    text: ".תורים קיימים יישארו, אך השעות ייסגרו להזמנות חדשות", 
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#dfb76c",
+    cancelButtonColor: "#ef4444",
+    confirmButtonText: "כן, בטל אילוץ",
+    cancelButtonText: "לא, חזור",
+    background: "#1a1a1a",
+    color: "#fff",
+  });
 
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
-    } else {
-      setError("לא ניתן לבטל את התור כרגע");
+  if (result.isConfirmed) {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/constraints/remove-constraint/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        },
+      );
+
+      console.log("Status:", response.status, "ID sent:", id);
+
+      if (response.ok) {
+        // עדכון הסטייט הלוקאלי כדי שהאילוץ ייעלם מיד מהמסך
+        setConstraints(
+          constraints.filter((cons) => cons.constraint_code !== id),
+        );
+
+        Swal.fire({
+          title: "בוטל!",
+          text: "האילוץ בוטל בהצלחה.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+          background: "#1a1a1a",
+          color: "#fff",
+        });
+      } else {
+        // אם השרת החזיר שגיאה, נציג פופאפ שגיאה
+        Swal.fire({
+          title: "אופס...",
+          text: "לא ניתן לבטל את האילוץ כרגע",
+          icon: "error",
+          confirmButtonColor: "#dfb76c",
+          background: "#1a1a1a",
+          color: "#fff",
+        });
+        setError("לא ניתן לבטל את האילוץ כרגע");
+      }
+    } catch (err) {
+      // אם יש שגיאת תקשורת
+      Swal.fire({
+        title: "שגיאה",
+        text: "שגיאת תקשורת בביטול האילוץ",
+        icon: "error",
+        confirmButtonColor: "#dfb76c",
+        background: "#1a1a1a",
+        color: "#fff",
+      });
+      setError("שגיאת תקשורת בביטול האילוץ");
     }
-  } catch (err) {
-    setError("שגיאת תקשורת בביטול התור");
   }
 }
 
