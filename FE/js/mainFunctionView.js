@@ -159,7 +159,7 @@ function calculateSlots(
 
   return availableSlots;
 }
-export async function getHoursSelect(barberMail, date, serviceName) {
+export async function getHoursSelect(barberMail, date, serviceName, clientMail) {
   const constraintsRes = await fetch(
     `http://localhost:5000/constraints/barbers-constraints`,
     {
@@ -195,6 +195,7 @@ export async function getHoursSelect(barberMail, date, serviceName) {
       body: JSON.stringify({
         date: date,
         barberMail: barberMail,
+        clientMail: clientMail,
       }),
       credentials: "include",
     }

@@ -108,7 +108,7 @@ function DashboardStats({ userStatus }) {
             value={dashDates.startDate}
             onChange={(e) => {
               e.preventDefault(); // מניעת רענון דפדפן לא רצוי
-              setDashDates((prev) => ({ ...prev, startDate: e.target.value }));
+              setDashDates((prev) => ({ ...prev, startDate: e.target.value, endDate:e.target.value }));
             }}
           />
         </div>
