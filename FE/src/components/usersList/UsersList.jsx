@@ -9,6 +9,10 @@ export default function UsersList() {
   const [refresh, setRefresh] = useState(false);
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
+  const [userToSearch,setUserToSearch] = useState("");
+const filteredUsers = users.filter((user) =>
+  user.user_name.startsWith(userToSearch)
+);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -29,6 +33,7 @@ export default function UsersList() {
     };
     fetchUsers();
   }, [isReverse, status, refresh]);
+
 
   return (
     <div className={classes.users_container}>
@@ -54,6 +59,12 @@ export default function UsersList() {
             <option value="false">א-ת</option>
             <option value="true">ת-א</option>
           </select>
+
+          <input
+            type="text"
+            placeholder="חיפוש משתמש לפי שם"
+            onChange={(e) => setUserToSearch(e.target.value)}
+          ></input>
         </div>
 
         {/* שגיאות */}
@@ -62,7 +73,7 @@ export default function UsersList() {
         {/* רשימת המשתמשים - ה-map רץ ישירות כאן על מערך ה-users העדכני */}
         {!error && (
           <div className={classes.grid_layout}>
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <UserCard
                 key={user.mail_address}
                 user={user}
