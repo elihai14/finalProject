@@ -6,7 +6,9 @@ const dbSingleton = require("../dbSingleton");
 
 // Execute a query to the database
 const db = dbSingleton.getConnection();
-
+const today = new Date();
+const todayStr = today.toISOString().split("T")[0];
+const currentTimeStr = `${String(today.getHours()).padStart(2, "0")}:${String(today.getMinutes()).padStart(2, "0")}`;
 // מחזיר רשימת תורים של המשתמש שמחובר
 router.post("/", (req, res) => {
   let { user_name, clientMail, service, startDate, endDate, barber_mail } =
@@ -30,12 +32,21 @@ router.post("/", (req, res) => {
   }
 
   if (startDate) {
-    query += " AND appointment_date >= ? ";
-    values.push(startDate);
+    if (startDate == todayStr) {
+      query +=
+        " AND appointment_date > ? OR (appointment_date = ? AND appointment_time > ?) ";
+      values.push(startDate);
+      values.push(startDate);
+      values.push(currentTimeStr);
+    }else
+    {
+      query +=
+        " AND appointment_date >= ? ";
+      values.push(startDate);
+    }
   }
 
-  if (endDate) 
-  {
+  if (endDate) {
     query += " AND appointment_date <= ? ";
     const nextDay = new Date(endDate);
     nextDay.setDate(nextDay.getDate() + 1);
@@ -61,7 +72,6 @@ router.post("/", (req, res) => {
 
 // נתיב להוספת תור
 router.post("/add-appointment", (req, res) => {
-  
   // 1. בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {
     // בדיקה אם משתמש לא מחובר
@@ -69,7 +79,7 @@ router.post("/add-appointment", (req, res) => {
   }
 
   console.log(req.body);
-  
+
   const { constraintCode, barberMail, service, date, time, price } = req.body;
   const userMail = req.session.user.email;
 
@@ -77,12 +87,12 @@ router.post("/add-appointment", (req, res) => {
     "INSERT INTO appointments (appointment_time,appointment_date, constraint_code,service_name,client_mail_address,barber_mail_address,price,is_cancel) VALUES(?,?,?,?,?,?,?,?)";
   db.query(
     insertQuery,
-    [time, date, constraintCode, service, userMail, barberMail, price,0],
+    [time, date, constraintCode, service, userMail, barberMail, price, 0],
     (err, result) => {
       if (err) return res.status(500).json({ message: "שגיאה בהוספת התור" });
 
       return res.status(200).json({ message: "התור נוסף בהצלחה" });
-    }
+    },
   );
 });
 
@@ -160,7 +170,6 @@ router.post("/analytics", (req, res) => {
       AND is_cancel = 0 
       AND appointment_date <= NOW()`;
 
-
   db.query(query, [startDate, endDate], (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Server Error" });
     return res.status(200).json(results);
@@ -168,52 +177,76 @@ router.post("/analytics", (req, res) => {
 });
 
 // 2. ראוטר נפרד לחישוב אחוז הלקוחות החוזרים - רק למנהל (שונה ל-POST)
+// router.post("/analytics/repeat-customers", (req, res) => {
+//   const { startDate, endDate } = req.body;
+//   const values = [];
+
+//   // בניית תנאי התאריכים עבור תת-השאילתה הפנימית
+//   let dateConditions = "";
+//   if (startDate) {
+//     dateConditions += " AND appointment_date >= ? ";
+//     values.push(startDate);
+//   }
+//   if (endDate) {
+//     dateConditions += " AND appointment_date <= ? ";
+//     values.push(endDate);
+//   }
+
+//   const repeatCustomersQuery = `
+//     SELECT 
+//       COUNT(DISTINCT client_mail_address) AS total_unique, 
+//       COUNT(CASE WHEN appointment_count > 1 THEN 1 END) AS repeat_count 
+//     FROM (
+//       SELECT client_mail_address, COUNT(appointment_id) AS appointment_count 
+//       FROM appointments 
+//       WHERE is_cancel = 0 
+//         AND appointment_date < NOW()
+//         ${dateConditions} -- מוסיף את התאריכים ישירות לכאן
+//       GROUP BY client_mail_address
+//     ) AS customer_counts`;
+
+//   db.query(repeatCustomersQuery, values, (err, results) => {
+//     if (err) return res.status(500).json({ message: "Internal Server Error" });
+
+//     const totalUnique = results[0].total_unique;
+//     const repeatCount = results[0].repeat_count;
+
+//     let repeatPercentage = 0;
+//     if (totalUnique > 0) {
+//       repeatPercentage = Math.round((repeatCount / totalUnique) * 100);
+//     }
+//     return res.status(200).json({ repeatPercentage: repeatPercentage });
+//   });
+// });
 router.post("/analytics/repeat-customers", (req, res) => {
-  const { startDate, endDate } = req.body;
-  const values = [];
+  // אם לא נשלחו תאריכים, נשים תאריכי ברירת מחדל קיצוניים (למשל משנת 1970 ועד היום)
+  const startDate = req.body.startDate || "1970-01-01";
+  const endDate = req.body.endDate || new Date().toISOString().split("T")[0];
 
-  // בניית תנאי התאריכים עבור תת-השאילתה הפנימית
-  let dateConditions = "";
-  if (startDate) {
-    dateConditions += " AND appointment_date >= ? ";
-    values.push(startDate);
-  }
-  if (endDate) {
-    dateConditions += " AND appointment_date <= ? ";
-    values.push(endDate);
-  }
-
-  const repeatCustomersQuery = `
-    SELECT 
-      COUNT(DISTINCT client_mail_address) AS total_unique, 
-      COUNT(CASE WHEN appointment_count > 1 THEN 1 END) AS repeat_count 
+  const query = `
+    SELECT COUNT(*) AS repeatCount 
     FROM (
-      SELECT client_mail_address, COUNT(appointment_id) AS appointment_count 
+      SELECT client_mail_address 
       FROM appointments 
       WHERE is_cancel = 0 
         AND appointment_date < NOW()
-        ${dateConditions} -- מוסיף את התאריכים ישירות לכאן
+        AND appointment_date >= ? 
+        AND appointment_date <= ?
       GROUP BY client_mail_address
-    ) AS customer_counts`;
+      HAVING COUNT(appointment_id) > 1
+    ) AS repeat_customers`;
 
-  db.query(repeatCustomersQuery, values, (err, results) => {
+  db.query(query, [startDate, endDate], (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Server Error" });
 
-    const totalUnique = results[0].total_unique;
-    const repeatCount = results[0].repeat_count;
-
-    let repeatPercentage = 0;
-    if (totalUnique > 0) {
-      repeatPercentage = Math.round((repeatCount / totalUnique) * 100);
-    }
-    return res.status(200).json({ repeatPercentage: repeatPercentage });
+    return res.status(200).json({ repeatCount: results[0].repeatCount });
   });
 });
 
 router.get("/busy-hours", (req, res) => {
   // שאילתה שמביאה רק את שעות הפעילות
   const hoursQuery = `SELECT MIN(start) as min_start, MAX(end) as max_end FROM dayshoursactivity WHERE start != '00:00:00'`;
-  const {startDate, endDate} = req.query;
+  const { startDate, endDate } = req.query;
   // שאילתה שמביאה את כמות התורים לכל שעה
   const appointmentsQuery = `
     SELECT HOUR(appointment_time) as hour, COUNT(*) as total 
@@ -228,7 +261,7 @@ router.get("/busy-hours", (req, res) => {
   db.query(hoursQuery, (err, hoursRes) => {
     if (err) return res.status(500).json({ error: "Database error hours" });
 
-    db.query(appointmentsQuery,[startDate,endDate] ,(err, apptsRes) => {
+    db.query(appointmentsQuery, [startDate, endDate], (err, apptsRes) => {
       if (err)
         return res.status(500).json({ error: "Database error appointments" });
 
@@ -236,14 +269,14 @@ router.get("/busy-hours", (req, res) => {
       res.status(200).json({
         min_start: hoursRes[0].min_start || "08:00:00",
         max_end: hoursRes[0].max_end || "18:00:00",
-        appointments: apptsRes, 
+        appointments: apptsRes,
       });
     });
   });
 });
 
 router.get("/busy-days", (req, res) => {
-    const { startDate, endDate } = req.query;
+  const { startDate, endDate } = req.query;
 
   // השאילתה המדויקת לפי ה-dayshoursactivity
   const query = `
@@ -271,7 +304,7 @@ router.get("/busy-days", (req, res) => {
     LIMIT 3
   `;
 
-  db.query(query, [startDate,endDate],(err, results) => {
+  db.query(query, [startDate, endDate], (err, results) => {
     if (err) {
       console.error("SQL Error:", err);
       return res.status(500).json({ error: err.message });
@@ -279,7 +312,6 @@ router.get("/busy-days", (req, res) => {
     res.json(results);
   });
 });
-
 
 // נתיב לקבלת תור לפי ID (עכשיו הוא אחרון, אז הוא לא יבלע את המילה analytics)
 router.get("/:id", (req, res) => {
@@ -296,6 +328,5 @@ router.get("/:id", (req, res) => {
     }
   });
 });
-
 
 module.exports = router;

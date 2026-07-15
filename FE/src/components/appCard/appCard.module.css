@@ -4,13 +4,12 @@
   justify-content: space-between;
   background: #1a1a1e;
   border: 1px solid rgba(255, 255, 255, 0.04);
-  border-right: 6px solid #dfb76c; /* פס הזהב המוכר */
+  border-right: 6px solid #dfb76c;
   border-radius: 16px;
-  padding: 20px 30px;
+  padding: 18px 28px; /* הגדלתי טיפה את הריפוד הפנימי שיתאים לפונטים */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   direction: rtl;
   gap: 20px;
-  flex-wrap: nowrap; 
   transition: all 0.3s ease;
 }
 
@@ -19,56 +18,66 @@
   transform: translateY(-2px);
 }
 
-/* --- עמודה 1: זמן ותאריך --- */
+/* --- עמודה 1: תאריך ושעה --- */
 .time_section {
   display: flex;
-  flex-direction: column;
-  min-width: 100px;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
 }
 
 .time { 
-  font-size: 1.8rem; 
-  font-weight: 900; 
-  color: #dfb76c; 
-  line-height: 1.1;
+  font-size: 1.6rem; /* ⬅️ הוגדל (היה 1.5) */
+  font-weight: 700; 
+  /* color: #dfb76c;  */
+  color: white;
 }
 
 .date { 
-  font-size: 0.9rem; 
-  color: #dfb76c; 
-  font-weight: 600;
-  margin-top: 4px;
+  font-size: 1.6rem;   
+  color: #dfb76c;      
+  font-weight: 700;    
+  letter-spacing: 0.5px;
+  
+  /* הוספת קו תחתון מעוצב */
+  border-bottom: 2px solid #dfb76c; /* קו בעובי 2 פיקסלים בצבע הזהב של המספרה */
+  padding-bottom: 2px;             /* רווח קטן בין הכתב לקו כדי שייראה אוורירי */
 }
 
-/* --- עמודה 2: פרטים (שם ספר/לקוח) --- */
+/* --- עמודה 2: ספר ולקוח --- */
 .info_section {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   flex-grow: 1;
-  gap: 2px;
+  gap: 24px;
+  white-space: nowrap;
 }
 
-.barberName {
-  font-size: 1.07rem;
+.barberName, .clientName {
+  font-size: 1.6rem; /* ⬅️ הוגדל (היה 1.05) */
   font-weight: 700;
   color: #f4f4f5;
 }
+.barberName
+{
+    cursor: pointer;
 
-.clientName {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #f4f4f5;
+}
+.barberName:hover {
+  /* background: #ef4444; */
+  color: #dfb76c;
 }
 
 /* --- עמודה 3: שירות, מחיר וכפתור --- */
 .details_section {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 22px;
+  white-space: nowrap;
 }
 
 .service_name { 
-  font-size: 1.1rem; 
+  font-size: 1.6rem; /* ⬅️ הוגדל (היה 1.05) */
   font-weight: 700;
   color: #f4f4f5; 
   margin: 0; 
@@ -78,9 +87,9 @@
   font-weight: 800; 
   color: #dfb76c; 
   background: rgba(223, 183, 108, 0.1); 
-  padding: 6px 14px; 
+  padding: 8px 16px; /* ⬅️ הוגדל מעט בשביל הפונט */
   border-radius: 20px; 
-  font-size: 0.95rem;
+  font-size: 1.6rem; /* ⬅️ הוגדל (היה 0.95) */
   border: 1px solid rgba(223, 183, 108, 0.2);
 }
 
@@ -91,11 +100,48 @@
   padding: 8px 16px;
   border-radius: 10px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700; /* ⬅️ הדגשתי את הטקסט שיהיה ברור */
+  font-size: 1.6rem; /* ⬅️ הוגדל */
   transition: all 0.2s;
 }
 
 .cancel_btn:hover {
   background: #ef4444;
   color: white;
+}
+
+/* ==========================================================================
+   חוקי רספונסיביות למובייל
+   ========================================================================== */
+@media (max-width: 768px) {
+  .appointment_card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 22px;
+  }
+
+  .time_section, .info_section, .details_section {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+
+  /* במובייל נשמור על פונטים בריאים וגדולים שלא יתכווצו */
+  .time {
+    font-size: 1.6rem;
+  }
+  .date {
+    font-size: 1.6rem;
+  }
+  .barberName, .clientName, .service_name {
+    font-size: 1.6rem;
+  }
+
+  .details_section {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 18px;
+    justify-content: space-between;
+  }
 }

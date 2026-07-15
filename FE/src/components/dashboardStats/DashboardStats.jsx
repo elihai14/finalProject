@@ -6,14 +6,14 @@ import StatisticsExport from "../statisticExport/StatisticsExport";
 import { getStatisticData } from "../../../js/mainFunctionView";
 
 function DashboardStats({ userStatus }) {
+
   const [chartData, setChartData] = useState([]);
-  const [repeatPercentage, setRepeatPercentage] = useState(0);
+  const [repeatCount, setRepeatCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [dashDates, setDashDates] = useState({ startDate: "", endDate: "" });
+  const [dashDates, setDashDates] = useState({ startDate:"", endDate: "" });
   const [daysRank, setDaysRank] = useState([]);
   const [hoursRank, setHoursRank] = useState([]);
-
-  // --- פורמט תאריכים בטוח ומניעת קריסות (ללא ISOString הרגיש) ---
+    // --- פורמט תאריכים בטוח ומניעת קריסות (ללא ISOString הרגיש) ---
   const today = new Date().toLocaleDateString("fr-CA"); // מחזיר YYYY-MM-DD מקומי
 
   // חישוב חודש קדימה בטוח: מבוסס על ה-startDate אם קיים, אחרת על היום
@@ -27,8 +27,15 @@ function DashboardStats({ userStatus }) {
     base.setMonth(base.getMonth() - 1);
     return base.toLocaleDateString("fr-CA");
   };
-
   const prevMonth = getPrevMonthSafe();
+
+  useEffect(()=>
+    {
+      setDashDates({startDate:today,
+                    endDate: prevMonth
+      })
+    },[])
+
 
   useEffect(() => {
     getStatisticData(
@@ -37,7 +44,7 @@ function DashboardStats({ userStatus }) {
       prevMonth,
       setChartData,
       userStatus,
-      setRepeatPercentage,
+      setRepeatCount,
       setLoading
     );
   }, [userStatus, dashDates, today]);
@@ -67,7 +74,7 @@ function DashboardStats({ userStatus }) {
   const statsData = {
     monthlyRevenue: chartData[0].total_revenue || 0,
     monthlyCustomers: chartData[0].total_customers,
-    returningCustomersPercent: repeatPercentage,
+    returningCustomersPercent: repeatCount,
     busyDays: daysArr,
     busyHours: [
       { rank: 1, hour: hoursRank[0], load: "גבוה מאוד" },
@@ -90,8 +97,21 @@ function DashboardStats({ userStatus }) {
             </div>
           </div>
         )}
-        <div className={classes.dashFilterGroup}>
+
+        {/* <div className={classes.dashFilterGroup}>
           <label>עד תאריך:</label>
+          <input
+            type="date"
+            value={dashDates.startDate}
+            onChange={(e) => {
+              e.preventDefault(); // מניעת רענון דפדפן לא רצוי
+              setDashDates((prev) => ({ ...prev, startDate: e.target.value, endDate:e.target.value }));
+            }}
+          />
+        </div>
+        <div className={classes.dashFilterGroup}>
+          <label>מתאריך:</label>
+
           <input
             type="date"
             value={dashDates.endDate}
@@ -100,15 +120,26 @@ function DashboardStats({ userStatus }) {
               setDashDates((prev) => ({ ...prev, endDate: e.target.value }));
             }}
           />
+        </div> */}
+        <div className={classes.dashFilterGroup}>
+          <label>עד תאריך:</label>
+          <input
+            type="date"
+            value={dashDates.endDate} // <--- עכשיו ה-endDate משויך בצורה נכונה ל"עד תאריך"
+            onChange={(e) => {
+              e.preventDefault();
+              setDashDates((prev) => ({ ...prev, endDate: e.target.value })); // <--- מעדכן רק את עצמו!
+            }}
+          />
         </div>
         <div className={classes.dashFilterGroup}>
           <label>מתאריך:</label>
           <input
             type="date"
-            value={dashDates.startDate}
+            value={dashDates.startDate} // <--- עכשיו ה-startDate משויך בצורה נכונה ל"מתאריך"
             onChange={(e) => {
-              e.preventDefault(); // מניעת רענון דפדפן לא רצוי
-              setDashDates((prev) => ({ ...prev, startDate: e.target.value, endDate:e.target.value }));
+              e.preventDefault();
+              setDashDates((prev) => ({ ...prev, startDate: e.target.value })); // <--- מעדכן רק את עצמו!
             }}
           />
         </div>
@@ -120,7 +151,7 @@ function DashboardStats({ userStatus }) {
             <div className={classes.stat_card}>
               <h3>לקוחות חוזרים</h3>
               <div className={classes.percentage_wrapper}>
-                <span className={classes.number}>{repeatPercentage}%</span>
+                <span className={classes.number}>{repeatCount}</span>
                 <p>מכלל הלקוחות שביקרו במספרה</p>
               </div>
             </div>

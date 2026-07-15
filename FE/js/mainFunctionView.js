@@ -707,14 +707,15 @@ export async function getStatisticData(
   prevMonth,
   setChartData,
   userStatus,
-  setRepeatPercentage,
-  setLoading
+  setRepeatCount,
+  setLoading,
 ) {
   setLoading(true);
 
   fetch("http://localhost:5000/appointments/analytics", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({
       startDate: dashDates.startDate || prevMonth,
       endDate: dashDates.endDate || today,
@@ -732,16 +733,17 @@ export async function getStatisticData(
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({
               startDate: dashDates.startDate || prevMonth,
               endDate: dashDates.endDate || today,
             }),
-          }
+          },
         ).then((res) => res.json());
       }
     })
     .then((repeatData) => {
-      if (repeatData) setRepeatPercentage(repeatData.repeatPercentage || 0);
+      if (repeatData) setRepeatCount(repeatData.repeatCount || 0);
       setLoading(false);
     })
     .catch((err) => {
