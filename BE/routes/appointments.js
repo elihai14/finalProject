@@ -10,10 +10,11 @@ const today = new Date();
 const todayStr = today.toISOString().split("T")[0];
 const currentTimeStr = `${String(today.getHours()).padStart(2, "0")}:${String(today.getMinutes()).padStart(2, "0")}`;
 // מחזיר רשימת תורים של המשתמש שמחובר
+
+
 router.post("/", (req, res) => {
-  let { user_name, clientMail, service, startDate, endDate, barber_mail } =
-    req.body;
-  console.log(req.body);
+  let { user_name, clientMail, service, startDate, endDate, barber_mail } = req.body;
+
   let query =
     "SELECT appointments.*, u1.user_name AS barberName, u2.user_name AS customerName           FROM appointments LEFT JOIN users u1 ON appointments.barber_mail_address =                 u1.mail_address LEFT JOIN users u2 ON appointments.client_mail_address = u2.mail_address  WHERE appointments.is_cancel = 0";
   const values = [];

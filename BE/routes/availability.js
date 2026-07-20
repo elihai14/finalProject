@@ -151,8 +151,33 @@ router.post("/add-constraint", (req, res) => {
   });
 });
 
+// router.put("/remove-constraint/:id", (req, res) => {
+//   // 1. אבטחה: בדיקה שהמשתמש מחובר
+//   if (!req.session || !req.session.user) {
+//     return res.status(401).json({ message: "User not logged in" });
+//   }
+
+//   const status = req.session.user.status;
+
+//   if (status != "ספר" && status != "מנהל")
+//     return res.status(403).json({ message: "Not authorized" });
+
+//   const mail = req.session.user.email;
+//   const constraintCode = parseInt(req.params.id, 10);
+
+
+//   const query =
+//     "UPDATE availability SET status = 'לא פעיל' WHERE constraint_code = ? AND mail_address = ?";
+
+//   db.query(query, [constraintCode, mail], (err, results) => {
+//     if (err) return res.status(500).json({ message: "Internal Error" });
+//     if (results.affectedRows === 0)
+//       return res.status(404).json({ message: "האילוץ לא נמצא" });
+//     return res.status(200).json({ message: "האילוץ הוסר בהצלחה" });
+//   });
+// });
+
 router.put("/remove-constraint/:id", (req, res) => {
-  // 1. אבטחה: בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
   }
@@ -162,16 +187,48 @@ router.put("/remove-constraint/:id", (req, res) => {
     return res.status(403).json({ message: "Not authorized" });
 
   const mail = req.session.user.email;
-const constraintCode = parseInt(req.params.id, 10);
-  const query =
-    "UPDATE availability SET status = 'לא פעיל' WHERE constraint_code = ? AND mail_address = ?";
+  const constraintCode = parseInt(req.params.id, 10);
 
-  db.query(query, [constraintCode, mail], (err, results) => {
-    if (err) return res.status(500).json({ message: "Internal Error" });
-    if (results.affectedRows === 0)
-      return res.status(404).json({ message: "האילוץ לא נמצא" });
-    return res.status(200).json({ message: "האילוץ הוסר בהצלחה" });
-  });
+  const getAvailabilityQuery =
+    "SELECT * FROM availability WHERE constraint_code = ? AND mail_address = ?";
+
+  db.query(getAvailabilityQuery, [constraintCode, mail], (err, availResults) => {
+      if (err) return res.status(500).json({ message: "Internal Error" });
+
+      if (availResults.length === 0)
+        return res.status(404).json({ message: "הזמינות לא נמצאה" });
+
+      const targetDate = availResults[0].date;
+      const startTime = availResults[0].start_time;
+      const endTime = availResults[0].end_time;
+
+      const updateQuery = "UPDATE availability SET status = 'לא פעיל' WHERE constraint_code = ? AND mail_address = ?";
+
+      db.query(updateQuery, [constraintCode, mail], (err, updateResults) => {
+        if (err) return res.status(500).json({ message: "Internal Error" });
+
+        const cancelAppointmentsQuery = `
+        UPDATE appointments 
+        SET is_cancel = 1
+        WHERE barber_mail_address = ? 
+          AND appointment_date = ? 
+          AND appointment_time >= ? 
+          AND appointment_time <= ?
+      `;
+
+        db.query(
+          cancelAppointmentsQuery,
+          [mail, targetDate, startTime, endTime],
+          (err, cancelResults) => {
+            if (err) return res.status(500).json({ message: "Internal Error" });
+
+            return res.status(200)
+            .json({ message: "הזמינות בוטלה בהצלחה והתורים התואמים בוטלו" });
+          },
+        );
+      });
+    },
+  );
 });
 
 router.get("/days-activity", (req, res) => {

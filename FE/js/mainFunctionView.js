@@ -634,8 +634,8 @@ export async function handleCancelConstraint(
 
   // 1. נפתח קודם כל את מודאל השאלה של Swal
   const result = await Swal.fire({
-    title: "לבטל את האילוץ?",
-    text: ".תורים קיימים יישארו, אך השעות ייסגרו להזמנות חדשות",
+    title: "האם לבטל את הזמינות ?",
+    text: "הזמינות תבוטל ותורים תואמים יבוטלו גם כן.",
     icon: "question",
     showCancelButton: true,
     confirmButtonColor: "#dfb76c",
@@ -667,7 +667,7 @@ export async function handleCancelConstraint(
 
         Swal.fire({
           title: "בוטל!",
-          text: "האילוץ בוטל בהצלחה.",
+          text: "הזמינות בוטלה בהצלחה.",
           icon: "success",
           timer: 2000,
           showConfirmButton: false,
@@ -678,25 +678,25 @@ export async function handleCancelConstraint(
         // אם השרת החזיר שגיאה, נציג פופאפ שגיאה
         Swal.fire({
           title: "אופס...",
-          text: "לא ניתן לבטל את האילוץ כרגע",
+          text: "לא ניתן לבטל את הזמינות כרגע",
           icon: "error",
           confirmButtonColor: "#dfb76c",
           background: "#1a1a1a",
           color: "#fff",
         });
-        setError("לא ניתן לבטל את האילוץ כרגע");
+        setError("לא ניתן לבטל את הזמינות כרגע");
       }
     } catch (err) {
       // אם יש שגיאת תקשורת
       Swal.fire({
         title: "שגיאה",
-        text: "שגיאת תקשורת בביטול האילוץ",
+        text: "שגיאת תקשורת בביטול הזמינות",
         icon: "error",
         confirmButtonColor: "#dfb76c",
         background: "#1a1a1a",
         color: "#fff",
       });
-      setError("שגיאת תקשורת בביטול האילוץ");
+      setError("שגיאת תקשורת בביטול הזמינות");
     }
   }
 }
