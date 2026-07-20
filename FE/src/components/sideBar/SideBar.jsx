@@ -58,7 +58,7 @@ export default function SideBar() {
 
                 <Link to="/barbers-constraints" onClick={toggleMenu}>
                 <FaExchangeAlt className={classes.navIcon} />
-                <span>ניהול אילוצים</span>
+                <span>ניהול זמינות ספרים</span>
                 </Link>
             </>
         )}

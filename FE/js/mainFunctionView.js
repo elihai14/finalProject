@@ -160,8 +160,8 @@ function calculateSlots(
   return availableSlots;
 }
 export async function getHoursSelect(barberMail, date, serviceName, clientMail) {
-  const constraintsRes = await fetch(
-    `http://localhost:5000/constraints/barbers-constraints`,
+  const availabilityRes = await fetch(
+    `http://localhost:5000/availability/barbers-constraints`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -170,10 +170,10 @@ export async function getHoursSelect(barberMail, date, serviceName, clientMail) 
         bMail: barberMail,
         date: date,
       }),
-    }
+    },
   );
 
-  const constraints = await constraintsRes.json();
+  const availability = await availabilityRes.json();
 
   const durationRes = await fetch(`http://localhost:5000/services/duration`, {
     method: "POST",
@@ -205,15 +205,15 @@ export async function getHoursSelect(barberMail, date, serviceName, clientMail) 
 
   let hours = [];
 
-  if (constraints && constraints.length > 0) {
-    constraints.forEach((c) => {
+  if (availability && availability.length > 0) {
+    availability.forEach((c) => {
       calculateSlots(
         existingApp,
         duration,
         date,
         c.start_time,
         c.end_time,
-        hours
+        hours,
       );
     });
   }
@@ -233,7 +233,7 @@ export async function handleCreateApp(
   setReloadApps
 ) {
   const constraint_code_response = await fetch(
-    `http://localhost:5000/constraints/get-code`,
+    `http://localhost:5000/availability/get-code`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -243,7 +243,7 @@ export async function handleCreateApp(
         date: date,
         time: time,
       }),
-    }
+    },
   );
   const code = await constraint_code_response.json();
   if (!constraint_code_response.ok) {
@@ -557,7 +557,7 @@ export async function handleAddConstraint(
   e.preventDefault();
   try {
     const response = await fetch(
-      "http://localhost:5000/constraints/add-constraint",
+      "http://localhost:5000/availability/add-constraint",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -567,7 +567,7 @@ export async function handleAddConstraint(
           start_time: startTime,
           end_time: selectedEndTime,
         }),
-      }
+      },
     );
     const data = await response.json();
     if (!response.ok) {
@@ -586,11 +586,11 @@ export async function handleAddConstraint(
   }
 }
 
-export async function fetchConstraints(
+export async function fetchAvailability(
   setIsLoading,
-  setConstraints,
+  setAvailability,
   setError,
-  filters
+  filters,
 ) {
   setIsLoading(true);
   // const requestBody = { ...filters };
@@ -601,17 +601,17 @@ export async function fetchConstraints(
     if (filters.endDate) params.append("endDate", filters.endDate);
 
     const response = await fetch(
-      `http://localhost:5000/constraints?${params.toString()}`,
+      `http://localhost:5000/availability?${params.toString()}`,
       {
         method: "GET",
         credentials: "include", // שומר על ה-session והעוגיות
-      }
+      },
     );
     const data = await response.json();
     if (response.ok) {
-      setConstraints(data);
+      setAvailability(data);
     } else {
-      setConstraints([]);
+      setAvailability([]);
     }
   } catch (err) {
     console.log(err);
@@ -626,8 +626,8 @@ export async function handleCancelConstraint(
   id,
   setError,
   setSuccessMessage,
-  setConstraints,
-  constraints,
+  setAvailability,
+  availability,
 ) {
   setError("");
   setSuccessMessage("");
@@ -635,7 +635,7 @@ export async function handleCancelConstraint(
   // 1. נפתח קודם כל את מודאל השאלה של Swal
   const result = await Swal.fire({
     title: "לבטל את האילוץ?",
-    text: ".תורים קיימים יישארו, אך השעות ייסגרו להזמנות חדשות", 
+    text: ".תורים קיימים יישארו, אך השעות ייסגרו להזמנות חדשות",
     icon: "question",
     showCancelButton: true,
     confirmButtonColor: "#dfb76c",
@@ -649,7 +649,7 @@ export async function handleCancelConstraint(
   if (result.isConfirmed) {
     try {
       const response = await fetch(
-        `http://localhost:5000/constraints/remove-constraint/${id}`,
+        `http://localhost:5000/availability/remove-constraint/${id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -661,8 +661,8 @@ export async function handleCancelConstraint(
 
       if (response.ok) {
         // עדכון הסטייט הלוקאלי כדי שהאילוץ ייעלם מיד מהמסך
-        setConstraints(
-          constraints.filter((cons) => cons.constraint_code !== id),
+        setAvailability(
+          availability.filter((cons) => cons.constraint_code !== id),
         );
 
         Swal.fire({

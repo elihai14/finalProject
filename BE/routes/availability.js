@@ -23,7 +23,7 @@ router.get("/", (req, res) => {
   const mail = req.session.user.email;
   values.push(mail)
   let query =
-    "SELECT * FROM constraints WHERE mail_address = ? AND status = 'פעיל'";
+    "SELECT * FROM availability WHERE mail_address = ? AND status = 'פעיל'";
   if(startDate)
   {
     query += " AND date >= ?"
@@ -63,7 +63,7 @@ router.post("/barbers-constraints", (req, res) => {
 
   const { bMail, date } = req.body;
   const query =
-    "SELECT * FROM constraints WHERE mail_address = ? AND status = 'פעיל' AND `date` = ?";
+    "SELECT * FROM availability WHERE mail_address = ? AND status = 'פעיל' AND `date` = ?";
   db.query(query, [bMail, date], (err, results) => {
     if (err) {
       return res.status(500).json({ message: "Internal Error" });
@@ -92,11 +92,11 @@ router.get("/range", (req, res) => {
 
   if (endDate) {
     query =
-      "SELECT * FROM constraints WHERE mail_address = ? AND date >= ? AND date <= ? AND status = 'פעיל' ORDER BY date ASC";
+      "SELECT * FROM availability WHERE mail_address = ? AND date >= ? AND date <= ? AND status = 'פעיל' ORDER BY date ASC";
     queryParams = [mail, startDate, endDate];
   } else {
     query =
-      "SELECT * FROM constraints WHERE mail_address = ? AND date >= ? AND status = 'פעיל' ORDER BY date ASC";
+      "SELECT * FROM availability WHERE mail_address = ? AND date >= ? AND status = 'פעיל' ORDER BY date ASC";
     queryParams = [mail, startDate];
   }
   db.query(query, queryParams, (err, results) => {
@@ -125,7 +125,7 @@ router.post("/add-constraint", (req, res) => {
       .json({ message: "שעת הסיום חייבת להיות אחרי שעת התחלה" });
 
   const checkQuery =
-    "SELECT * FROM constraints WHERE mail_address = ? AND date = ? AND start_time < ? AND end_time > ? AND status = 'פעיל' ";
+    "SELECT * FROM availability WHERE mail_address = ? AND date = ? AND start_time < ? AND end_time > ? AND status = 'פעיל' ";
 
   db.query(checkQuery, [mail, date, end_time, start_time], (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Error" });
@@ -137,7 +137,7 @@ router.post("/add-constraint", (req, res) => {
     }
 
     const insertQuery =
-      "INSERT INTO constraints (mail_address, date, start_time, end_time) VALUES (?, ?, ?, ?)";
+      "INSERT INTO availability (mail_address, date, start_time, end_time) VALUES (?, ?, ?, ?)";
 
     db.query(
       insertQuery,
@@ -164,7 +164,7 @@ router.put("/remove-constraint/:id", (req, res) => {
   const mail = req.session.user.email;
 const constraintCode = parseInt(req.params.id, 10);
   const query =
-    "UPDATE constraints SET status = 'לא פעיל' WHERE constraint_code = ? AND mail_address = ?";
+    "UPDATE availability SET status = 'לא פעיל' WHERE constraint_code = ? AND mail_address = ?";
 
   db.query(query, [constraintCode, mail], (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Error" });
@@ -208,11 +208,11 @@ router.post("/get-code", (req, res) => {
 
   const { date, barberMail, time } = req.body;
   const query =
-    "SELECT constraint_code FROM constraints WHERE date = ? AND mail_address = ? AND ? BETWEEN start_time AND end_time; ";
+    "SELECT constraint_code FROM availability WHERE date = ? AND mail_address = ? AND ? BETWEEN start_time AND end_time; ";
   db.query(query, [date, barberMail, time], (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Error" });
     if (results.length > 0) return res.status(200).json(results[0]);
-    return res.status(404).json({ message: "Constraint Not Found" });
+    return res.status(404).json({ message: "availability Not Found" });
   });
 });
 

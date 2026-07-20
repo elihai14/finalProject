@@ -8,7 +8,7 @@ const nodemailer = require("nodemailer"); // <-- הוספנו
 const usersRouter = require("./routes/users");
 const appRouter = require("./routes/appointments");
 const servicesRouter = require("./routes/services");
-const constraintsRouter = require("./routes/constraints");
+const availabilityRouter = require("./routes/availability");
 const daysHoursRouter = require("./routes/daysHours");
 
 
@@ -58,7 +58,7 @@ app.use(express.static(distPath));
 app.use("/users", usersRouter);
 app.use("/appointments", appRouter);
 app.use("/services", servicesRouter);
-app.use("/constraints", constraintsRouter);
+app.use("/availability", availabilityRouter);
 app.use("/daysHours", daysHoursRouter);
 
 

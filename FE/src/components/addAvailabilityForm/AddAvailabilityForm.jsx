@@ -1,10 +1,10 @@
 import { useState } from "react";
-import classes from "./addConstraintForm.module.css";
+import classes from "./addAvailabilityForm.module.css";
 import { getHoursArr } from "../../../js/mainFunctionView";
 import { loadStartHours } from "../../../js/mainFunctionView";
 import { handleAddConstraint } from "../../../js/mainFunctionView";
 
-export default function AddConstraintForm({setRefresh}) {
+export default function AddAvailabilityForm({setRefresh}) {
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState("");
   const [hours, setHours] = useState([]);
@@ -52,7 +52,7 @@ export default function AddConstraintForm({setRefresh}) {
 
   return (
     <div className={classes.container}>
-      <h3 className={classes.title}>הוספת אילוץ</h3>
+      <h3 className={classes.title}>הוספת זמינות</h3>
 
       <form onSubmit={(e) => addCons(e)} className={classes.form}>
         <label htmlFor="dateInput">בחר תאריך</label>

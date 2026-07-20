@@ -14,8 +14,8 @@
   import ServiceList from "../components/serviceList/ServiceList";
   import SideBar from "../components/sideBar/SideBar";
   import { fetchUser } from "../../js/mainFunctionView";
-  import ConstraintList from "../components/constraintsList/ConstraintsList";
-  import AddConstraintForm from "../components/addConstraintForm/AddConstraintForm";
+  import AvailabilityList from "../components/availabilityList/AvailabilityList";
+  import AddAvailabilityForm from "../components/addAvailabilityForm/AddAvailabilityForm";
   import UsersList from "../components/usersList/UsersList";
   import UpdateDetailsForm from "../components/updateDetailsForm/UpdateDetailsForm";
   import AdminAddService from "../components/adminAddService/AdminAddService";
@@ -164,13 +164,13 @@
               <div className={classes.page_container}>
                 <div className={classes.form_column}>
                   <div className={classes.card_wrapper}>
-                    <AddConstraintForm setRefresh={setRefresh} />
+                    <AddAvailabilityForm setRefresh={setRefresh} />
                   </div>
                 </div>
 
                 <div className={classes.list_column}>
                   <div className={classes.card_wrapper}>
-                    <ConstraintList refresh={refresh} />
+                    <AvailabilityList refresh={refresh} />
                   </div>
                 </div>
               </div>

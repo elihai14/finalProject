@@ -1,13 +1,13 @@
-import classes from "./constraintsCard.module.css";
+import classes from "./availabilityCard.module.css";
 
-export default function ConstraintCard({ cons, onCancel }) {
+export default function AvailabilityCard({ cons, onCancel }) {
   return (
     // הקלאס card ייתן את הרקע והגבולות
     <div className={classes.card}>
 
       {onCancel && (
         <button className={classes.cancel_btn} onClick={onCancel}>
-          ביטול אילוץ
+          הסרת חלון זמן
         </button>
       )}
 

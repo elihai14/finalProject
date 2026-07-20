@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import ConstraintCard from "../constraintCard/ConstraintsCard";
-import classes from "./constraintsList.module.css";
+import AvailabilityCard from "../availabilityCard/AvailabilityCard";
+import classes from "./availabilityList.module.css";
 import {
-  fetchConstraints,
+  fetchAvailability,
   handleCancelConstraint,
 } from "../../../js/mainFunctionView";
 
-export default function ConstraintList({ refresh }) {
-  const [constraints, setConstraints] = useState([]);
+export default function AvailabilityList({ refresh }) {
+  const [availability, setAvailability] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -18,20 +18,20 @@ export default function ConstraintList({ refresh }) {
   });
 
   useEffect(() => {
-    fetchConstraints(setIsLoading, setConstraints, setError, filters);
+    fetchAvailability(setIsLoading, setAvailability, setError, filters);
   }, [refresh]);
   const cancleCons = async (id) => {
     handleCancelConstraint(
       id,
       setError,
       setSuccessMessage,
-      setConstraints,
-      constraints
+      setAvailability,
+      availability
     );
   };
 
   // רינדור התורים בצורה חכמה ואחידה דרך ה-AppCard המעוצב!
-  let arr = constraints.map((cons) => {
+  let arr = availability.map((cons) => {
     const constDate = cons.date ? cons.date.split("T")[0] : "";
 
     let formattedCons = {
@@ -42,7 +42,7 @@ export default function ConstraintList({ refresh }) {
     };
 
     return (
-      <ConstraintCard
+      <AvailabilityCard
         key={cons.constraint_code}
         cons={formattedCons}
         onCancel={() => cancleCons(cons.constraint_code)}
@@ -77,9 +77,9 @@ export default function ConstraintList({ refresh }) {
                 const updatedFilters = { ...filters, endDate: updatedValue };
 
                 setFilters(updatedFilters); // מעדכן את המסך
-                fetchConstraints(
+                fetchAvailability(
                   setIsLoading,
-                  setConstraints,
+                  setAvailability,
                   setError,
                   updatedFilters
                 ); // שולח את המידע המעודכן לשרת
@@ -100,9 +100,9 @@ export default function ConstraintList({ refresh }) {
                 const updatedFilters = { ...filters, startDate: updatedValue, endDate:updatedValue };
 
                 setFilters(updatedFilters); // מעדכן את המסך
-                fetchConstraints(
+                fetchAvailability(
                   setIsLoading,
-                  setConstraints,
+                  setAvailability,
                   setError,
                   updatedFilters
                 ); // שולח את המידע המעודכן לשרת
