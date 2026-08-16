@@ -1,0 +1,278 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  background: rgba(0, 0, 0, 0.72);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 999999;
+
+  box-sizing: border-box;
+
+  padding: 20px;
+}
+
+/* הפופאפ עצמו */
+.popup {
+  position: relative;
+
+  width: 450px;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px);
+
+  overflow-y: auto;
+
+  box-sizing: border-box;
+
+  background: #1a1a1e;
+
+  border: 1px solid rgba(223, 183, 108, 0.25);
+
+  border-radius: 16px;
+
+  padding: 35px 32px 30px;
+
+  direction: rtl;
+  text-align: right;
+
+  color: #f4f4f5;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.55),
+    0 0 30px rgba(223, 183, 108, 0.06);
+}
+
+/* כותרת */
+.popup h2 {
+  margin: 0 0 28px;
+
+  text-align: center;
+
+  color: #dfb76c;
+
+  font-size: 26px;
+  font-weight: 700;
+
+  letter-spacing: 0.3px;
+}
+
+/* קו זהב קטן מתחת לכותרת */
+.popup h2::after {
+  content: "";
+
+  display: block;
+
+  width: 55px;
+  height: 2px;
+
+  margin: 12px auto 0;
+
+  background: linear-gradient(
+    90deg,
+    #c59b4e,
+    #dfb76c
+  );
+
+  border-radius: 2px;
+}
+
+/* כפתור סגירה */
+.close_btn {
+  position: absolute;
+
+  top: 14px;
+  left: 14px;
+
+  width: 36px;
+  height: 36px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 9px;
+
+  background: #121214;
+
+  color: #a1a1aa;
+
+  font-size: 17px;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.close_btn:hover {
+  color: #121214;
+
+  background: linear-gradient(
+    135deg,
+    #dfb76c 0%,
+    #c59b4e 100%
+  );
+
+  border-color: #dfb76c;
+
+  transform: rotate(90deg);
+}
+
+/* שורה של פרט */
+.info_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 15px 4px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* כותרת של פרט */
+.label {
+  color: #a1a1aa;
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* הערך */
+.value {
+  color: #f4f4f5;
+
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* אזור השירותים */
+.services_section {
+  margin-top: 26px;
+}
+
+/* רשימת השירותים */
+.services_list {
+  list-style: none;
+
+  padding: 0;
+  margin: 15px 0 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 9px;
+}
+
+/* שירות בודד */
+.services_list li {
+  padding: 11px 14px;
+
+  background: #121214;
+
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  border-radius: 9px;
+
+  color: #d4d4d8;
+
+  font-size: 15px;
+
+  transition:
+    border-color 0.25s ease,
+    color 0.25s ease,
+    background-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.services_list li:hover {
+  color: #dfb76c;
+
+  background: rgba(223, 183, 108, 0.05);
+
+  border-color: rgba(223, 183, 108, 0.25);
+
+  transform: translateX(-3px);
+}
+
+/* כשאין שירותים */
+.no_services {
+  color: #71717a;
+
+  font-size: 14px;
+
+  margin-top: 12px;
+}
+
+/* טעינה */
+.loading {
+  padding: 35px 0;
+
+  text-align: center;
+
+  color: #a1a1aa;
+
+  font-size: 15px;
+}
+
+/* Scrollbar בתוך הפופאפ */
+.popup::-webkit-scrollbar {
+  width: 6px;
+}
+
+.popup::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.popup::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+
+  border-radius: 10px;
+}
+
+.popup::-webkit-scrollbar-thumb:hover {
+  background: #dfb76c;
+}
+
+/* מובייל */
+@media (max-width: 500px) {
+  .overlay {
+    padding: 15px;
+  }
+
+  .popup {
+    width: 100%;
+    max-width: none;
+
+    padding: 32px 20px 25px;
+
+    border-radius: 14px;
+  }
+
+  .popup h2 {
+    font-size: 22px;
+  }
+
+  .info_item {
+    padding: 13px 2px;
+  }
+
+  .label {
+    font-size: 14px;
+  }
+
+  .value {
+    font-size: 15px;
+  }
+}

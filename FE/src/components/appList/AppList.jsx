@@ -97,6 +97,7 @@ export default function AppList({ refresh, setReloadApps, reloadApps }) {
                 customerName: app.customerName,
                 serviceName: app.service_name,
                 price: app.price ? `₪${app.price}` : null,
+                barberMailAddress: app.barber_mail_address,
               }}
               onCancel={() =>
                 handleCancelAppointment(
