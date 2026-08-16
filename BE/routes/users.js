@@ -179,7 +179,7 @@ router.post("/verify-otp", (req, res) => {
   if (otpCodes[mailAddress] && otpCodes[mailAddress] === code) {
     delete otpCodes[mailAddress];
 
-    // כאן אנחנו מוציאים את המשתמש מהדאטהבייס כדי לדעת מה הסטטוס שלו
+    // 1. שליפת הסטטוס של המשתמש
     const query =
       "SELECT status, mail_address FROM users WHERE mail_address = ?";
     db.query(query, [mailAddress], (err, results) => {
@@ -190,11 +190,36 @@ router.post("/verify-otp", (req, res) => {
       const user = results[0];
       req.session.user = { email: user.mail_address, status: user.status };
 
-      // שולחים לריאקט את הסטטוס!
-      return res.status(200).json({
-        message: "Authentication successful",
-        status: results[0].status,
-      });
+      // 2. בודקים תורים קרובים אך ורק אם מדובר בלקוח!
+      if (user.status === "לקוח") {
+        const checkQuery = `
+          SELECT 1 
+          FROM appointments
+          WHERE client_mail_address = ? 
+            AND is_cancel = 0
+            AND appointment_date >= CURDATE()
+            AND appointment_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+          LIMIT 1;
+        `;
+
+        db.query(checkQuery, [mailAddress], (appErr, appResults) => {
+          console.log("SQL Results:", appResults);
+          const hasUpcoming = !appErr && appResults.length > 0;
+
+          return res.status(200).json({
+            message: "Authentication successful",
+            status: user.status,
+            hasUpcomingAppointments: hasUpcoming,
+          });
+        });
+      } else {
+        // 3. אם זה ספר או מנהל – מחזירים false מיד בלי לבדוק תורים
+        return res.status(200).json({
+          message: "Authentication successful",
+          status: user.status,
+          hasUpcomingAppointments: false,
+        });
+      }
     });
   } else {
     return res.status(401).json({ message: "Invalid code" });

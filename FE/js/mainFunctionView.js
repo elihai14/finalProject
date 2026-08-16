@@ -48,23 +48,39 @@ export const loginRequest = async (email) => {
 /**
  * 3. אימות קוד ה-OTP מול השרת
  */
-export const verifyOTP = async (otpCode, email) => {
+export const verifyOTP = async (otpCode, email, setUser) => {
   try {
     const response = await fetch(`${API_URL}/auth/verify-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ code: otpCode, email: email }),
+      // התאמה לשרת: mailAddress במקום email
+      body: JSON.stringify({ code: otpCode, mailAddress: email }),
     });
 
     if (response.ok) {
       const data = await response.json();
-      // כאן בדרך כלל תקבל Token (JWT) ותשמור אותו ב-LocalStorage
-      if (data.token) {
-        localStorage.setItem("userToken", data.token);
+
+      // 1. עדכון ה-Session של המשתמש ב-State במקום localStorage
+      if (setUser) {
+        await fetchUser(setUser);
       }
+
+      // 2. בדיקה אם יש תורים לשבוע הקרוב והקפצת ההודעה
+      if (data.hasUpcomingAppointments) {
+        await Swal.fire({
+          title: "✂️ תזכורת לתור קרוב!",
+          html: "<b>שים לב:</b> קיימים לך תורים מתוכננים לשבוע הקרוב.<br>ניתן לצפות בפרטי התור באזור האישי.",
+          icon: "info",
+          confirmButtonText: "מעולה, תודה!",
+          confirmButtonColor: "#3085d6",
+          direction: "rtl",
+        });
+      }
+
       return true;
     }
+
     return false;
   } catch (error) {
     console.error("Error verifying OTP:", error);
@@ -696,7 +712,7 @@ export async function handleCancelConstraint(
         background: "#1a1a1a",
         color: "#fff",
       });
-      setError("שגיאת תקשורת בביטול הזמינות");
+      setError("שגיאת תקשורת בביטול האילוץ");
     }
   }
 }
