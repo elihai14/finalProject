@@ -883,3 +883,20 @@ export async function fetchFilterOptions(user, setServices,setBarbers,setCustome
     }
   };
 
+  export async function fetchBarberDetails(barberMail) {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/users/barber-details/${encodeURIComponent(barberMail)}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch barber details");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching barber details:", error);
+      return null;
+    }
+  }
+

@@ -312,5 +312,45 @@ router.put("/update", (req, res) => {
     });
   });
 });
+router.get("/barber-details/:mail", (req, res) => {
+  const { mail } = req.params;
 
+  const query = `
+    SELECT
+      user_name AS barberName,
+      phone_number AS phone
+    FROM users 
+    WHERE mail_address = ?
+  `;
+
+  db.query(query, [mail], (err, barberResults) => {
+    if (err) {
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    if (barberResults.length === 0) {
+      return res.status(404).json({ message: "Barber not found" });
+    }
+
+    const barber = barberResults[0];
+
+    const servicesQuery = `
+      SELECT service_name
+      FROM barber_services
+      WHERE mail_address = ?
+    `;
+
+    db.query(servicesQuery, [mail], (err, serviceResults) => {
+      if (err) {
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      return res.status(200).json({
+        barberName: barber.barberName,
+        phone: barber.phone,
+        services: serviceResults.map((service) => service.service_name),
+      });
+    });
+  });
+});
 module.exports = router;
