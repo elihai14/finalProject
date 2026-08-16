@@ -31,7 +31,6 @@ router.post("/", (req, res) => {
   });
 });
 
-
 router.post("/current", (req, res) => {
   if (!req.session || !req.session.user || !req.session.user.email) {
     return res.status(401).json({ message: "Unauthorized: Please log in" });
@@ -74,7 +73,7 @@ router.post("/get-status", (req, res) => {
 
 router.post("/register", (req, res) => {
   const { fullName, phoneNumber, mailAddress } = req.body;
-  
+
   if (phoneNumber) {
     if (!/^\d{10}$/.test(phoneNumber) || !phoneNumber.startsWith("05")) {
       return res.status(400).json({ message: "מספר טלפון לא תקין" });
@@ -112,7 +111,7 @@ router.post("/register", (req, res) => {
         return res
           .status(201)
           .json({ message: "נרשמת בהצלחה! כעת ניתן להתחבר" });
-      },
+      }
     );
   });
 });
@@ -158,7 +157,6 @@ router.post("/login", (req, res) => {
   });
 });
 
-
 //נתיב להתנתקות המשתמש מהמערכת
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
@@ -170,7 +168,6 @@ router.post("/logout", (req, res) => {
     return res.status(200).json({ message: "התנתקות בוצעה בהצלחה" });
   });
 });
-
 
 router.post("/verify-otp", (req, res) => {
   const { mailAddress, code } = req.body;
@@ -244,17 +241,16 @@ router.get("/:status", (req, res) => {
 });
 
 router.put("/updateStatus", (req, res) => {
-    console.log("UPDATE STATUS ROUTE HIT");
+  console.log("UPDATE STATUS ROUTE HIT");
 
   const { status, userEmail } = req.body;
   console.log(userEmail);
-  
 
   const query = "UPDATE users SET status = ? WHERE mail_address = ?";
   db.query(query, [status, userEmail], (err, results) => {
     if (err) {
       console.log(err);
-      
+
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
@@ -316,4 +312,5 @@ router.put("/update", (req, res) => {
     });
   });
 });
+
 module.exports = router;

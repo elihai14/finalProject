@@ -882,3 +882,4 @@ export async function fetchFilterOptions(user, setServices,setBarbers,setCustome
       }
     }
   };
+
