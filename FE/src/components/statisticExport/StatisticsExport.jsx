@@ -3,23 +3,7 @@ import * as XLSX from "xlsx";
 import classes from "./statisticsExport.module.css";
 
 const StatisticsExport = ({ statsData, startDate, endDate }) => {
-  // דוגמה למבנה הנתונים שהקומפוננטה מצפה לקבל ב-statsData:
 
-  // const statsData = {
-  //   monthlyRevenue: 15450,
-  //   monthlyCustomers: 120,
-  //   returningCustomersPercent: 65,
-  //   busyDays: [
-  //     { rank: 1, day: "חמישי", appointments: 45 },
-  //     { rank: 2, day: "שישי", appointments: 38 },
-  //     { rank: 3, day: "שלישי", appointments: 22 }
-  //   ],
-  //   busyHours: [
-  //     { rank: 1, hour: "16:00 - 17:00", load: "גבוה מאוד" },
-  //     { rank: 2, hour: "17:00 - 18:00", load: "גבוה" },
-  //     { rank: 3, hour: "10:00 - 11:00", load: "בינוני" }
-  //   ]
-  // };
 
   const handleExport = () => {
     if (!statsData) {
@@ -27,7 +11,6 @@ const StatisticsExport = ({ statsData, startDate, endDate }) => {
       return;
     }
 
-    // --- 1. בניית הגיליון הראשון: מדדים כלליים (רלוונטי גם למנהל וגם לספר) ---
     const summaryRows = [
       {
         "מדד סטטיסטי": "כמות הכנסות חודשיות",

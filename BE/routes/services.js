@@ -7,7 +7,7 @@ const dbSingleton = require("../dbSingleton");
 // Execute a query to the database
 const db = dbSingleton.getConnection();
 
-// 👈 1. עדכון: הוספת duration ושליפת שירותים פעילים בלבד (סטטוס 1)
+// נתיב לשליפת כל פרטי השירותים הפעילים של ספר 
 router.post("/", (req, res) => {
   const { barberMail } = req.body;
   console.log(req.body);
@@ -29,7 +29,7 @@ router.post("/", (req, res) => {
   });
 });
 
-// 👈 2. ראוטר חדש: מביא את כל השירותים הקיימים במערכת עבור הקומבובוקס בפרונטנד
+// נתיב מחזיר את כל שמות השירותים הפעילים במערכת
 router.get("/global", (req, res) => {
   const query = "SELECT service_name FROM services WHERE status_service = 1";
   db.query(query, (err, results) => {
@@ -40,16 +40,19 @@ router.get("/global", (req, res) => {
   });
 });
 
+// נתיב להוספת שירות חדש כפעיל לספר אך ורק אם לא קיים ברשימת השירותים שלו 
+// וגם קיים ברשימת השירותים הכללית של המערכת 
 router.post("/barber/add-service", (req, res) => {
-  // 1. ננסה לחלץ מייל מה-body (מה שיגיע מהריאקט) או כגיבוי מהסשן
+
   let barberMail = req.body.barberMail;
+
   if (!barberMail && req.session && req.session.user) {
     barberMail = req.session.user.mail_address;
   }
 
   const { serviceName, price, duration } = req.body;
 
-  // הגנה: אם אין מייל, נעצור מיד
+
   if (!barberMail) {
     return res.status(400).json({ message: "לא נמצא מייל של הספר המחובר" });
   }
@@ -65,22 +68,20 @@ router.post("/barber/add-service", (req, res) => {
         return res.status(400).json({ message: "השירות כבר קיים בתפריט שלך" });
       }
 
-      // אם היה מבוטל (סטטוס 0) - מחזירים ל-1 וממירים למספרים
       const updateBackQuery =
         "UPDATE barber_services SET barber_service_status = 1, price = ?, duration = ? WHERE mail_address = ? AND service_name = ?";
       db.query(
         updateBackQuery,
-        [Number(price), Number(duration), barberMail, serviceName], // 👈 המרה למספרים
+        [Number(price), Number(duration), barberMail, serviceName],
         (err) => {
+
           if (err)
-            return res
-              .status(500)
-              .json({ message: "Error activating service" });
-          return res
-            .status(200)
-            .json({ message: "השירות הוחזר לתפריט שלך בהצלחה" });
+            return res.status(500).json({ message: "Error activating service" });
+
+          return res.status(200).json({ message: "השירות הוחזר לתפריט שלך בהצלחה" });
         },
       );
+
       return;
     }
 
@@ -93,50 +94,16 @@ router.post("/barber/add-service", (req, res) => {
       [barberMail, serviceName, Number(price), Number(duration)], // 👈 המרה למספרים ומייל נקי
       (err) => {
         if (err) {
-          console.error("שגיאת SQL בהוספת שירות:", err); // מדפיס לטרמינל את הסיבה המדויקת למקרה של תקלה
           return res.status(500).json({ message: "Error linking service" });
         }
 
-        return res
-          .status(200)
-          .json({ message: "השירות נוסף בהצלחה למספרה שלך" });
+        return res.status(200).json({ message: "השירות נוסף בהצלחה למספרה שלך" });
       },
     );
   });
 });
 
-// router.post("/admin/add-service", (req, res) => {
-//   if (!req.session || !req.session.user) {
-//     return res.status(401).json({ message: "User not logged in" });
-//   }
-//   const { serviceName } = req.body;
-//   console.log(serviceName);
-  
-
-//   const checkQuery = "SELECT * FROM services WHERE service_name = ? AND status_service = 1";
-
-//   db.query(checkQuery, [serviceName], (err, results) => {
-//     if (err) return res.status(500).json({ message: "Internal Error" });
-
-//     if (results.length > 0) {
-//       return res.status(400).json({ message: "השירות כבר קיים בקטלוג המערכת" });
-//     }
-
-//     const insertQuery =
-//       "INSERT INTO services (service_name, status_service) VALUES (?, 1)";
-
-//     db.query(insertQuery, [serviceName], (err) => {
-//       if (err)
-//         return res
-//           .status(500)
-//           .json({ message: "Error adding to global services" });
-
-//       return res.status(200).json({ message: "השירות נוסף למערכת בהצלחה" });
-//     });
-//   });
-// });
-
-// 👈 3. עדכון: משנה סטטוס ל-0 רק עבור הספר הספציפי בטבלת barber_services ולא לכל המערכת!
+// נתיב להוספת שירות חדש כפעיל לרשימת השירותים הכללית של המערכת (על ידי מנהל בלבד)
 router.post("/admin/add-service", (req, res) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({
@@ -166,7 +133,6 @@ router.post("/admin/add-service", (req, res) => {
         });
       }
 
-      // קיים אבל כבוי → מפעילים מחדש
       const updateQuery =
         "UPDATE services SET status_service = 1 WHERE service_name = ?";
 
@@ -203,6 +169,7 @@ router.post("/admin/add-service", (req, res) => {
   });
 });
 
+// נתיב להסרת שירות מרשימת שירותים של ספר
 router.put("/remove-service", (req, res) => {
   
   if (!req.session || !req.session.user) {
@@ -229,6 +196,7 @@ router.put("/remove-service", (req, res) => {
   });
 });
 
+// נתיב להסרת שירות מרשימת השירותים הכללית של המערכת (מנהל בלבד)
 router.put("/admin/remove-service", (req, res) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
@@ -269,7 +237,6 @@ router.put("/admin/remove-service", (req, res) => {
           });
         }
 
-        // --- התיקון החשוב: ביצוע ה-COMMIT ---
         db.commit((err) => {
           if (err) {
             return db.rollback(() => {
@@ -282,40 +249,12 @@ router.put("/admin/remove-service", (req, res) => {
     });
   });
 });
-// router.put("/update-service", (req, res) => {
-//   if (!req.session || !req.session.user) {
-//     return res.status(401).json({ message: "User not logged in" });
-//   }
-//   const barberMail = req.session.user.mail_address;
 
-//   const { serviceName, newPrice, newDuration } = req.body;
-//   const cleanServiceName = serviceName ? serviceName.trim() : "";
-//   const query =
-//     "UPDATE barber_services SET price = ? , duration = ? WHERE service_name = ? AND mail_address = ?";
 
-//   db.query(
-//     query,
-//     [newPrice, newDuration, cleanServiceName, barberMail],
-//     (err, results) => {
-//       if (err) {
-//         return res.status(500).json({ message: "Internal Server Error" });
-//       }
-//       if (results.affectedRows === 0) {
-//         return res
-//           .status(404)
-//           .json({ message: `השירות ${cleanServiceName} לא חלק מהשירותים שלך` });
-//       }
-
-//       return res.status(200).json({ message: "השירות עודכן בהצלחה" });
-//     },
-//   );
-// });
-
+// נתיב לעדכון פרטי שירות 
 router.put("/update-service", (req, res) => {
-  // 1. קודם כל מנסים לקחת את המייל ישירות מה-body (מה ששלחנו מהריאקט)
   let barberMail = req.body.barberMail;
 
-  // 2. אם הוא לא שם, ניקח כגיבוי מהסשן
   if (!barberMail && req.session && req.session.user) {
     barberMail = req.session.user.mail_address;
   }
@@ -323,7 +262,6 @@ router.put("/update-service", (req, res) => {
   const { serviceName, newPrice, newDuration } = req.body;
   const cleanServiceName = serviceName ? serviceName.trim() : "";
 
-  // הגנה: אם בסוף אין מייל בכלל, נעצור מיד עם שגיאה
   if (!barberMail) {
     return res.status(400).json({ message: "לא נמצא מייל של הספר המחובר" });
   }
@@ -331,10 +269,7 @@ router.put("/update-service", (req, res) => {
   const query =
     "UPDATE barber_services SET price = ? , duration = ? WHERE service_name = ? AND mail_address = ?";
 
-  console.log("--- ניסיון עדכון שירות (מתוקן) ---");
-  console.log("שם שירות:", cleanServiceName);
-  console.log("מייל הספר בשימוש:", barberMail); // 👈 עכשיו אתה תראה פה את המייל האמיתי שלך!
-
+  
   db.query(
     query,
     [Number(newPrice), Number(newDuration), cleanServiceName, barberMail],
@@ -355,26 +290,25 @@ router.put("/update-service", (req, res) => {
   );
 });
 
+// נתיב המחזיר את מחיר השירות 
 router.post("/price", (req, res) => {
   const { barberMail, serviceName } = req.body;
-  console.log(serviceName);
-  console.log(barberMail);
-  
   
   const query =
     "SELECT price from barber_services WHERE mail_address = ? AND service_name = ?";
   db.query(query, [barberMail, serviceName], (err, results) => {
+
     if (err) return res.status(500).json({ message: "Internal Server Error" });
+
     if (results.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Price not found for this service and barber" });
+      return res.status(400).json({ message: "Price not found for this service and barber" });
     }
 
     return res.status(200).json(results[0]);
   });
 });
 
+// נתיב המחזיר את משך זמן השירות
 router.post("/duration", (req, res) => {
   const { barberMail, serviceName } = req.body;
   const query =

@@ -1,8 +1,6 @@
 import Swal from "sweetalert2";
 
-/**
- * 1. בדיקה האם המשתמש קיים בדאטהבייס לפי מייל
- */
+// פונקציה הבודקת את תקינות המייל של המשתמש 
 export const checkUserEmail = async (email) => {
   try {
     const response = await fetch(`$/users/login`, {
@@ -22,85 +20,6 @@ export const checkUserEmail = async (email) => {
   }
 };
 
-/**
- * 2. בקשת התחברות - יצירת קוד (OTP) ושליחתו למייל
- */
-export const loginRequest = async (email) => {
-  try {
-    const response = await fetch(`${API_URL}/auth/login-request`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email }),
-    });
-
-    if (!response.ok) {
-      throw new Error("נכשל בהפקה או שליחה של קוד האימות");
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error in loginRequest:", error);
-    throw error;
-  }
-};
-
-/**
- * 3. אימות קוד ה-OTP מול השרת
- */
-export const verifyOTP = async (otpCode, email, setUser) => {
-  try {
-    const response = await fetch(`${API_URL}/auth/verify-otp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      // התאמה לשרת: mailAddress במקום email
-      body: JSON.stringify({ code: otpCode, mailAddress: email }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-
-      // 1. עדכון ה-Session של המשתמש ב-State במקום localStorage
-      if (setUser) {
-        await fetchUser(setUser);
-      }
-
-      // 2. בדיקה אם יש תורים לשבוע הקרוב והקפצת ההודעה
-      if (data.hasUpcomingAppointments) {
-        await Swal.fire({
-          title: "✂️ תזכורת לתור קרוב!",
-          html: "<b>שים לב:</b> קיימים לך תורים מתוכננים לשבוע הקרוב.<br>ניתן לצפות בפרטי התור באזור האישי.",
-          icon: "info",
-          confirmButtonText: "מעולה, תודה!",
-          confirmButtonColor: "#3085d6",
-          direction: "rtl",
-        });
-      }
-
-      return true;
-    }
-
-    return false;
-  } catch (error) {
-    console.error("Error verifying OTP:", error);
-    return false;
-  }
-};
-
-/**
- * 4. בדיקה האם המשתמש הוא אדמין (לפי הדיאגרמה שלך)
- */
-export const isMainAdmin = async (userId) => {
-  try {
-    const response = await fetch(`${API_URL}/users/is-admin/${userId}`);
-    const data = await response.json();
-    return data.isAdmin;
-  } catch (error) {
-    return false;
-  }
-};
-
 // פונקצייה מקבלת רשימת תורים קיימים ואת משך הזמן של השירות המבוקש ומחזירה מערך של שעות פנויות
 function calculateSlots(
   existingApps,
@@ -110,10 +29,7 @@ function calculateSlots(
   end,
   availableSlots
 ) {
-  console.log("start:", start);
-  console.log("end:", end);
-  console.log("duration:", duration);
-  console.log("existingApps:", existingApps);
+
   const currentDate = new Date();
   const dateToCheck = new Date(date);
 
@@ -175,6 +91,9 @@ function calculateSlots(
 
   return availableSlots;
 }
+
+// פונקצייה מקבלת כתובת מייל של ספר, תאריך, שם שירות, כתובת מייל של לקוח
+//  ומחזירה מערך מחרוזות המייצג את השעות הפנויות לקביעת תור 
 export async function getHoursSelect(barberMail, date, serviceName, clientMail) {
   const availabilityRes = await fetch(
     `http://localhost:5000/availability/barbers-constraints`,
@@ -236,6 +155,8 @@ export async function getHoursSelect(barberMail, date, serviceName, clientMail) 
 
   return [...new Set(hours)];
 }
+
+// פונקצייה מקבלת פרטי תור ומוסיפה אותו לבסיס הנתונים
 export async function handleCreateApp(
   date,
   barberMail,
@@ -338,6 +259,8 @@ export async function handleCreateApp(
   setReloadApps((prev) => !prev);
 }
 
+// פונקצייה מקבלת שעת התחלה ושעת סיום
+// ומחזירה מערך מחרוזות המייצג את כל השעות בטווח בהפרשים של 15 דקות
 export function getHoursArr(startTime, endTime) {
   const result = [];
 
@@ -364,6 +287,7 @@ export function getHoursArr(startTime, endTime) {
   return result;
 }
 
+// פונקצייה מקבלת פרטי משתמש וסטטוס חדש ומעדכנת את סטטוס המשתמש לסטטוס החדש
 export async function handleUpdateStatus(
   userMail,
   status,
@@ -454,8 +378,10 @@ export async function handleUpdateStatus(
   setRefresh(!refresh);
 }
 
+
+// 
 export async function getUsersList(status, isReverse) {
-  const response = await fetch(`http://localhost:5000/users`, {
+  const response = await fetch(`http://localhost:5000/users/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -546,9 +472,9 @@ export async function loadStartHours(day, setHours, setEndtTime) {
     const data = await response.json();
     if (!response.ok) {
       setHours([]);
-    } else {
-      console.log(data);
-
+    } 
+    else
+    {
       setHours(getHoursArr(data.start, data.end));
       setEndtTime(data.end);
     }
@@ -739,7 +665,6 @@ export async function getStatisticData(
   })
     .then((res) => res.json())
     .then((data) => {
-      console.log(data);
 
       setChartData(data);
 

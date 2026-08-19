@@ -13,7 +13,7 @@ function DashboardStats({ userStatus }) {
   const [dashDates, setDashDates] = useState({ startDate:"", endDate: "" });
   const [daysRank, setDaysRank] = useState([]);
   const [hoursRank, setHoursRank] = useState([]);
-    // --- פורמט תאריכים בטוח ומניעת קריסות (ללא ISOString הרגיש) ---
+
   const today = new Date().toLocaleDateString("fr-CA"); // מחזיר YYYY-MM-DD מקומי
 
   // חישוב חודש קדימה בטוח: מבוסס על ה-startDate אם קיים, אחרת על היום
@@ -48,8 +48,6 @@ function DashboardStats({ userStatus }) {
       setLoading
     );
   }, [userStatus, dashDates, today]);
-
-  // if (loading) return <div className={classes.loading_text}>טוען...</div>;
 
 
   if (loading) {
@@ -98,48 +96,26 @@ function DashboardStats({ userStatus }) {
           </div>
         )}
 
-        {/* <div className={classes.dashFilterGroup}>
+        
+        <div className={classes.dashFilterGroup}>
           <label>עד תאריך:</label>
+          <input
+            type="date"
+            value={dashDates.endDate} 
+            onChange={(e) => {
+              e.preventDefault();
+              setDashDates((prev) => ({ ...prev, endDate: e.target.value })); 
+            }}
+          />
+        </div>
+        <div className={classes.dashFilterGroup}>
+          <label>מתאריך:</label>
           <input
             type="date"
             value={dashDates.startDate}
             onChange={(e) => {
-              e.preventDefault(); // מניעת רענון דפדפן לא רצוי
-              setDashDates((prev) => ({ ...prev, startDate: e.target.value, endDate:e.target.value }));
-            }}
-          />
-        </div>
-        <div className={classes.dashFilterGroup}>
-          <label>מתאריך:</label>
-
-          <input
-            type="date"
-            value={dashDates.endDate}
-            onChange={(e) => {
-              e.preventDefault(); // מניעת רענון דפדפן לא רצוי
-              setDashDates((prev) => ({ ...prev, endDate: e.target.value }));
-            }}
-          />
-        </div> */}
-        <div className={classes.dashFilterGroup}>
-          <label>עד תאריך:</label>
-          <input
-            type="date"
-            value={dashDates.endDate} // <--- עכשיו ה-endDate משויך בצורה נכונה ל"עד תאריך"
-            onChange={(e) => {
               e.preventDefault();
-              setDashDates((prev) => ({ ...prev, endDate: e.target.value })); // <--- מעדכן רק את עצמו!
-            }}
-          />
-        </div>
-        <div className={classes.dashFilterGroup}>
-          <label>מתאריך:</label>
-          <input
-            type="date"
-            value={dashDates.startDate} // <--- עכשיו ה-startDate משויך בצורה נכונה ל"מתאריך"
-            onChange={(e) => {
-              e.preventDefault();
-              setDashDates((prev) => ({ ...prev, startDate: e.target.value })); // <--- מעדכן רק את עצמו!
+              setDashDates((prev) => ({ ...prev, startDate: e.target.value })); 
             }}
           />
         </div>

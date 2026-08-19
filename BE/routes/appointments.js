@@ -11,7 +11,7 @@ const todayStr = today.toISOString().split("T")[0];
 const currentTimeStr = `${String(today.getHours()).padStart(2, "0")}:${String(today.getMinutes()).padStart(2, "0")}`;
 // מחזיר רשימת תורים של המשתמש שמחובר
 
-
+// נתיב לשליפת תורים לפי סינון 
 router.post("/", (req, res) => {
   let { user_name, clientMail, service, startDate, endDate, barber_mail } = req.body;
 
@@ -97,21 +97,7 @@ router.post("/add-appointment", (req, res) => {
   );
 });
 
-// נתיב המחזיר את השעות הפנויות לפי תאריך ושירות מבוקשים
-// router.post("/existing-apps", (req, res) => {
-//   const { date } = req.body;
-//   const appQuery =
-//     "SELECT a.appointment_time , s.duration FROM appointments a join barber_services s ON a.service_name = s.service_name WHERE a.appointment_date = ? ORDER BY a.appointment_time ASC";
-
-//   db.query(appQuery, [date], (err, results) => {
-//     // שאילתה לקבלת שעת תור ומשך זמן שירות לכל תור בתאריך המבוקש
-//     if (err) {
-//       return res.status(400).json({ message: "Internal Server Error" });
-//     }
-
-//     return res.status(200).json(results);
-//   });
-// });
+// נתיב לשליפת כל התורים הקיימים והפעילים 
 router.post("/existing-apps", (req, res) => {
   const { date, barberMail, clientMail } = req.body;
 
@@ -153,11 +139,7 @@ router.put("/cancel/:id", (req, res) => {
   });
 });
 
-/* ========================================================
-   הזזנו את ראוטי האנליטיקה לכאן - מעל הראוט הדינמי של /:id
-   ======================================================== */
-
-// 1. ראוטר לגרפים החודשיים - משותף לספר ולמנהל (שונה ל-POST)
+// נתיב המחזיר את כמות הלקוחות וסכום הכנסות בטווח תאריכים 
 router.post("/analytics", (req, res) => {
   const { startDate, endDate } = req.body;
 
@@ -177,48 +159,7 @@ router.post("/analytics", (req, res) => {
   });
 });
 
-// 2. ראוטר נפרד לחישוב אחוז הלקוחות החוזרים - רק למנהל (שונה ל-POST)
-// router.post("/analytics/repeat-customers", (req, res) => {
-//   const { startDate, endDate } = req.body;
-//   const values = [];
-
-//   // בניית תנאי התאריכים עבור תת-השאילתה הפנימית
-//   let dateConditions = "";
-//   if (startDate) {
-//     dateConditions += " AND appointment_date >= ? ";
-//     values.push(startDate);
-//   }
-//   if (endDate) {
-//     dateConditions += " AND appointment_date <= ? ";
-//     values.push(endDate);
-//   }
-
-//   const repeatCustomersQuery = `
-//     SELECT 
-//       COUNT(DISTINCT client_mail_address) AS total_unique, 
-//       COUNT(CASE WHEN appointment_count > 1 THEN 1 END) AS repeat_count 
-//     FROM (
-//       SELECT client_mail_address, COUNT(appointment_id) AS appointment_count 
-//       FROM appointments 
-//       WHERE is_cancel = 0 
-//         AND appointment_date < NOW()
-//         ${dateConditions} -- מוסיף את התאריכים ישירות לכאן
-//       GROUP BY client_mail_address
-//     ) AS customer_counts`;
-
-//   db.query(repeatCustomersQuery, values, (err, results) => {
-//     if (err) return res.status(500).json({ message: "Internal Server Error" });
-
-//     const totalUnique = results[0].total_unique;
-//     const repeatCount = results[0].repeat_count;
-
-//     let repeatPercentage = 0;
-//     if (totalUnique > 0) {
-//       repeatPercentage = Math.round((repeatCount / totalUnique) * 100);
-//     }
-//     return res.status(200).json({ repeatPercentage: repeatPercentage });
-//   });
-// });
+// נתיב המחזיר את כמות הלקוחות החוזרים בטווח תאריכים מסוים
 router.post("/analytics/repeat-customers", (req, res) => {
   // אם לא נשלחו תאריכים, נשים תאריכי ברירת מחדל קיצוניים (למשל משנת 1970 ועד היום)
   const startDate = req.body.startDate || "1970-01-01";
@@ -244,6 +185,7 @@ router.post("/analytics/repeat-customers", (req, res) => {
   });
 });
 
+// נתיב המחזיר מערך הכולל את השעות הכי עמוסות בטווח תאריכים מסוים
 router.get("/busy-hours", (req, res) => {
   // שאילתה שמביאה רק את שעות הפעילות
   const hoursQuery = `SELECT MIN(start) as min_start, MAX(end) as max_end FROM dayshoursactivity WHERE start != '00:00:00'`;
@@ -276,6 +218,7 @@ router.get("/busy-hours", (req, res) => {
   });
 });
 
+// נתיב המחזיר את שלושת הימים הכי עמוסים במספרה בטווח תאריכים מסוים
 router.get("/busy-days", (req, res) => {
   const { startDate, endDate } = req.query;
 
@@ -314,7 +257,7 @@ router.get("/busy-days", (req, res) => {
   });
 });
 
-// נתיב לקבלת תור לפי ID (עכשיו הוא אחרון, אז הוא לא יבלע את המילה analytics)
+// נתיב לשליפת פרטי תור לפי מזהה יחודי של התור 
 router.get("/:id", (req, res) => {
   const id = req.params.id;
   const query = "SELECT * FROM appointments WHERE appointment_id = ?";

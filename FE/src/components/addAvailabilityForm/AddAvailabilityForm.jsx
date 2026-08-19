@@ -14,6 +14,7 @@ export default function AddAvailabilityForm({setRefresh}) {
   const [endHours, setEndHours] = useState([]);
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
 
+  // פונקצייה טוענת רשימת שעות לפי תאריך שנבחר 
   const handleDateChange = (e) => {
     const value = e.target.value;
     setSelectedDate(value); // הפונקציה המקורית שמעדכנת את הסטייט
@@ -24,16 +25,19 @@ export default function AddAvailabilityForm({setRefresh}) {
     }
   };
 
+  // פונקצייה שמעדכנת את שעת ההתחלה לערך שבחר 
   const handleStartTimeChange = (e) => {
     const value = e.target.value;
     setStartTime(value);
     loadEndHours(value);
   };
 
+  // פונקצייה שמעדכנת את רשימת שעות הסיום 
   const loadEndHours = (start) => {
     setEndHours(getHoursArr(start, endTime));
   };
 
+  // פונקצייה שמטפלת בהוספת האילוץ 
   const addCons = async(e)=>{
     handleAddConstraint(
       e,

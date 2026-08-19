@@ -67,6 +67,8 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
 
     fetchServices();
   }, [selectedBarber]);
+
+  
   useEffect(() => {
     if (!selectedBarber || !selectedService || !selectedDate) return;
 

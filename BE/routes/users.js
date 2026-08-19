@@ -7,30 +7,40 @@ const dbSingleton = require("../dbSingleton");
 // Execute a query to the database
 const db = dbSingleton.getConnection();
 
+// ראוטר מחזיר את פרטי כל המשתמשים לפי סינון
 router.post("/", (req, res) => {
   const { status, isReverse } = req.body;
-  let query = "SELECT * FROM users ";
+
+  let query = "SELECT * FROM users";
   let values = [];
 
-  // כאן השינוי: אם ביקשו 'ספר', נחזיר את כל מי שמוגדר כספר או כמנהל
+  // טיפול בסינון לפי סטטוס
   if (status === "ספר") {
+    // אם ביקשו ספר - נביא ספרים ומנהלים
     query += " WHERE status IN ('ספר', 'מנהל')";
-  } else if (status === "לקוח" || status === "מנהל") {
+  } else if (status) {
+    // אם נשלח סטטוס ספציפי אחר (כמו 'לקוח' או 'מנהל')
     query += " WHERE status = ?";
     values.push(status);
   }
+  // אם לא נשלח status בכלל - השאילתה פשוט תביא את כל המשתמשים!
 
-  query += " ORDER BY user_name";
-  if (isReverse) query += " DESC";
-  else query += " ASC";
+  // מיון
+  query += " ORDER BY user_name " + (isReverse ? "DESC" : "ASC");
 
+  // הרצת השאילתה
   db.query(query, values, (err, results) => {
-    if (err) return res.status(500).json({ message: "Internal Server Error" });
-    if (results.length > 0) return res.status(200).json(results);
-    else return res.status(404).json({ message: "User not found" });
+    if (err) {
+      console.error("Database query error:", err);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    // תמיד מחזירים 200 עם התוצאות (גם אם זה מערך ריק [])
+    return res.status(200).json(results);
   });
 });
 
+// ראוטר מחזיר את פרטי המשתמנש הנוכחי שמחובר 
 router.post("/current", (req, res) => {
   if (!req.session || !req.session.user || !req.session.user.email) {
     return res.status(401).json({ message: "Unauthorized: Please log in" });
@@ -51,6 +61,7 @@ router.post("/current", (req, res) => {
   });
 });
 
+// ראוטר מחזיר את סטטוס המשתמש המחובר 
 router.post("/get-status", (req, res) => {
   if (!req.session || !req.session.user || !req.session.user.email) {
     return res.status(401).json({ message: "Unauthorized: Please log in" });
@@ -71,6 +82,7 @@ router.post("/get-status", (req, res) => {
   });
 });
 
+// ראוטר ליצירת משתמש חדש בודק תקינות קלט ולאחר מכן מוסיף את פרטי המשתמש לבסיס הנתונים
 router.post("/register", (req, res) => {
   const { fullName, phoneNumber, mailAddress } = req.body;
 
@@ -116,6 +128,8 @@ router.post("/register", (req, res) => {
   });
 });
 
+// ראוטר התחברות למשתמש , בודק תקינות כתובת מייל ואם קיים במערכת
+// שולח קוד רנדומלי חד פעמי בן 4 ספרות לכתובת המייל לצורך התחברות
 router.post("/login", (req, res) => {
   const { mailAddress } = req.body;
   const { otpCodes, transporter } = req.app.locals; // שליפת הכלים מה-app.js
@@ -169,6 +183,8 @@ router.post("/logout", (req, res) => {
   });
 });
 
+// נתיב לבדיקת הקוד שנשלח למייל 
+// ובנוסף כאשר הקוד תקין וההתחברות הצליחה קיימת בדיקה האם למשתמש קיימים תורים קרובים
 router.post("/verify-otp", (req, res) => {
   const { mailAddress, code } = req.body;
   const { otpCodes } = req.app.locals;
@@ -223,25 +239,26 @@ router.post("/verify-otp", (req, res) => {
   }
 });
 
-router.get("/:status", (req, res) => {
-  const status = req.params.status;
-  const query = "SELECT * FROM users WHERE status = ?";
-  db.query(query, [status], (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-    if (results.length > 0) {
-      return res.status(200).json(results);
-    } else {
-      return res
-        .status(404)
-        .json({ message: "No users found with this status" });
-    }
-  });
-});
+// נתיב המחזיר את כל פרטי המשתמשים לפי סטטוס לקוח שהוכנס
+// router.get("/:status", (req, res) => {
+//   const status = req.params.status;
+//   const query = "SELECT * FROM users WHERE status = ?";
+//   db.query(query, [status], (err, results) => {
+//     if (err) {
+//       return res.status(500).json({ message: "Internal Server Error" });
+//     }
+//     if (results.length > 0) {
+//       return res.status(200).json(results);
+//     } else {
+//       return res
+//         .status(404)
+//         .json({ message: "No users found with this status" });
+//     }
+//   });
+// });
 
+// נתיב לעדכון סטטוס משתמש 
 router.put("/updateStatus", (req, res) => {
-  console.log("UPDATE STATUS ROUTE HIT");
 
   const { status, userEmail } = req.body;
   console.log(userEmail);
@@ -264,12 +281,13 @@ router.put("/updateStatus", (req, res) => {
   });
 });
 
+// נתיב לעדכון פרטי משתמש (שם משתמש , מס טלפון) 
 router.put("/update", (req, res) => {
   if (!req.session || !req.session.user || !req.session.user.email) {
     return res.status(401).json({ message: "Unauthorized: Please log in" });
   }
 
-  const oldEmail = req.session.user.email;
+  const email = req.session.user.email;
   const { newName, phoneNumber } = req.body;
 
   // וולידציה לטלפון
@@ -298,7 +316,7 @@ router.put("/update", (req, res) => {
   }
 
   query += " WHERE mail_address = ?";
-  values.push(oldEmail);
+  values.push(email);
 
   db.query(query, values, (err, results) => {
     if (err) {
@@ -312,6 +330,8 @@ router.put("/update", (req, res) => {
     });
   });
 });
+
+// נתיב המחזיר פרטים של ספר
 router.get("/barber-details/:mail", (req, res) => {
   const { mail } = req.params;
 

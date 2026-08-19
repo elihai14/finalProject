@@ -2,13 +2,18 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom"; 
 import classes from "./sideBar.module.css";
 import { FaHome, FaSlidersH, FaExchangeAlt, FaUserEdit } from "react-icons/fa";
-// import UpdateDetailsForm from "../updateDetailsForm/UpdateDetailsForm"; 
+import { useEffect } from "react";
+import { fetchUser } from "../../../js/mainFunctionView";
 
 export default function SideBar() {
     const [isOpen, setIsOpen] = useState(false);
-    // const [showPopup, setShowPopup] = useState(false); // 👈 סטייט לשליטה בפופ-אפ
-    
-    const status = localStorage.getItem("userStatus");
+    const [user, setUser] = useState({});
+
+     useEffect(() => {
+        fetchUser(setUser);
+      }, []);
+
+    const status = user.status ;
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);

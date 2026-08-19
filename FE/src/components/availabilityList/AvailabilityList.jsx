@@ -20,6 +20,7 @@ export default function AvailabilityList({ refresh }) {
   useEffect(() => {
     fetchAvailability(setIsLoading, setAvailability, setError, filters);
   }, [refresh]);
+
   const cancleCons = async (id) => {
     handleCancelConstraint(
       id,
@@ -53,17 +54,7 @@ export default function AvailabilityList({ refresh }) {
   return (
     <div>
       <div className={classes.filterBar}>
-        {/* ילד 1: הכפתור */}
-        {/* <button
-          className={classes.filterButton}
-          onClick={() =>
-            fetchConstraints(setIsLoading, setConstraints, setError, filters)
-          }
-        >
-          סנן
-        </button> */}
-
-        {/* ילד 2: חבילת התאריכים */}
+  
         <div className={classes.dateWrapper}>
           <div>
             <input

@@ -4,13 +4,12 @@ import BarberDetailsPopup from "../barberDetailsPopup/BarberDetailsPopup";
 import { fetchBarberDetails } from "../../../js/mainFunctionView";
 
 export default function AppCard({ app, onCancel }) {
+
   const [showPopUp, setShowPopUp] = useState(false);
   const [barberDetails, setBarberDetails] = useState(null);
 
   const handleShowBarber = async () => {
     const details = await fetchBarberDetails(app.barberMailAddress);
-
-    console.log(details);
 
     setBarberDetails(details);
     setShowPopUp(true);

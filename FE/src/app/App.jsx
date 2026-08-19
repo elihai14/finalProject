@@ -23,21 +23,20 @@
 
   export default function App() {
 
-    const [user, setUser] = useState(null); // התחל עם null ולא {}
+    const [user, setUser] = useState(null); 
     const [isLoading, setIsLoading] = useState(true); // מצב טעינה
     const location = useLocation();
     const [refresh, setRefresh] = useState(false); 
     const [refreshAppointments, setRefreshAppointments] = useState(0);
     const hideSidebarRoutes = ["/", "/login", "/register"];
     const shouldShowSidebar = !hideSidebarRoutes.includes(location.pathname);
-      const [reloadApps, setReloadApps] = useState(true);
+    const [reloadApps, setReloadApps] = useState(true);
 
 
     useEffect(() => {
       const checkAuth = async () => {
         setIsLoading(true);
         await fetchUser(setUser);
-        console.log(user);
         
         setIsLoading(false);
       };

@@ -1,38 +1,56 @@
 import { useEffect, useState } from "react";
 import classes from "./serviceList.module.css";
 import Swal from "sweetalert2"; 
-import { use } from "react";
+import { fetchUser } from "../../../js/mainFunctionView";
 
-export default function ServiceList({refresh}) {
+export default function ServiceList({ refresh }) {
   const [myServices, setMyServices] = useState([]);
+  const [user, setUser] = useState({});
   const [editingName, setEditingName] = useState(null);
   const [editForm, setEditForm] = useState({
     newPrice: "",
     newDuration: "30",
   });
 
-  const userEmail = localStorage.getItem("userEmail");
-  const fetchServices = async () => {
+  // 1. טעינת פרטי המשתמש
+  useEffect(() => {
+    fetchUser(setUser);
+  }, []);
+
+  const userEmail = user?.mail_address;
+
+  // 2. פונקציית טעינת השירותים לקבלת המייל כפרמטר
+  const fetchServices = async (emailToUse) => {
+    const email = emailToUse || userEmail;
+    
+    // עצירה: אם אין מייל זמין, לא מבצעים את ה-fetch!
+    if (!email) return;
+
     try {
       const res = await fetch("http://localhost:5000/services", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ barberMail: userEmail }),
+        body: JSON.stringify({ barberMail: email }),
       });
 
       const data = await res.json();
 
-      if (res.ok) setMyServices(data);
+      if (res.ok) {
+        setMyServices(data);
+      } else {
+        console.error("Server returned error:", data);
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Fetch error:", err);
     }
   };
 
-
-
-  useEffect(()=>{
-    fetchServices();
-}, [refresh]);
+  // 3. מריצים את השליפה רק כשהמייל קיים או כשיש refresh
+  useEffect(() => {
+    if (userEmail) {
+      fetchServices(userEmail);
+    }
+  }, [userEmail, refresh]);
 
   const startEditing = (service) => {
     setEditingName(service.service_name);
@@ -56,55 +74,55 @@ export default function ServiceList({refresh}) {
     });
 
     setEditingName(null);
-    fetchServices();
+    fetchServices(userEmail);
   };
 
   const handleDelete = async (serviceName) => {
-  const result = await Swal.fire({
-    title: "למחוק שירות?",
-    text: "השירות כולל תורים קיימים במערכת. לאחר ההסרה, השירות יוסר מתפריט השירותים שלך ולא יהיה זמין לקביעת תורים חדשים." ,
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "כן, למחוק",
-    cancelButtonText: "ביטול",
-    background: "#1a1a1a",
-    color: "#fff",
-    confirmButtonColor: "#ef4444",
-    cancelButtonColor: "#555",
-  });
-
-  if (!result.isConfirmed) return;
-
-  try {
-    await fetch("http://localhost:5000/services/remove-service", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ serviceName }),
-    });
-
-    await Swal.fire({
-      icon: "success",
-      title: "נמחק בהצלחה",
-      timer: 2000,
-      showConfirmButton: false,
+    const result = await Swal.fire({
+      title: "למחוק שירות?",
+      text: "השירות כולל תורים קיימים במערכת. לאחר ההסרה, השירות יוסר מתפריט השירותים שלך ולא יהיה זמין לקביעת תורים חדשים.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "כן, למחוק",
+      cancelButtonText: "ביטול",
       background: "#1a1a1a",
       color: "#fff",
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#555",
     });
 
-    fetchServices();
-  } catch (err) {
-    console.error(err);
+    if (!result.isConfirmed) return;
 
-    Swal.fire({
-      icon: "error",
-      title: "שגיאה במחיקה",
-      text: "נסה שוב מאוחר יותר",
-      background: "#1a1a1a",
-      color: "#fff",
-    });
-  }
-};
+    try {
+      await fetch("http://localhost:5000/services/remove-service", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ serviceName }),
+      });
+
+      await Swal.fire({
+        icon: "success",
+        title: "נמחק בהצלחה",
+        timer: 2000,
+        showConfirmButton: false,
+        background: "#1a1a1a",
+        color: "#fff",
+      });
+
+      fetchServices(userEmail);
+    } catch (err) {
+      console.error(err);
+
+      Swal.fire({
+        icon: "error",
+        title: "שגיאה במחיקה",
+        text: "נסה שוב מאוחר יותר",
+        background: "#1a1a1a",
+        color: "#fff",
+      });
+    }
+  };
 
   return (
     <div className={classes.container}>
@@ -120,11 +138,11 @@ export default function ServiceList({refresh}) {
             return (
               <div key={s.service_name} className={classes.card}>
                 <div className={classes.info}>
-                <div className={classes.serviceHeader}>
-                  <h4>{s.service_name}</h4>
-                  {!isEditing && <p>{s.duration} דקות</p>}
+                  <div className={classes.serviceHeader}>
+                    <h4>{s.service_name}</h4>
+                    {!isEditing && <p>{s.duration} דקות</p>}
+                  </div>
                 </div>
-              </div>
 
                 <div className={classes.center}>
                   {!isEditing ? (

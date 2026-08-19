@@ -7,8 +7,9 @@ const dbSingleton = require("../dbSingleton");
 // Execute a query to the database
 const db = dbSingleton.getConnection();
 
+
+// ראוטר מחזיר את פרטי כל ימי העבודה של ספר 
 router.get("/", (req, res) => {
-  // 1. אבטחה: בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
   }
@@ -55,8 +56,9 @@ router.get("/", (req, res) => {
   });
 });
 
+// מחזיר את שעות העבודה של ספר בתאריך מסוים 
 router.post("/barbers-constraints", (req, res) => {
-  // 1. אבטחה: בדיקה שהמשתמש מחובר
+
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
   }
@@ -73,8 +75,8 @@ router.post("/barbers-constraints", (req, res) => {
   });
 });
 
+// נתיב המחזיר את פרטי ימי ושעות העבודה של ספר בטווח תאריכים מסוים
 router.get("/range", (req, res) => {
-  // 1. אבטחה: בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
   }
@@ -106,6 +108,7 @@ router.get("/range", (req, res) => {
   });
 });
 
+// נתיב להוספת יום ושעות עבודה עבור ספר 
 router.post("/add-constraint", (req, res) => {
   // 1. אבטחה: בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {
@@ -151,32 +154,7 @@ router.post("/add-constraint", (req, res) => {
   });
 });
 
-// router.put("/remove-constraint/:id", (req, res) => {
-//   // 1. אבטחה: בדיקה שהמשתמש מחובר
-//   if (!req.session || !req.session.user) {
-//     return res.status(401).json({ message: "User not logged in" });
-//   }
-
-//   const status = req.session.user.status;
-
-//   if (status != "ספר" && status != "מנהל")
-//     return res.status(403).json({ message: "Not authorized" });
-
-//   const mail = req.session.user.email;
-//   const constraintCode = parseInt(req.params.id, 10);
-
-
-//   const query =
-//     "UPDATE availability SET status = 'לא פעיל' WHERE constraint_code = ? AND mail_address = ?";
-
-//   db.query(query, [constraintCode, mail], (err, results) => {
-//     if (err) return res.status(500).json({ message: "Internal Error" });
-//     if (results.affectedRows === 0)
-//       return res.status(404).json({ message: "האילוץ לא נמצא" });
-//     return res.status(200).json({ message: "האילוץ הוסר בהצלחה" });
-//   });
-// });
-
+// נתיב למחיקת זמני עבודה של ספר 
 router.put("/remove-constraint/:id", (req, res) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
@@ -231,6 +209,7 @@ router.put("/remove-constraint/:id", (req, res) => {
   );
 });
 
+
 router.get("/days-activity", (req, res) => {
   const query =
     "SELECT * FROM dayshoursactivity ORDER BY FIELD(day, 'ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת')";
@@ -240,6 +219,7 @@ router.get("/days-activity", (req, res) => {
   });
 });
 
+// נתיב לעדכון שעות פעילות המספרה ביום מסוים
 router.put("/update-day/:day", (req, res) => {
   if (req.session.user.status !== "מנהל")
     return res.status(403).json({ message: "Not authorized" });
@@ -247,7 +227,6 @@ router.put("/update-day/:day", (req, res) => {
   const { day } = req.params;
   const { start, end } = req.body;
 
-  // אם הוגדרו שעות 00:00:00 זה אומר שהיום סגור
   const query = "UPDATE dayshoursactivity SET start = ?, end = ? WHERE day = ?";
 
   db.query(query, [start, end, day], (err, results) => {
@@ -258,6 +237,7 @@ router.put("/update-day/:day", (req, res) => {
   });
 });
 
+// נתיב לשליפת קוד זמינות עבודה של ספר בטווח תאריכים 
 router.post("/get-code", (req, res) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });

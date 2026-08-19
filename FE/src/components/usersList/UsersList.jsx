@@ -61,6 +61,7 @@ const filteredUsers = users.filter((user) =>
           </select>
 
           <input
+            className={classes.status_select}
             type="text"
             placeholder="חיפוש משתמש לפי שם"
             onChange={(e) => setUserToSearch(e.target.value)}

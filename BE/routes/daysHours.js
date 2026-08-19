@@ -7,6 +7,7 @@ const dbSingleton = require("../dbSingleton");
 // Execute a query to the database
 const db = dbSingleton.getConnection();
 
+// נתיב המחזיר פרטי היום מטבלת ימי פעילות המספרה
 router.post("/get-day", (req, res) => {
   if (!req.session || !req.session.user || !req.session.user.email) {
     return res.status(401).json({ message: "Unauthorized: Please log in" });
@@ -26,13 +27,6 @@ router.post("/get-day", (req, res) => {
     }
   });
 });
-
-
-
-
-
-
-
 
 
 module.exports = router;
