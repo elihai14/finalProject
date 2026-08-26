@@ -46,8 +46,9 @@ function BusyDays({ setDaysRank, startDate, endDate }) {
     labels: busyDays.map((day) => day.day_name),
     datasets: [
       {
-        label: 'רמת עומס',
-        data: busyDays.map((_, index) => index + 1),
+        label: 'כמות תורים',
+        // data: busyDays.map((_, index) => index + 1),
+        data: busyDays.map((day) => day.total_appointments),
         backgroundColor: '#dfb76c',
         borderColor: '#dfb76c',
         borderWidth: 1,

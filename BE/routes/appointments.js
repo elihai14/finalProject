@@ -35,7 +35,7 @@ router.post("/", (req, res) => {
   if (startDate) {
     if (startDate == todayStr) {
       query +=
-        " AND appointment_date > ? OR (appointment_date = ? AND appointment_time > ?) ";
+        " AND (appointment_date > ? OR (appointment_date = ? AND appointment_time > ?)) ";
       values.push(startDate);
       values.push(startDate);
       values.push(currentTimeStr);
@@ -49,10 +49,10 @@ router.post("/", (req, res) => {
 
   if (endDate) {
     query += " AND appointment_date <= ? ";
-    const nextDay = new Date(endDate);
-    nextDay.setDate(nextDay.getDate() + 1);
-
-    values.push(nextDay.toISOString().slice(0, 10));
+    // const nextDay = new Date(endDate);
+    // nextDay.setDate(nextDay.getDate() + 1);
+    // values.push(nextDay.toISOString().slice(0, 10));
+    values.push(endDate);
   }
 
   if (barber_mail) {
@@ -244,8 +244,7 @@ router.get("/busy-days", (req, res) => {
     WHERE d.start != '00:00:00' 
       AND d.end != '00:00:00'
     GROUP BY d.day
-    ORDER BY total_appointments DESC
-    LIMIT 3
+    ORDER BY FIELD(d.day, 'ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת') ASC
   `;
 
   db.query(query, [startDate, endDate], (err, results) => {

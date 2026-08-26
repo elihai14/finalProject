@@ -31,8 +31,8 @@ function DashboardStats({ userStatus }) {
 
   useEffect(()=>
     {
-      setDashDates({startDate:today,
-                    endDate: prevMonth
+      setDashDates({startDate: prevMonth,
+                    endDate: today
       })
     },[])
 
@@ -101,7 +101,8 @@ function DashboardStats({ userStatus }) {
           <label>עד תאריך:</label>
           <input
             type="date"
-            value={dashDates.endDate} 
+            value={dashDates.endDate}
+            min={dashDates.startDate} 
             onChange={(e) => {
               e.preventDefault();
               setDashDates((prev) => ({ ...prev, endDate: e.target.value })); 
@@ -115,7 +116,9 @@ function DashboardStats({ userStatus }) {
             value={dashDates.startDate}
             onChange={(e) => {
               e.preventDefault();
-              setDashDates((prev) => ({ ...prev, startDate: e.target.value })); 
+              setDashDates((prev) => ({ ...prev, startDate: e.target.value ,
+                                                 endDate: e.target.value
+                })); 
             }}
           />
         </div>
