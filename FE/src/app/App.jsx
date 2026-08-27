@@ -20,6 +20,7 @@
   import UpdateDetailsForm from "../components/updateDetailsForm/UpdateDetailsForm";
   import AdminAddService from "../components/adminAddService/AdminAddService";
   import GlobalServicesList from "../components/globalServiceList/GlobalServiceList";
+import DaysHoursManagement from "../components/daysHoursManagement/DaysHoursManagement";
 
   export default function App() {
 
@@ -31,6 +32,12 @@
     const hideSidebarRoutes = ["/", "/login", "/register"];
     const shouldShowSidebar = !hideSidebarRoutes.includes(location.pathname);
     const [reloadApps, setReloadApps] = useState(true);
+
+    const day = {
+      day: "ראשון",
+      start:"08:00",
+      end: "16:00"
+    }
 
 
 
@@ -49,8 +56,10 @@
 
     return (
       <div>
-        <Header />
-        <Navbar user={user} setUser={setUser} />
+        <div className={classes.topNavWrapper}>
+          {/* <Header  /> */}
+          <Navbar user={user} setUser={setUser} />
+        </div>
 
         {shouldShowSidebar && <SideBar />}
         <Routes>
@@ -118,7 +127,9 @@
                   <div className={classes.card_wrapper}>
                     <NewAppForm
                       setReloadApps={setReloadApps}
-                      onSuccess={() => setRefreshAppointments((prev) => prev + 1)}
+                      onSuccess={() =>
+                        setRefreshAppointments((prev) => prev + 1)
+                      }
                     />
                   </div>
                 </div>
@@ -177,6 +188,12 @@
             }
           />
           <Route path="/manage-users" element={<div>{<UsersList />}</div>} />
+          <Route
+            path="/manage-days-hours"
+            element={
+              <div>{<DaysHoursManagement setRefresh={setRefresh} />}</div>
+            }
+          />
         </Routes>
         <Footer prog="Elihai & Daniel" year="2026" />
       </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import classes from "./serviceList.module.css";
-import Swal from "sweetalert2"; 
+import Swal from "sweetalert2";
 import { fetchUser } from "../../../js/mainFunctionView";
 
 export default function ServiceList({ refresh }) {
@@ -22,7 +22,7 @@ export default function ServiceList({ refresh }) {
   // 2. פונקציית טעינת השירותים לקבלת המייל כפרמטר
   const fetchServices = async (emailToUse) => {
     const email = emailToUse || userEmail;
-    
+
     // עצירה: אם אין מייל זמין, לא מבצעים את ה-fetch!
     if (!email) return;
 

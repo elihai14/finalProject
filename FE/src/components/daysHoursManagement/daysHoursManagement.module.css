@@ -1,0 +1,30 @@
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #18181b;
+  border-radius: 16px;
+  color: #ffffff;
+  direction: rtl;
+}
+
+.title {
+  font-size: 1.8rem;
+  color: #dfb76c;
+  margin-bottom: 20px;
+  text-align: right;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.empty {
+  color: #ef4444;
+  font-size: 1.1rem;
+  text-align: center;
+  margin: 20px 0;
+}

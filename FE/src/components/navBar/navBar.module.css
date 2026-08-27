@@ -8,6 +8,7 @@
   min-height: 80px;
   box-sizing: border-box;
   direction: ltr; /* משאיר את הלוגיקה של שמאל/ימין קבועה ונקייה */
+  padding-right: 5%;
 }
 
 /* עיצוב שם המשתמש - גדול, קריא ומעוצב בצד ימין */

@@ -825,3 +825,18 @@ export async function fetchFilterOptions(user, setServices,setBarbers,setCustome
     }
   }
 
+  export async function getDays()
+  {
+          const response = await fetch(
+          `http://localhost:5000/daysHours/`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          }
+        );
+        if(!response.ok)
+          return [];
+        return response.json();
+  }
+
