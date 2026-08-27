@@ -1,8 +1,13 @@
+// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./newAppForm.module.css";
+// ייבוא פונקציות העזר לקבלת פרטי המשתמש, שעות פנויות ויצירת תור חדש
 import { fetchUser, getHoursSelect, handleCreateApp } from "../../../js/mainFunctionView";
+// ייבוא הוקים מ-React
 import { useState, useEffect } from "react";
 
+// קומפוננטת טופס לקביעת תור חדש
 export default function NewAppForm({ onSuccess, setReloadApps }) {
+// ניהול משתני State עבור רשימת הספרים, השירותים, השעות, והבחירות של המשתמש
   const [barbers, setBarbers] = useState([]); // מצב לשמירת רשימת הספרים
   const [loading, setLoading] = useState(true);
   const [selectedBarber, setSelectedBarber] = useState(""); // הספר שנבחר
@@ -14,8 +19,10 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
   const [hours, setHours] = useState([]);
   const [selectedHour, setSelectedHour] = useState("");
 
+// קבלת התאריך של היום בפורמט YYYY-MM-DD לקביעת תאריך מינימלי
   const today = new Date().toISOString().split("T")[0];
 
+// טעינת רשימת הספרים ופרטי המשתמש המחובר בעת ענידת הקומפוננטה
   useEffect(() => {
     const fetchBarbers = async () => {
       try {
@@ -68,7 +75,7 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
     fetchServices();
   }, [selectedBarber]);
 
-  
+  // שליפת השעות הזמינות בכל שינוי של ספר, שירות או תאריך
   useEffect(() => {
     if (!selectedBarber || !selectedService || !selectedDate) return;
 
@@ -86,6 +93,7 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
     fetchHours();
   }, [selectedBarber, selectedService, selectedDate]);
 
+// פונקציה לשליחת טופס קביעת התור
   const submitAppointment = async () => {
     await handleCreateApp(
       selectedDate,
@@ -106,6 +114,7 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
   return (
     <div className={classes.container} id="addApp-form">
       <form id="appointmentForm" className={classes.main_form}>
+{/* שדה בחירת ספר */}
         <div className={classes.form_group}>
           <label htmlFor="barberSelect">בחר ספר</label>
           <select
@@ -129,6 +138,7 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
             ))}
           </select>
         </div>
+{/* שדה בחירת שירות */}
         <div className={classes.form_group}>
           <label htmlFor="serviceSelect">בחר שירות</label>
           <select
@@ -155,6 +165,7 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
             ))}
           </select>
         </div>
+{/* שדה בחירת תאריך */}
         <div className={classes.form_group}>
           <label htmlFor="dateInput">בחר תאריך</label>
           <input
@@ -168,6 +179,7 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
           />
         </div>
 
+{/* שדה בחירת שעה */}
         <div className={classes.form_group}>
           <label htmlFor="hourSelect">בחר שעה</label>
           <select
@@ -189,6 +201,7 @@ export default function NewAppForm({ onSuccess, setReloadApps }) {
           </select>
         </div>
 
+{/* כפתור אישור לקביעת התור */}
         <button
           type="button"
           onClick={submitAppointment}

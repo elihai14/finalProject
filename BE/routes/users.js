@@ -1,50 +1,63 @@
+/**
+ * ============================================================================
+ * מודול ניהול משתמשים (Users Router - Backend Model / Controller)
+ * ============================================================================
+ * תפקיד המודול:
+ * מודול זה מרכז את כל לוגיקת ה-API הקשורה לניהול המשתמשים במערכת.
+ * המודול מנהל את תהליכי ההרשמה, ההתחברות האינטראקטיבית (OTP), ההתנתקות,
+ * שליפת פרטי המשתמש המחובר, עדכון פרופיל וסטטוס הרשאות (לקוח/ספר/מנהל),
+ * ובדיקת תורים עתידיים עבור הלקוח בעת ההתחברות.
+ */
+
 const express = require("express");
 const router = express.Router();
 
-//routes/user.js
 const dbSingleton = require("../dbSingleton");
 
-// Execute a query to the database
+// קבלת חיבור יחיד (Singleton) למסד הנתונים
 const db = dbSingleton.getConnection();
 
-// ראוטר מחזיר את פרטי כל המשתמשים לפי סינון
+/**
+ * שליפת רשימת משתמשים לפי סינון סטטוס ומיון
+ * POST /users/
+ */
 router.post("/", (req, res) => {
   const { status, isReverse } = req.body;
 
   let query = "SELECT * FROM users";
   let values = [];
 
-  // טיפול בסינון לפי סטטוס
+  // הרכבת תנאי ה-WHERE בהתאם לסטטוס המבוקש
   if (status === "ספר") {
-    // אם ביקשו ספר - נביא ספרים ומנהלים
     query += " WHERE status IN ('ספר', 'מנהל')";
   } else if (status) {
-    // אם נשלח סטטוס ספציפי אחר (כמו 'לקוח' או 'מנהל')
     query += " WHERE status = ?";
     values.push(status);
   }
-  // אם לא נשלח status בכלל - השאילתה פשוט תביא את כל המשתמשים!
 
-  // מיון
+  // הגדרת כיוון המיון לפי שם המשתמש
   query += " ORDER BY user_name " + (isReverse ? "DESC" : "ASC");
 
-  // הרצת השאילתה
+  // ביצוע השאילתא והחזרת תוצאות המשתמשים
   db.query(query, values, (err, results) => {
     if (err) {
       console.error("Database query error:", err);
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
-    // תמיד מחזירים 200 עם התוצאות (גם אם זה מערך ריק [])
     return res.status(200).json(results);
   });
 });
 
-// ראוטר מחזיר את פרטי המשתמנש הנוכחי שמחובר 
+/**
+ * שליפת פרטי המשתמש הנוכחי שמחובר בסשן
+ * POST /users/current
+ */
 router.post("/current", (req, res) => {
   if (!req.session || !req.session.user || !req.session.user.email) {
     return res.status(401).json({ message: "Unauthorized: Please log in" });
   }
+
   const mail = req.session.user.email;
   const query = "SELECT * FROM users WHERE mail_address = ?";
 
@@ -61,11 +74,15 @@ router.post("/current", (req, res) => {
   });
 });
 
-// ראוטר מחזיר את סטטוס המשתמש המחובר 
+/**
+ * שליפת סטטוס ההרשאה של המשתמש המחובר
+ * POST /users/get-status
+ */
 router.post("/get-status", (req, res) => {
   if (!req.session || !req.session.user || !req.session.user.email) {
     return res.status(401).json({ message: "Unauthorized: Please log in" });
   }
+
   const mail = req.session.user.email;
   const query = "SELECT status FROM users WHERE mail_address = ?";
 
@@ -82,10 +99,14 @@ router.post("/get-status", (req, res) => {
   });
 });
 
-// ראוטר ליצירת משתמש חדש בודק תקינות קלט ולאחר מכן מוסיף את פרטי המשתמש לבסיס הנתונים
+/**
+ * הרשמת משתמש חדש למערכת
+ * POST /users/register
+ */
 router.post("/register", (req, res) => {
   const { fullName, phoneNumber, mailAddress } = req.body;
 
+  // ולידציה לפורמט תקין של טלפון נייד
   if (phoneNumber) {
     if (!/^\d{10}$/.test(phoneNumber) || !phoneNumber.startsWith("05")) {
       return res.status(400).json({ message: "מספר טלפון לא תקין" });
@@ -96,6 +117,7 @@ router.post("/register", (req, res) => {
     return res.status(400).json({ message: "נא למלא את כל השדות" });
   }
 
+  // בדיקת קיום מוקדם של המייל במערכת
   const checkQuery = "SELECT * FROM users WHERE mail_address = ?";
 
   db.query(checkQuery, [mailAddress], (err, results) => {
@@ -107,6 +129,7 @@ router.post("/register", (req, res) => {
       return res.status(400).json({ message: "המשתמש כבר קיים במערכת" });
     }
 
+    // הוספת המשתמש החדש עם סטטוס "לקוח" כברירת מחדל
     const insertQuery =
       "INSERT INTO users (user_name, phone_number, mail_address, status) VALUES (?, ?, ?, 'לקוח')";
 
@@ -123,16 +146,18 @@ router.post("/register", (req, res) => {
         return res
           .status(201)
           .json({ message: "נרשמת בהצלחה! כעת ניתן להתחבר" });
-      }
+      },
     );
   });
 });
 
-// ראוטר התחברות למשתמש , בודק תקינות כתובת מייל ואם קיים במערכת
-// שולח קוד רנדומלי חד פעמי בן 4 ספרות לכתובת המייל לצורך התחברות
+/**
+ * שליחת קוד אימות חד-פעמי להתחברות
+ * POST /users/login
+ */
 router.post("/login", (req, res) => {
   const { mailAddress } = req.body;
-  const { otpCodes, transporter } = req.app.locals; // שליפת הכלים מה-app.js
+  const { otpCodes, transporter } = req.app.locals;
 
   const query = "SELECT * FROM users WHERE mail_address = ?";
 
@@ -142,13 +167,13 @@ router.post("/login", (req, res) => {
     }
 
     if (results.length > 0) {
-      // 1. המשתמש קיים - מייצרים קוד רנדומלי
+      // ייצור קוד אימות אקראי בן 4 ספרות
       const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
 
-      // 2. שומרים את הקוד בזיכרון השרת (כדי שנוכל לבדוק אותו ב-verify)
+      // שמירת הקוד בזיכרון השרת לבדיקה
       otpCodes[mailAddress] = otpCode;
 
-      // 3. הגדרת תוכן המייל
+      // הגדרת תוכן הודעת המייל
       const mailOptions = {
         from: "your-email@gmail.com",
         to: mailAddress,
@@ -156,8 +181,8 @@ router.post("/login", (req, res) => {
         text: `שלום, קוד האימות שלך הוא: ${otpCode}`,
       };
 
+      // שליחת המייל באמצעות Nodemailer
       try {
-        // 4. שליחה בפועל
         await transporter.sendMail(mailOptions);
         console.log(`OTP ${otpCode} sent to ${mailAddress}`);
         return res.status(200).json({ message: "הקוד נשלח לכתובת המייל" });
@@ -171,10 +196,12 @@ router.post("/login", (req, res) => {
   });
 });
 
-//נתיב להתנתקות המשתמש מהמערכת
+/**
+ * התנתקות מהמערכת והשמדת הסשן
+ * POST /users/logout
+ */
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
-    //משמיד את הsession ומנתק את המשתמש
     if (err) {
       return res.status(500).send("logout failed");
     }
@@ -183,16 +210,18 @@ router.post("/logout", (req, res) => {
   });
 });
 
-// נתיב לבדיקת הקוד שנשלח למייל 
-// ובנוסף כאשר הקוד תקין וההתחברות הצליחה קיימת בדיקה האם למשתמש קיימים תורים קרובים
+/**
+ * אימות קוד OTP ובדיקת תורים קרובים של המשתמש
+ * POST /users/verify-otp
+ */
 router.post("/verify-otp", (req, res) => {
   const { mailAddress, code } = req.body;
   const { otpCodes } = req.app.locals;
 
+  // בדיקה שהקוד שהוזן תואם לקוד בזיכרון השרת
   if (otpCodes[mailAddress] && otpCodes[mailAddress] === code) {
     delete otpCodes[mailAddress];
 
-    // 1. שליפת הסטטוס של המשתמש
     const query =
       "SELECT status, mail_address FROM users WHERE mail_address = ?";
     db.query(query, [mailAddress], (err, results) => {
@@ -203,7 +232,7 @@ router.post("/verify-otp", (req, res) => {
       const user = results[0];
       req.session.user = { email: user.mail_address, status: user.status };
 
-      // 2. בודקים תורים קרובים אך ורק אם מדובר בלקוח!
+      // בדיקת תורים קרובים בשבוע הקרוב (רק עבור לקוחות)
       if (user.status === "לקוח") {
         const checkQuery = `
           SELECT 1 
@@ -226,7 +255,6 @@ router.post("/verify-otp", (req, res) => {
           });
         });
       } else {
-        // 3. אם זה ספר או מנהל – מחזירים false מיד בלי לבדוק תורים
         return res.status(200).json({
           message: "Authentication successful",
           status: user.status,
@@ -239,27 +267,11 @@ router.post("/verify-otp", (req, res) => {
   }
 });
 
-// נתיב המחזיר את כל פרטי המשתמשים לפי סטטוס לקוח שהוכנס
-// router.get("/:status", (req, res) => {
-//   const status = req.params.status;
-//   const query = "SELECT * FROM users WHERE status = ?";
-//   db.query(query, [status], (err, results) => {
-//     if (err) {
-//       return res.status(500).json({ message: "Internal Server Error" });
-//     }
-//     if (results.length > 0) {
-//       return res.status(200).json(results);
-//     } else {
-//       return res
-//         .status(404)
-//         .json({ message: "No users found with this status" });
-//     }
-//   });
-// });
-
-// נתיב לעדכון סטטוס משתמש 
+/**
+ * עדכון סטטוס/הרשאת משתמש (מנהל/ספר/לקוח)
+ * PUT /users/updateStatus
+ */
 router.put("/updateStatus", (req, res) => {
-
   const { status, userEmail } = req.body;
   console.log(userEmail);
 
@@ -267,7 +279,6 @@ router.put("/updateStatus", (req, res) => {
   db.query(query, [status, userEmail], (err, results) => {
     if (err) {
       console.log(err);
-
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
@@ -281,7 +292,10 @@ router.put("/updateStatus", (req, res) => {
   });
 });
 
-// נתיב לעדכון פרטי משתמש (שם משתמש , מס טלפון) 
+/**
+ * עדכון פרטים אישיים של המשתמש (שם וטלפון)
+ * PUT /users/update
+ */
 router.put("/update", (req, res) => {
   if (!req.session || !req.session.user || !req.session.user.email) {
     return res.status(401).json({ message: "Unauthorized: Please log in" });
@@ -290,7 +304,6 @@ router.put("/update", (req, res) => {
   const email = req.session.user.email;
   const { newName, phoneNumber } = req.body;
 
-  // וולידציה לטלפון
   if (phoneNumber) {
     if (!/^\d{10}$/.test(phoneNumber) || !phoneNumber.startsWith("05")) {
       return res.status(400).json({ message: "מספר טלפון לא תקין" });
@@ -301,6 +314,7 @@ router.put("/update", (req, res) => {
     return res.status(400).json({ message: "נא להזין פרטים לעדכון" });
   }
 
+  // בניית שאילתת עדכון דינמית לפי הפרטים שהוזנו
   let query = "UPDATE users SET ";
   let values = [];
 
@@ -331,7 +345,10 @@ router.put("/update", (req, res) => {
   });
 });
 
-// נתיב המחזיר פרטים של ספר
+/**
+ * שליפת פרטי ספר והשירותים שהוא מספק
+ * GET /users/barber-details/:mail
+ */
 router.get("/barber-details/:mail", (req, res) => {
   const { mail } = req.params;
 
@@ -343,6 +360,7 @@ router.get("/barber-details/:mail", (req, res) => {
     WHERE mail_address = ?
   `;
 
+  // שליפת פרטי הספר
   db.query(query, [mail], (err, barberResults) => {
     if (err) {
       return res.status(500).json({ message: "Internal Server Error" });
@@ -354,6 +372,7 @@ router.get("/barber-details/:mail", (req, res) => {
 
     const barber = barberResults[0];
 
+    // שליפת רשימת השירותים השייכים לספר
     const servicesQuery = `
       SELECT service_name
       FROM barber_services
@@ -373,4 +392,5 @@ router.get("/barber-details/:mail", (req, res) => {
     });
   });
 });
+
 module.exports = router;

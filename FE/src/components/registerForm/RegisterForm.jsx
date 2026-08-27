@@ -1,8 +1,12 @@
+// ייבוא הוקים מ-React, רכיבי ניווט וספריית ההתראות SweetAlert2
 import { useState } from "react";
 import { useNavigate ,Link } from "react-router-dom";
 import classes from "./registerForm.module.css";
 import Swal from 'sweetalert2';
+
+// קומפוננטת טופס הרשמת משתמש חדש
 function RegisterForm() {
+// ניהול משתני State עבור פרטי הנרשם, מצבי טעינה ושגיאות
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -10,6 +14,7 @@ function RegisterForm() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+// פונקציה לטיפול בשליחת טופס ההרשמה
   const handleRegister = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -17,6 +22,7 @@ function RegisterForm() {
     
    
     try {
+// שליחת פרטי המשתמש החדש לשרת
       const response = await fetch("http://localhost:5000/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,6 +61,7 @@ function RegisterForm() {
 
 return (
     <div className={classes.loginContainer}>
+{/* כותרת הטופס */}
       <h2>הרשמה</h2>
 
       {/* הצגת שגיאה מהבקאנד (כמו "משתמש רשום") */}
@@ -97,6 +104,7 @@ return (
           {isLoading ? "נרשם..." : "הרשמה"}
         </button>
 
+{/* קישור מעבר לדף התחברות למשתמשים רשומים */}
         <p className={classes.footerText}>
           כבר יש לך חשבון? <Link to="/login" className={classes.linkBtn}>התחבר</Link>
         </p>

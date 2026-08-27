@@ -1,23 +1,40 @@
+/**
+ * ============================================================================
+ * מודול ניהול תורים ואנליטיקה 
+ * ============================================================================
+ * תפקיד המודול:
+ * מודול זה מרכז את כל הפעולות הקשורות לתורים במערכת:
+ * 1. שליפת תורים לפי סינונים (לקוח, ספר, שירות, טווח תאריכים).
+ * 2. הוספה, ביטול ושליפת פרטי תור לפי מזהה יחודי.
+ * 3. בדיקת תורים קיימים למניעת חפיפות.
+ * 4. הפקת נתונים ודוחות מנהל: סכום הכנסות, סך לקוחות, לקוחות חוזרים,
+ *    ניתוח השעות העמוסות ביותר והימים העמוסים בשבוע.
+ */
+
 const express = require("express");
 const router = express.Router();
 
-//routes/user.js
 const dbSingleton = require("../dbSingleton");
 
-// Execute a query to the database
+// קבלת חיבור יחיד (Singleton) למסד הנתונים
 const db = dbSingleton.getConnection();
+
 const today = new Date();
 const todayStr = today.toISOString().split("T")[0];
 const currentTimeStr = `${String(today.getHours()).padStart(2, "0")}:${String(today.getMinutes()).padStart(2, "0")}`;
-// מחזיר רשימת תורים של המשתמש שמחובר
 
-// נתיב לשליפת תורים לפי סינון 
+/**
+ * שליפת תורים פעילים לפי סינונים דינמיים (שם לקוח, מייל לקוח, שירות, ספר, טווח תאריכים)
+ * POST /appointments/
+ */
 router.post("/", (req, res) => {
-  let { user_name, clientMail, service, startDate, endDate, barber_mail } = req.body;
+  let { user_name, clientMail, service, startDate, endDate, barber_mail } =
+    req.body;
 
   let query =
     "SELECT appointments.*, u1.user_name AS barberName, u2.user_name AS customerName           FROM appointments LEFT JOIN users u1 ON appointments.barber_mail_address =                 u1.mail_address LEFT JOIN users u2 ON appointments.client_mail_address = u2.mail_address  WHERE appointments.is_cancel = 0";
   const values = [];
+
   if (clientMail) {
     query += " AND client_mail_address = ? ";
     values.push(clientMail);
@@ -39,19 +56,14 @@ router.post("/", (req, res) => {
       values.push(startDate);
       values.push(startDate);
       values.push(currentTimeStr);
-    }else
-    {
-      query +=
-        " AND appointment_date >= ? ";
+    } else {
+      query += " AND appointment_date >= ? ";
       values.push(startDate);
     }
   }
 
   if (endDate) {
     query += " AND appointment_date <= ? ";
-    // const nextDay = new Date(endDate);
-    // nextDay.setDate(nextDay.getDate() + 1);
-    // values.push(nextDay.toISOString().slice(0, 10));
     values.push(endDate);
   }
 
@@ -64,18 +76,18 @@ router.post("/", (req, res) => {
     if (err) return res.status(400).json({ message: "Internal Server Error" });
     if (results.length > 0) {
       return res.status(200).json(results);
-    } // בסיס הנתונים החזיר 0 תוצאות
-    else {
+    } else {
       return res.status(200).json([]);
     }
   });
 });
 
-// נתיב להוספת תור
+/**
+ * הוספת תור חדש למערכת עבור לקוח מחובר
+ * POST /appointments/add-appointment
+ */
 router.post("/add-appointment", (req, res) => {
-  // 1. בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {
-    // בדיקה אם משתמש לא מחובר
     return res.status(401).json({ message: "User not logged in" });
   }
 
@@ -97,7 +109,10 @@ router.post("/add-appointment", (req, res) => {
   );
 });
 
-// נתיב לשליפת כל התורים הקיימים והפעילים 
+/**
+ * שליפת תורים קיימים ופעילים ביום מסוים למניעת חפיפות (כולל משך זמן השירות)
+ * POST /appointments/existing-apps
+ */
 router.post("/existing-apps", (req, res) => {
   const { date, barberMail, clientMail } = req.body;
 
@@ -126,20 +141,25 @@ router.post("/existing-apps", (req, res) => {
   });
 });
 
-// נתיב למחיקת תור
+/**
+ * ביטול תור לפי מזהה ייחודי (Soft Delete - מעדכן is_cancel ל-1)
+ * PUT /appointments/cancel/:id
+ */
 router.put("/cancel/:id", (req, res) => {
   const appId = req.params.id;
   const query = "UPDATE appointments SET is_cancel=1 WHERE appointment_id = ?";
   db.query(query, [appId], (err, result) => {
-    // שאילתה שמוחקת תור לפי ID של תור מבוקש
     if (err) return res.status(500).json({ message: "Internal server error" });
     if (result.affectedRows === 0)
-      return res.status(404).json("appointment not found"); //בדיקה אם לא בוצע שינוי
+      return res.status(404).json("appointment not found");
     return res.status(200).json({ message: "appointment deleted successfuly" });
   });
 });
 
-// נתיב המחזיר את כמות הלקוחות וסכום הכנסות בטווח תאריכים 
+/**
+ * דוח אנליטיקה: כמות לקוחות סך הכל וסך הכנסות בטווח תאריכים
+ * POST /appointments/analytics
+ */
 router.post("/analytics", (req, res) => {
   const { startDate, endDate } = req.body;
 
@@ -159,9 +179,11 @@ router.post("/analytics", (req, res) => {
   });
 });
 
-// נתיב המחזיר את כמות הלקוחות החוזרים בטווח תאריכים מסוים
+/**
+ * דוח אנליטיקה: כמות הלקוחות החוזרים (קבעו יותר מתור אחד) בטווח תאריכים
+ * POST /appointments/analytics/repeat-customers
+ */
 router.post("/analytics/repeat-customers", (req, res) => {
-  // אם לא נשלחו תאריכים, נשים תאריכי ברירת מחדל קיצוניים (למשל משנת 1970 ועד היום)
   const startDate = req.body.startDate || "1970-01-01";
   const endDate = req.body.endDate || new Date().toISOString().split("T")[0];
 
@@ -185,12 +207,14 @@ router.post("/analytics/repeat-customers", (req, res) => {
   });
 });
 
-// נתיב המחזיר מערך הכולל את השעות הכי עמוסות בטווח תאריכים מסוים
+/**
+ * דוח אנליטיקה: התפלגות השעות העמוסות ביותר בטווח תאריכים
+ * GET /appointments/busy-hours
+ */
 router.get("/busy-hours", (req, res) => {
-  // שאילתה שמביאה רק את שעות הפעילות
   const hoursQuery = `SELECT MIN(start) as min_start, MAX(end) as max_end FROM dayshoursactivity WHERE start != '00:00:00'`;
   const { startDate, endDate } = req.query;
-  // שאילתה שמביאה את כמות התורים לכל שעה
+
   const appointmentsQuery = `
     SELECT HOUR(appointment_time) as hour, COUNT(*) as total 
     FROM appointments 
@@ -208,7 +232,6 @@ router.get("/busy-hours", (req, res) => {
       if (err)
         return res.status(500).json({ error: "Database error appointments" });
 
-      // איחוד התוצאות
       res.status(200).json({
         min_start: hoursRes[0].min_start || "08:00:00",
         max_end: hoursRes[0].max_end || "18:00:00",
@@ -218,11 +241,13 @@ router.get("/busy-hours", (req, res) => {
   });
 });
 
-// נתיב המחזיר את שלושת הימים הכי עמוסים במספרה בטווח תאריכים מסוים
+/**
+ * דוח אנליטיקה: ניתוח הימים העמוסים ביותר בשבוע בטווח תאריכים
+ * GET /appointments/busy-days
+ */
 router.get("/busy-days", (req, res) => {
   const { startDate, endDate } = req.query;
 
-  // השאילתה המדויקת לפי ה-dayshoursactivity
   const query = `
     SELECT 
         d.day as day_name, 
@@ -256,21 +281,21 @@ router.get("/busy-days", (req, res) => {
   });
 });
 
-// נתיב לשליפת פרטי תור לפי מזהה יחודי של התור 
+/**
+ * שליפת פרטי תור מסוים לפי מזהה ייחודי (ID)
+ * GET /appointments/:id
+ */
 router.get("/:id", (req, res) => {
   const id = req.params.id;
   const query = "SELECT * FROM appointments WHERE appointment_id = ?";
   db.query(query, [id], (err, results) => {
-    // שאילתה לקבלת תור לפי ID של תור מבוקש
     if (err) return res.status(400).json({ message: "Internal Server Error" });
     if (results.length === 1) {
-      // בדיקה אם חזרה תוצאה אחת
       return res.status(200).json(results);
     } else {
       return res.status(400).json({ message: "תור לא קיים" });
     }
   });
 });
-
 
 module.exports = router;

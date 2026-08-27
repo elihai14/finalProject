@@ -1,24 +1,30 @@
+// ייבוא הוקים מ-React ואימפורטים נדרשים
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { fetchUser } from "../../../js/mainFunctionView";
 import classes from "./loginForm.module.css";
 
+// קומפוננטת טופס התחברות דו-שלבי בעזרת קוד אימות במייל (OTP)
 function LoginForm({ setUser }) {
+// ניהול משתני State עבור מייל, קוד אימות, שלב בטופס, מצבי טעינה ושגיאות
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+// הוק לניווט בין דפים במערכת
   const navigate = useNavigate();
 
+// שלב 1: שליחת המייל לשרת לקבלת קוד אימות
   const handleSendEmail = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
+// שליחת בקשת התחברות ראשונית לשרת
       const response = await fetch("http://localhost:5000/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -28,6 +34,7 @@ function LoginForm({ setUser }) {
 
       const data = await response.json();
 
+// מעבר לשלב הזנת קוד האימות במידה והמייל קיים במערכת
       if (response.ok) {
         setStep(2);
       } else {
@@ -40,12 +47,14 @@ function LoginForm({ setUser }) {
     }
   };
 
+// שלב 2: אימות קוד ה-OTP והתחברות למערכת
   const handleVerifyCode = async (e) => {
   e.preventDefault();
   setIsLoading(true);
   setError("");
 
   try {
+// שליחת קוד האימות והמייל לבדיקה בשרת
     const response = await fetch("http://localhost:5000/users/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -108,10 +117,13 @@ function LoginForm({ setUser }) {
 
   return (
     <div className={classes.loginContainer}>
+{/* כותרת הטופס */}
       <h2>התחברות</h2>
 
+{/* הצגת הודעת שגיאה במידה וקיימת */}
       {error && <p className={classes.errorMessage}>{error}</p>}
 
+{/* שלב 1: טופס הזנת מייל */}
       {step === 1 && (
         <form onSubmit={handleSendEmail} className={classes.form}>
           <input
@@ -129,6 +141,7 @@ function LoginForm({ setUser }) {
         </form>
       )}
 
+{/* שלב 2: טופס הזנת קוד האימות */}
       {step === 2 && (
         <form onSubmit={handleVerifyCode} className={classes.form}>
           <p>
@@ -148,6 +161,7 @@ function LoginForm({ setUser }) {
             {isLoading ? "מאמת..." : "התחבר עכשיו"}
           </button>
 
+{/* כפתור לחזרה לשלב 1 ושינוי כתובת המייל */}
           <button
             type="button"
             onClick={() => {

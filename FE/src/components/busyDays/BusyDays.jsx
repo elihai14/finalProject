@@ -1,4 +1,6 @@
+// ייבוא הוקים מ-React
 import React, { useState, useEffect } from "react";
+// ייבוא קומפוננטות ורכיבים מ-Chart.js להצגת דיאגרמת עמודות
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,8 +11,10 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./busyDays.module.css";
 
+// רישום רכיבי Chart.js הנדרשים לדיאגרמה
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -20,18 +24,23 @@ ChartJS.register(
   Legend
 );
 
+// קומפוננטה להצגת דיאגרמת עמודות של הימים העמוסים ביותר בתורים
 function BusyDays({ setDaysRank, startDate, endDate }) {
+// ניהול משתנה ה-State לאחסון נתוני הימים העמוסים
   const [busyDays, setBusyDays] = useState([]);
 
+// טעינת הנתונים מהשרת בכל שינוי של טווח התאריכים
   useEffect(() => {
     const fetchData = async () => {
       try {
+// שליפת נתוני עומסים לפי ימים מהשרת
         const response = await fetch(
           `http://localhost:5000/appointments/busy-days?startDate=${startDate}&endDate=${endDate}`
         );
         if (!response.ok) throw new Error("Server error");
         const data = await response.json();
         const arr = Array.isArray(data) ? data : [];
+// עדכון ה-State והעברת הנתונים לרכיב האב
         setBusyDays(arr);
         setDaysRank(arr);
       } catch (err) {
@@ -42,6 +51,7 @@ function BusyDays({ setDaysRank, startDate, endDate }) {
     fetchData();
   }, [startDate, endDate]);
 
+// הגדרת הנתונים שיוצגו בגרף העמודות
   const chartData = {
     labels: busyDays.map((day) => day.day_name),
     datasets: [
@@ -57,6 +67,7 @@ function BusyDays({ setDaysRank, startDate, endDate }) {
     ],
   };
 
+// הגדרות עיצוב והתנהגות של הגרף
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -90,6 +101,7 @@ function BusyDays({ setDaysRank, startDate, endDate }) {
     <div className={classes.container}>
       <h3>דירוג עומס בימים</h3>
       <div className={classes.chartContainer}>
+{/* הצגת הגרף במידה וקיימים נתונים, אחרת הצגת הודעת מתאימה */}
         {busyDays.length > 0 ? (
           <Bar data={chartData} options={chartOptions} />
         ) : (

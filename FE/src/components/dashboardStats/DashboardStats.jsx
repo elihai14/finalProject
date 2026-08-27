@@ -1,12 +1,17 @@
+// ייבוא הוקים מ-React
 import React, { useState, useEffect } from "react";
+// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./dashboardStats.module.css";
+// ייבוא קומפוננטות עזר לסטטיסטיקות ויצוא נתונים
 import BusyHours from "../busyHours/BusyHours";
 import BusyDays from "../busyDays/BusyDays";
 import StatisticsExport from "../statisticExport/StatisticsExport";
 import { getStatisticData } from "../../../js/mainFunctionView";
 
+// קומפוננטה ראשית להצגת דשבורד סטטיסטיקות ונתונים עסקיים
 function DashboardStats({ userStatus }) {
 
+// ניהול משתני ה-State עבור הנתונים הסטטיסטיים, תאריכים, דירוגים ומצבי טעינה
   const [chartData, setChartData] = useState([]);
   const [repeatCount, setRepeatCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -29,6 +34,7 @@ function DashboardStats({ userStatus }) {
   };
   const prevMonth = getPrevMonthSafe();
 
+// הגדרת תאריכי ברירת המחדל (חודש אחורה עד היום) בטעינה הראשונית
   useEffect(()=>
     {
       setDashDates({startDate: prevMonth,
@@ -36,7 +42,7 @@ function DashboardStats({ userStatus }) {
       })
     },[])
 
-
+// שליפת נתוני הסטטיסטיקה מהשרת בכל שינוי של תאריכים או הרשאות משתמש
   useEffect(() => {
     getStatisticData(
       today,
@@ -49,7 +55,7 @@ function DashboardStats({ userStatus }) {
     );
   }, [userStatus, dashDates, today]);
 
-
+// הצגת הודעת שגיאה/טעינה במידה והנתונים טרם התקבלו
   if (loading) {
     return (
       <div className={classes.error_message}>
@@ -69,6 +75,7 @@ function DashboardStats({ userStatus }) {
     appointments: parseInt(item.total_appointments, 10) || 0,
   }));
 
+// אריזת הנתונים המעובדים לצורך ייצוא דוחות
   const statsData = {
     monthlyRevenue: chartData[0].total_revenue || 0,
     monthlyCustomers: chartData[0].total_customers,
@@ -83,7 +90,9 @@ function DashboardStats({ userStatus }) {
 
   return (
     <div className={classes.dashboard_wrapper}>
+{/* סרגל סינון תאריכים וכפתור ייצוא דוחות */}
       <div className={classes.dashFilterBar}>
+{/* כפתור ייצוא דוח המופיע רק למנהל או ספר */}
         {(userStatus === "מנהל" || userStatus === "ספר") && (
           <div className={classes.action_bar_wrapper}>
             <div className={classes.export_btn_container}>
@@ -97,6 +106,7 @@ function DashboardStats({ userStatus }) {
         )}
 
         
+{/* שדה בחירת תאריך סיום */}
         <div className={classes.dashFilterGroup}>
           <label>עד תאריך:</label>
           <input
@@ -109,6 +119,7 @@ function DashboardStats({ userStatus }) {
             }}
           />
         </div>
+{/* שדה בחירת תאריך התחלה */}
         <div className={classes.dashFilterGroup}>
           <label>מתאריך:</label>
           <input
@@ -124,7 +135,9 @@ function DashboardStats({ userStatus }) {
         </div>
       </div>
 
+{/* פריסת הנתונים של הדשבורד */}
       <div className={classes.dashboard_layout}>
+{/* עמודת עומסים ולקוחות חוזרים (עבור מנהל בלבד) */}
         {userStatus === "מנהל" && (
           <div className={classes.busy_column}>
             <div className={classes.stat_card}>
@@ -144,6 +157,7 @@ function DashboardStats({ userStatus }) {
           </div>
         )}
 
+{/* גריד הכנסות וכמות לקוחות */}
         <div className={classes.stats_grid}>
           <div className={classes.stat_card}>
             <h3>הכנסות תקופתיות</h3>
@@ -163,6 +177,7 @@ function DashboardStats({ userStatus }) {
             </div>
           </div>
 
+{/* הצגת קומפוננטת שעות עומס עבור מנהל */}
           {userStatus === "מנהל" && (
             <div className={classes.stat_card} style={{ gridColumn: "span 2" }}>
               {/* שליחת התאריכים המעודכנים לקומפוננטת העומס */}

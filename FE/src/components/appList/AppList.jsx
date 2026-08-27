@@ -1,7 +1,12 @@
+// ייבוא הוקים וספריות של React
 import React, { useState, useEffect } from "react";
+// ייבוא קומפוננטת כרטיס תור בודד
 import AppCard from "../appCard/AppCard";
+// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./appList.module.css";
+// ייבוא קומפוננטת סינון התורים
 import AppointmentsFilter from "../appointmentsFilter/AppointmentsFilter";
+// ייבוא פונקציות עזר לטעינת תורים, משתמש, אפשרויות סינון וביטול תור
 import {
   fetchAppointments,
   fetchUser,
@@ -9,8 +14,10 @@ import {
   handleCancelAppointment,
 } from "../../../js/mainFunctionView";
 
+// קומפוננטה ראשית להצגת רשימת התורים המנהלת סינונים שטוענת נתונים בהתאם
 export default function AppList({ refresh, setReloadApps, reloadApps }) {
 
+// ניהול משתני State עבור רשימת התורים, סינונים, משתמש מחובר ומצבי טעינה/שגיאה
   const [appointments, setAppointments] = useState([]);
   const [services, setServices] = useState([]);
   const [barbers, setBarbers] = useState([]);
@@ -20,6 +27,7 @@ export default function AppList({ refresh, setReloadApps, reloadApps }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+// חישוב תאריך היום ותאריך סיום בדיפולט (חודש קדימה)
   const today = new Date();
   const todayStr = today.toISOString().split("T")[0];
 
@@ -67,6 +75,7 @@ export default function AppList({ refresh, setReloadApps, reloadApps }) {
 
   return (
     <div className={classes.appList}>
+{/* רכיב הסינון להגדרת תאריכים, ספרים, לקוחות ושירותים */}
       <AppointmentsFilter
         filters={filters}
         setFilters={setFilters}
@@ -76,9 +85,12 @@ export default function AppList({ refresh, setReloadApps, reloadApps }) {
         userStatus={user?.status}
       />
 
+{/* הצגת הודעת שגיאה במידה וקיימת */}
       {error && <div className={classes.error_message}>{error}</div>}
 
+{/* אזור הצגת כרטיסי התורים */}
       <div className={classes.appointments_container}>
+{/* הצגת אינדיקטור טעינה או מיפוי כרטיסי התורים */}
         {isLoading ? (
           <div className={classes.loading_text}>טוען תורים...</div>
         ) : (

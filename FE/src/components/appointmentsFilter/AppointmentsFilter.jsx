@@ -1,6 +1,9 @@
+// ייבוא ספריית React
 import React from "react";
+// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./appointmentsFilter.module.css";
 
+// קומפוננטת סרגל סינון תורים לפי תאריכים, שירותים, לקוחות וספרים
 export default function AppointmentsFilter({
   filters,
   setFilters,
@@ -11,6 +14,7 @@ export default function AppointmentsFilter({
 }) {
   return (
     <div className={classes.filterBar}>
+{/* שדה לבחירת תאריך התחלה - עדכון תאריך ההתחלה והסיום במקביל */}
       <input
         type="date"
         value={filters.startDate}
@@ -23,6 +27,7 @@ export default function AppointmentsFilter({
         }}
       />
 
+{/* שדה לבחירת תאריך סיום - לא מאפשר בחירת תאריך מוקדם מתאריך ההתחלה */}
       <input
         type="date"
         value={filters.endDate}
@@ -36,6 +41,7 @@ export default function AppointmentsFilter({
       />
 
       {/* שירותים */}
+{/* תפריט נגלל לסינון לפי שירות מסוים */}
       <select
         value={filters.service}
         onChange={(e) => {
@@ -55,6 +61,7 @@ export default function AppointmentsFilter({
       </select>
 
       {/* לקוחות */}
+{/* תפריט נגלל לסינון לפי לקוח - מוצג רק למנהל או לספר */}
       {(userStatus === "מנהל" || userStatus === "ספר") && (
         <select
           value={filters.user_name}
@@ -76,6 +83,7 @@ export default function AppointmentsFilter({
       )}
 
       {/* ספרים */}
+{/* תפריט נגלל לסינון לפי ספר - מוצג רק למנהל או ללקוח */}
       {(userStatus === "מנהל" || userStatus === "לקוח") && (
         <select
           value={filters.barber_mail}

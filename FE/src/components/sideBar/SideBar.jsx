@@ -1,3 +1,4 @@
+// ייבוא הוקים מ-React, רכיב Link לניווט, קובץ העיצוב ואייקונים מ-react-icons
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import classes from "./sideBar.module.css";
@@ -14,20 +15,25 @@ import {
 import { useEffect } from "react";
 import { fetchUser } from "../../../js/mainFunctionView";
 
+// קומפוננטת תפריט הצד (Sidebar) הדינמי לפי סוג המשתמש
 export default function SideBar() {
+// ניהול מצב פתיחה/סגירה של התפריט ושמירת פרטי המשתמש המחובר
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState({});
 
+// טעינת פרטי המשתמש בעת טעינת הקומפוננטה
   useEffect(() => {
     fetchUser(setUser);
   }, []);
 
   const status = user.status;
 
+// פונקציה לשינוי מצב פתיחה/סגירה של תפריט הצד
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
+// פונקציה המחזירה את נתיב דף הבית המתאים לפי סוג המשתמש (לקוח/ספר/מנהל)
   const getHomePath = () => {
     if (status === "לקוח") return "/client-dashboard";
     if (status === "ספר") return "/barber-dashboard";
@@ -50,11 +56,13 @@ export default function SideBar() {
 
       {/* תפריט הצד שנשלף מימין */}
       <nav className={`${classes.sidebarNav} ${isOpen ? classes.active : ""}`}>
+{/* קישור לדף הבית */}
         <Link to={getHomePath()} onClick={toggleMenu}>
           <FaHome className={classes.navIcon} />
           <span>דף הבית</span>
         </Link>
 
+{/* קישורים הייחודיים לספר או מנהל */}
         {(status === "ספר" || status === "מנהל") && (
           <>
             <Link to="/manage-services" onClick={toggleMenu}>
@@ -69,6 +77,7 @@ export default function SideBar() {
           </>
         )}
 
+{/* קישורים הייחודיים למנהל בלבד */}
         {status == "מנהל" && (
           <>
             <Link to="/manage-users" onClick={toggleMenu}>
@@ -83,6 +92,7 @@ export default function SideBar() {
           </>
         )}
 
+{/* קישור לעדכון פרטים אישיים - זמין לכל המשתמשים */}
         <Link to="/update" onClick={toggleMenu} className={classes.navButton}>
           <FaUserEdit className={classes.navIcon} />
           <span>עדכון פרטים</span>

@@ -1,21 +1,35 @@
-//dbSingleton.js
+/**
+ * ============================================================================
+ * מודול ניהול חיבור למסד הנתונים 
+ * ============================================================================
+ * תפקיד המודול:
+ * מודול זה מממש את תבנית העיצוב Singleton עבור התקשורת עם מסד הנתונים (MySQL).
+ * תפקידו להבטיח שייווצר חיבור יחיד (Single Connection) למסד הנתונים לאורך כל
+ * לייף-סייקל האפליקציה, למנוע בזבוז משאבי שרת, ולנהל תקלות ניתוק בזמן אמת.
+ */
+
 const mysql = require("mysql2");
 
-let connection; // Variable for storing a single connection
+// משתנה פנימי לשמירת ה-Instance היחיד של החיבור
+let connection;
 
 const dbSingleton = {
+  /**
+   * פונקציה לקבלת אובייקט החיבור למסד הנתונים
+   * במידה ואין חיבור פעיל - היא יוצרת אותו, במידה וקיים - היא מחזירה את הקיים.
+   */
   getConnection: () => {
     if (!connection) {
-      // Create a connection only once
+      // הגדרת פרטי התחברות ויצירת אובייקט החיבור ל-MySQL
       connection = mysql.createConnection({
         host: "localhost",
         user: "root",
         password: "",
         database: "finalprojectdb",
-        timezone: "Z"
+        timezone: "Z",
       });
 
-      // Connect to the database
+      // ביצוע ההתחברות בפועל וטיפול בשגיאות אתחול
       connection.connect((err) => {
         if (err) {
           console.error("Error connecting to database:", err);
@@ -24,16 +38,16 @@ const dbSingleton = {
         console.log("Connected to MySQL!");
       });
 
-      // Handle connection errors
+      // האזנה לאירועי שגיאה בזמן ריצה וטיפול בניתוק פתאומי
       connection.on("error", (err) => {
         console.error("Database connection error:", err);
         if (err.code === "PROTOCOL_CONNECTION_LOST") {
-          connection = null; // Update the connection state
+          connection = null; // איפוס המשתנה כדי לאפשר התחברות מחדש בקריאה הבאה
         }
       });
     }
 
-    return connection; // Return the current connection
+    return connection;
   },
 };
 

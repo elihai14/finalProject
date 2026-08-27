@@ -1,16 +1,20 @@
+// ייבוא React, ספריית XLSX לייצוא קובצי אקסל וקובץ העיצוב
 import React from "react";
 import * as XLSX from "xlsx";
 import classes from "./statisticsExport.module.css";
 
+// קומפוננטה לייצוא דוחות סטטיסטיקה של העסק לקובץ Excel (.xlsx)
 const StatisticsExport = ({ statsData, startDate, endDate }) => {
 
-
+// פונקציית הייצוא הראשית
   const handleExport = () => {
+// בדיקה אם קיימים נתונים לייצוא
     if (!statsData) {
       alert("אין נתונים זמינים לייצוא");
       return;
     }
 
+// --- 1. בניית הגיליון הראשון: סיכום מדדים כללי ---
     const summaryRows = [
       {
         "מדד סטטיסטי": "כמות הכנסות חודשיות",
@@ -30,6 +34,7 @@ const StatisticsExport = ({ statsData, startDate, endDate }) => {
       });
     }
 
+// הפיכת נתוני הסיכום לגיליון אקסל
     const wsSummary = XLSX.utils.json_to_sheet(summaryRows, {
       header: ["מדד סטטיסטי", "ערך"],
     });
@@ -47,6 +52,7 @@ const StatisticsExport = ({ statsData, startDate, endDate }) => {
     if (statsData.busyDays && statsData.busyHours) {
       const analyticsRows = [];
 
+// הוספת נתוני הימים העמוסים ביותר
       analyticsRows.push({
         "נתוני עומסים ודירוגים": "🏆 דירוג 3 הימים העמוסים ביותר",
         פרטים: "",
@@ -64,8 +70,10 @@ const StatisticsExport = ({ statsData, startDate, endDate }) => {
         });
       });
 
+// שורת רווח מפרידה
       analyticsRows.push({ "נתוני עומסים ודירוגים": "", פרטים: "", נתון: "" });
 
+// הוספת נתוני השעות העמוסות ביותר
       analyticsRows.push({
         "נתוני עומסים ודירוגים": "⏰ דירוג שעות לפי עומס",
         פרטים: "",
@@ -79,6 +87,7 @@ const StatisticsExport = ({ statsData, startDate, endDate }) => {
         });
       });
 
+// הפיכת נתוני העומסים לגיליון אקסל
       const wsAnalytics = XLSX.utils.json_to_sheet(analyticsRows, {
         header: ["נתוני עומסים ודירוגים", "פרטים", "נתון"],
       });
@@ -102,6 +111,8 @@ const StatisticsExport = ({ statsData, startDate, endDate }) => {
       .replace(/\./g, "-");
     XLSX.writeFile(workbook, `דוח_סטטיסטיקה_עסקית_${startDate}-${endDate}.xlsx`);
   };
+
+// רינדור כפתור הייצוא
   return (
     <button
       onClick={handleExport}

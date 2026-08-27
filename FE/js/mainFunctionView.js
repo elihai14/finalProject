@@ -1,6 +1,12 @@
+/**
+ * mainFunctions.js
+ * קובץ פונקציות עזר מרכזי .
+ * מכיל פונקציות פנייה לשרת, חישובי זמינות שעות, ניהול תורים, אילוצים וסטטיסטיקות.
+ */
+
 import Swal from "sweetalert2";
 
-// פונקציה הבודקת את תקינות המייל של המשתמש 
+// פונקציה הבודקת את תקינות המייל של המשתמש
 export const checkUserEmail = async (email) => {
   try {
     const response = await fetch(`$/users/login`, {
@@ -27,15 +33,14 @@ function calculateSlots(
   date,
   start,
   end,
-  availableSlots
+  availableSlots,
 ) {
-
   const currentDate = new Date();
   const dateToCheck = new Date(date);
 
   const interval = 15;
 
-  // עוזר: המרה ל־דקות
+  // עוזר: המרה לדקות
   const toMinutes = (t) => {
     if (typeof t === "number") return t; // כבר דקות
     const [h, m] = t.split(":").map(Number);
@@ -47,8 +52,9 @@ function calculateSlots(
 
   const nowMinutes = currentDate.getHours() * 60 + currentDate.getMinutes();
 
-  // אם זה היום → מתחילים מהשעה הנוכחית המעוגלת
+  // אם זה היום מתחילים מהשעה הנוכחית המעוגלת
   if (currentDate.toDateString() === dateToCheck.toDateString()) {
+    // עיגול שעת ההתחלה כלפי מעלה לפי המרווח (15 דקות)
     if (nowMinutes > startMin) {
       startMin = Math.ceil(nowMinutes / interval) * interval;
     }
@@ -77,11 +83,13 @@ function calculateSlots(
   ) {
     const potentialEnd = current + duration;
 
+    // בדיקה האם הטווח המוצע חופף לתור קיים
     const isOverlap = busyTimes.some((busy) => {
       return current < busy.end && potentialEnd > busy.start;
     });
 
     if (!isOverlap) {
+      // המרה חזרה מפורמט דקות למחרוזת HH:MM
       const h = String(Math.floor(current / 60)).padStart(2, "0");
       const m = String(current % 60).padStart(2, "0");
 
@@ -93,8 +101,13 @@ function calculateSlots(
 }
 
 // פונקצייה מקבלת כתובת מייל של ספר, תאריך, שם שירות, כתובת מייל של לקוח
-//  ומחזירה מערך מחרוזות המייצג את השעות הפנויות לקביעת תור 
-export async function getHoursSelect(barberMail, date, serviceName, clientMail) {
+//  ומחזירה מערך מחרוזות המייצג את השעות הפנויות לקביעת תור
+export async function getHoursSelect(
+  barberMail,
+  date,
+  serviceName,
+  clientMail,
+) {
   const availabilityRes = await fetch(
     `http://localhost:5000/availability/barbers-constraints`,
     {
@@ -133,7 +146,7 @@ export async function getHoursSelect(barberMail, date, serviceName, clientMail) 
         clientMail: clientMail,
       }),
       credentials: "include",
-    }
+    },
   );
 
   const existingApp = await appsRes.json();
@@ -153,6 +166,7 @@ export async function getHoursSelect(barberMail, date, serviceName, clientMail) 
     });
   }
 
+  // סינון ערכים כפולים במערך השעות
   return [...new Set(hours)];
 }
 
@@ -167,7 +181,7 @@ export async function handleCreateApp(
   setSelectedDate,
   setSelectedHour,
   setHours,
-  setReloadApps
+  setReloadApps,
 ) {
   const constraint_code_response = await fetch(
     `http://localhost:5000/availability/get-code`,
@@ -230,7 +244,7 @@ export async function handleCreateApp(
         time: time,
         price: price.price,
       }),
-    }
+    },
   );
   const addApp = await addAppResponse.json();
   if (!addAppResponse.ok) {
@@ -251,6 +265,7 @@ export async function handleCreateApp(
     confirmButtonText: "מעולה !",
     confirmButtonColor: "#dfb76c",
   });
+  // איפוס שדות הטופס ורענון רשימת התורים
   setSelectedBarber("");
   setSelectedService("");
   setSelectedDate("");
@@ -272,6 +287,7 @@ export function getHoursArr(startTime, endTime) {
   const end = endH * 60 + endM;
 
   while (current <= end) {
+    // יצירת פורמט מרופד באפסים HH:MM
     const hours = Math.floor(current / 60)
       .toString()
       .padStart(2, "0");
@@ -293,7 +309,7 @@ export async function handleUpdateStatus(
   status,
   selectedStatus,
   refresh,
-  setRefresh
+  setRefresh,
 ) {
   if (status === selectedStatus) {
     Swal.fire({
@@ -378,8 +394,7 @@ export async function handleUpdateStatus(
   setRefresh(!refresh);
 }
 
-
-// 
+// פונקצייה המחזירה את רשימת המשתמשים לפי סטטוס וכיוון מיון
 export async function getUsersList(status, isReverse) {
   const response = await fetch(`http://localhost:5000/users/`, {
     method: "POST",
@@ -397,6 +412,7 @@ export async function getUsersList(status, isReverse) {
   return data;
 }
 
+// פונקצייה המעדכנת את פרטי המשתמש המחובר (שם וטלפון)
 export async function handleUpdate(e, setIsLoading, setError, phone, name) {
   e.preventDefault();
   setIsLoading(true);
@@ -438,6 +454,7 @@ export async function handleUpdate(e, setIsLoading, setError, phone, name) {
   }
 }
 
+// פונקצייה המביאה את פרטי המשתמש המחובר כרגע
 export async function fetchUser(setUser) {
   try {
     const response = await fetch("http://localhost:5000/users/current", {
@@ -459,6 +476,7 @@ export async function fetchUser(setUser) {
   }
 }
 
+// פונקצייה המביאה את שעות הפעילות ליום ספציפי
 export async function loadStartHours(day, setHours, setEndtTime) {
   try {
     const response = await fetch("http://localhost:5000/daysHours/get-day", {
@@ -472,9 +490,7 @@ export async function loadStartHours(day, setHours, setEndtTime) {
     const data = await response.json();
     if (!response.ok) {
       setHours([]);
-    } 
-    else
-    {
+    } else {
       setHours(getHoursArr(data.start, data.end));
       setEndtTime(data.end);
     }
@@ -483,6 +499,7 @@ export async function loadStartHours(day, setHours, setEndtTime) {
   }
 }
 
+// פונקצייה המוסיפה זמינות חדשה לספר
 export async function handleAddConstraint(
   e,
   selectedDate,
@@ -494,7 +511,7 @@ export async function handleAddConstraint(
   selectedEndTime,
   setSelectedEndTime,
   setEndHours,
-  setRefresh
+  setRefresh,
 ) {
   e.preventDefault();
   try {
@@ -521,13 +538,14 @@ export async function handleAddConstraint(
       setEndtTime("");
       setSelectedEndTime("");
       setEndHours([]);
-      setRefresh(prev => !prev);
+      setRefresh((prev) => !prev);
     }
   } catch (error) {
     console.error("שגיאה בהוספת האילוץ:", error);
   }
 }
 
+// פונקצייה המביאה את רשימת אילוצי הזמינות לפי סינון
 export async function fetchAvailability(
   setIsLoading,
   setAvailability,
@@ -535,7 +553,7 @@ export async function fetchAvailability(
   filters,
 ) {
   setIsLoading(true);
-  // const requestBody = { ...filters };
+
   try {
     // בניית ה-URL בצורה דינמית כדי לא לשלוח פרמטרים ריקים
     const params = new URLSearchParams();
@@ -546,7 +564,7 @@ export async function fetchAvailability(
       `http://localhost:5000/availability?${params.toString()}`,
       {
         method: "GET",
-        credentials: "include", // שומר על ה-session והעוגיות
+        credentials: "include", // שומר על ה-session
       },
     );
     const data = await response.json();
@@ -564,6 +582,7 @@ export async function fetchAvailability(
   }
 }
 
+// פונקצייה המבטלת אילוץ זמינות קיים
 export async function handleCancelConstraint(
   id,
   setError,
@@ -574,7 +593,6 @@ export async function handleCancelConstraint(
   setError("");
   setSuccessMessage("");
 
-  // 1. נפתח קודם כל את מודאל השאלה של Swal
   const result = await Swal.fire({
     title: "האם לבטל את הזמינות ?",
     text: "הזמינות תבוטל ותורים תואמים יבוטלו גם כן.",
@@ -602,7 +620,7 @@ export async function handleCancelConstraint(
       console.log("Status:", response.status, "ID sent:", id);
 
       if (response.ok) {
-        // עדכון הסטייט הלוקאלי כדי שהאילוץ ייעלם מיד מהמסך
+        // עדכון הסטייט המקומי כדי שהאילוץ ייעלם מיד מהמסך
         setAvailability(
           availability.filter((cons) => cons.constraint_code !== id),
         );
@@ -643,6 +661,7 @@ export async function handleCancelConstraint(
   }
 }
 
+// פונקצייה המביאה נתונים סטטיסטיים ואנליטיקה עבור דשבורד מנהל/ספר
 export async function getStatisticData(
   today,
   dashDates,
@@ -665,9 +684,9 @@ export async function getStatisticData(
   })
     .then((res) => res.json())
     .then((data) => {
-
       setChartData(data);
 
+      // שליפת נתוני לקוחות חוזרים במידה והמשתמש הוא מנהל
       if (userStatus === "מנהל") {
         return fetch(
           "http://localhost:5000/appointments/analytics/repeat-customers",
@@ -699,11 +718,12 @@ export async function fetchAppointments(
   setIsLoading,
   setError,
   user,
-  setAppointments
+  setAppointments,
 ) {
   setIsLoading(true);
   setError("");
 
+  // התאמת גוף הבקשה לפי הסטטוס וההרשאות של המשתמש המחובר
   const requestBody = { ...customFilters };
   if (user.status === "ספר") requestBody.barber_mail = user.mail_address;
   else if (user.status === "לקוח") requestBody.clientMail = user.mail_address;
@@ -724,7 +744,14 @@ export async function fetchAppointments(
     setIsLoading(false);
   }
 }
-export async function fetchFilterOptions(user, setServices,setBarbers,setCustomers) {
+
+// פונקצייה המביאה את אפשרויות הסינון לתורים (שירותים, ספרים ולקוחות)
+export async function fetchFilterOptions(
+  user,
+  setServices,
+  setBarbers,
+  setCustomers,
+) {
   try {
     const requestBody = {};
     if (user.status === "ספר") requestBody.barber_mail = user.mail_address;
@@ -738,9 +765,11 @@ export async function fetchFilterOptions(user, setServices,setBarbers,setCustome
 
     const data = await response.json();
     if (response.ok) {
+      // חילוץ שירותים ייחודיים בלבד ללא כפילויות
       setServices([
         ...new Set(data.map((app) => app.service_name).filter(Boolean)),
       ]);
+      // חילוץ ספרים ייחודיים לפי כתובת מייל
       setBarbers(
         data
           .map((app) => ({
@@ -751,9 +780,10 @@ export async function fetchFilterOptions(user, setServices,setBarbers,setCustome
             (barber, index, self) =>
               barber.mail_address &&
               index ===
-                self.findIndex((b) => b.mail_address === barber.mail_address)
-          )
+                self.findIndex((b) => b.mail_address === barber.mail_address),
+          ),
       );
+      // חילוץ לקוחות ייחודיים בלבד
       setCustomers([
         ...new Set(data.map((app) => app.customerName).filter(Boolean)),
       ]);
@@ -763,80 +793,80 @@ export async function fetchFilterOptions(user, setServices,setBarbers,setCustome
   }
 }
 
+// פונקציית ביטול תור
+export async function handleCancelAppointment(
+  id,
+  getApps,
+  filters,
+  setReloadApps,
+) {
+  const result = await Swal.fire({
+    title: "האם לבטל את התור?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#dfb76c",
+    cancelButtonColor: "#ef4444",
+    confirmButtonText: "כן, בטל תור",
+    cancelButtonText: "לא, חזור",
+    background: "#1a1a1a",
+    color: "#fff",
+  });
 
-  // פונקציית ביטול תור
-  export async function handleCancelAppointment(id, getApps, filters, setReloadApps) {
-    const result = await Swal.fire({
-      title: "האם לבטל את התור?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#dfb76c",
-      cancelButtonColor: "#ef4444",
-      confirmButtonText: "כן, בטל תור",
-      cancelButtonText: "לא, חזור",
-      background: "#1a1a1a",
-      color: "#fff",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        const response = await fetch(
-          `http://localhost:5000/appointments/cancel/${id}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-
-        if (response.ok) {
-          await Swal.fire({
-            title: "בוצע!",
-            text: "התור בוטל בהצלחה.",
-            icon: "success",
-            background: "#1a1a1a",
-            color: "#fff",
-            confirmButtonColor: "#dfb76c",
-          });
-          getApps(filters); // רענון רשימה
-          setReloadApps(false);
-        } else {
-          Swal.fire("שגיאה", "לא הצלחנו לבטל את התור.", "error");
-        }
-      } catch (err) {
-        Swal.fire("שגיאה", "תקלה בשרת.", "error");
-      }
-    }
-  };
-
-  export async function fetchBarberDetails(barberMail) {
+  if (result.isConfirmed) {
     try {
       const response = await fetch(
-        `http://localhost:5000/users/barber-details/${encodeURIComponent(barberMail)}`
+        `http://localhost:5000/appointments/cancel/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+        },
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch barber details");
+      if (response.ok) {
+        await Swal.fire({
+          title: "בוצע!",
+          text: "התור בוטל בהצלחה.",
+          icon: "success",
+          background: "#1a1a1a",
+          color: "#fff",
+          confirmButtonColor: "#dfb76c",
+        });
+        getApps(filters); // רענון רשימה
+        setReloadApps(false);
+      } else {
+        Swal.fire("שגיאה", "לא הצלחנו לבטל את התור.", "error");
       }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching barber details:", error);
-      return null;
+    } catch (err) {
+      Swal.fire("שגיאה", "תקלה בשרת.", "error");
     }
   }
+}
 
-  export async function getDays()
-  {
-          const response = await fetch(
-          `http://localhost:5000/daysHours/`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-          }
-        );
-        if(!response.ok)
-          return [];
-        return response.json();
+// פונקצייה המביאה את פרטי הספר לפי כתובת המייל שלו
+export async function fetchBarberDetails(barberMail) {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/users/barber-details/${encodeURIComponent(barberMail)}`,
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch barber details");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching barber details:", error);
+    return null;
   }
+}
 
+// פונקצייה המביאה את ימות השבוע ושעות הפעילות שלהם
+export async function getDays() {
+  const response = await fetch(`http://localhost:5000/daysHours/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  if (!response.ok) return [];
+  return response.json();
+}

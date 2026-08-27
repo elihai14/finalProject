@@ -1,9 +1,12 @@
+// ייבוא הוקים מ-React, ספריית התראות SweetAlert2 וקובץ העיצוב
 import { useEffect, useState } from "react";
 import classes from "./serviceList.module.css";
 import Swal from "sweetalert2";
 import { fetchUser } from "../../../js/mainFunctionView";
 
+// קומפוננטת הצגת וניהול השירותים המוצעים על ידי הספר
 export default function ServiceList({ refresh }) {
+// ניהול משתני State עבור רשימת השירותים, פרטי הספר והשירות הנערך כעת
   const [myServices, setMyServices] = useState([]);
   const [user, setUser] = useState({});
   const [editingName, setEditingName] = useState(null);
@@ -52,6 +55,7 @@ export default function ServiceList({ refresh }) {
     }
   }, [userEmail, refresh]);
 
+// פתיחת מצב עריכה עבור שירות שנבחר
   const startEditing = (service) => {
     setEditingName(service.service_name);
     setEditForm({
@@ -60,6 +64,7 @@ export default function ServiceList({ refresh }) {
     });
   };
 
+// עדכון נתוני השירות בשרת (מחיר ומשך זמן)
   const handleUpdate = async (serviceName) => {
     await fetch("http://localhost:5000/services/update-service", {
       method: "PUT",
@@ -77,6 +82,7 @@ export default function ServiceList({ refresh }) {
     fetchServices(userEmail);
   };
 
+// מחיקת שירות מהמערכת לאחר אישור המשתמש
   const handleDelete = async (serviceName) => {
     const result = await Swal.fire({
       title: "למחוק שירות?",
@@ -126,8 +132,10 @@ export default function ServiceList({ refresh }) {
 
   return (
     <div className={classes.container}>
+{/* כותרת האזור */}
       <h3 className={classes.title}>השירותים שלי</h3>
 
+{/* רשת הכרטיסיות להצגת השירותים */}
       <div className={classes.grid}>
         {myServices.length === 0 ? (
           <p className={classes.empty}>אין שירותים עדיין</p>
@@ -137,6 +145,7 @@ export default function ServiceList({ refresh }) {
 
             return (
               <div key={s.service_name} className={classes.card}>
+{/* פרטי השירות (שם ומשך זמן) */}
                 <div className={classes.info}>
                   <div className={classes.serviceHeader}>
                     <h4>{s.service_name}</h4>
@@ -144,11 +153,13 @@ export default function ServiceList({ refresh }) {
                   </div>
                 </div>
 
+{/* מחיר השירות או טופס עריכה */}
                 <div className={classes.center}>
                   {!isEditing ? (
                     <div className={classes.price}>₪{s.price}</div>
                   ) : (
                     <div className={classes.editBox}>
+{/* שדה עדכון מחיר */}
                       <input
                         type="number"
                         value={editForm.newPrice}
@@ -157,6 +168,7 @@ export default function ServiceList({ refresh }) {
                         }
                       />
 
+{/* שדה עדכון משך זמן */}
                       <select
                         value={editForm.newDuration}
                         onChange={(e) =>
@@ -178,6 +190,7 @@ export default function ServiceList({ refresh }) {
                   )}
                 </div>
 
+{/* כפתורי פעולה: עריכה/מחיקה או שמירה/ביטול */}
                 <div className={classes.actions}>
                   {!isEditing ? (
                     <>

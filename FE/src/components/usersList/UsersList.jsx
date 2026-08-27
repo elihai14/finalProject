@@ -1,19 +1,25 @@
+// ייבוא הוקים מ-React, קובץ ה-CSS, פונקציית טעינת רשימת משתמשים וקומפוננטת כרטיס משתמש
 import { useState, useEffect } from "react";
 import classes from "./usersList.module.css";
 import { getUsersList } from "../../../js/mainFunctionView";
 import UserCard from "../userCard/UserCard";
 
+// קומפוננטת ניהול והצגת רשימת המשתמשים במערכת
 export default function UsersList() {
+// ניהול מצבים (States) של סינון, מיוון, רענון, חיפוש, רשימת משתמשים והודעות שגיאה
   const [isReverse, setIsReverse] = useState(false);
   const [status, setStatus] = useState("");
   const [refresh, setRefresh] = useState(false);
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
   const [userToSearch,setUserToSearch] = useState("");
+
+// סינון רשימת המשתמשים לפי מחרוזת החיפוש שהוזנה על ידי המשתמש
 const filteredUsers = users.filter((user) =>
   user.user_name.startsWith(userToSearch)
 );
 
+// טעינת רשימת המשתמשים מהשרת בעת טעינת הקומפוננטה או בעת שינוי מסננים/רענון
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -35,11 +41,13 @@ const filteredUsers = users.filter((user) =>
   }, [isReverse, status, refresh]);
 
 
+// רינדור הממשק
   return (
     <div className={classes.users_container}>
       <div className={classes.main_card}>
         {/* אזור הפילטרים */}
         <div className={classes.filters_area}>
+{/* תפריט סינון לפי סטטוס/תפקיד משתמש */}
           <select
             className={classes.status_select}
             onChange={(e) => setStatus(e.target.value)}
@@ -51,6 +59,7 @@ const filteredUsers = users.filter((user) =>
             <option value="">הכל</option>
           </select>
 
+{/* תפריט בירור כיוון המיון (א-ת / ת-א) */}
           <select
             className={classes.order_select}
             onChange={(e) => setIsReverse(e.target.value === "true")}
@@ -60,6 +69,7 @@ const filteredUsers = users.filter((user) =>
             <option value="true">ת-א</option>
           </select>
 
+{/* שדה חיפוש טקסטואלי לפי שם המשתמש */}
           <input
             className={classes.status_select}
             type="text"

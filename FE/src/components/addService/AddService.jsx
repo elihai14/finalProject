@@ -1,8 +1,15 @@
+// ייבוא הוקים של React לניהול State ומעגל חיים
 import { useEffect, useState } from "react";
+// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./addService.module.css";
+// ייבוא ספריית התראות מעוצבות
 import Swal from 'sweetalert2';
+// ייבוא פונקציית עזר לשליפת נתוני המשתמש המחובר
 import { fetchUser } from "../../../js/mainFunctionView";
+
+// קומפוננטת טופס הוספת שירות חדש לתפריט של הספר
 export default function AddService({ refresh , setRefresh}) {
+// ניהול משתני State עבור פרטי המשתמש, רשימת השירותים הכללית ונתוני השירות החדש
   const [user , setUser] = useState({});
   const [globalServices, setGlobalServices] = useState([]);
   const [newService, setNewService] = useState({
@@ -11,7 +18,10 @@ export default function AddService({ refresh , setRefresh}) {
     duration: "30",
   });
 
+// ניהול מנגנון מניעת לחיצות כפולות בזמן שליחה
   const [isLoading, setIsLoading] = useState(false);
+
+// טעינת נתוני המשתמש ורשימת השירותים הגלובלית בעת טעינת הרכיב או בעת רענון
   useEffect(() => {
 
     fetchUser(setUser);
@@ -20,6 +30,7 @@ export default function AddService({ refresh , setRefresh}) {
       .then((data) => {
         setGlobalServices(data);
 
+// הגדרת ערך ברירת מחדל לשם השירות מתוך השירות הראשון ברשימה
         if (data.length > 0) {
           setNewService((prev) => ({
             ...prev,
@@ -30,14 +41,17 @@ export default function AddService({ refresh , setRefresh}) {
   }, [refresh]);
 
   
+// פונקציה לטיפול בשליחת הטופס והוספת השירות
   const handleAddService = async (e) => {
     e.preventDefault();
 
+// בדיקת תקינות שדות חובה ומניעת קריאה כפולה
     if (!newService.serviceName || !newService.price) return;
     if(isLoading) return;
     setIsLoading(true);
 
     try {
+// שליחת בקשת POST להוספת השירות למאגר הנתונים של הספר
       const res = await fetch(
         "http://localhost:5000/services/barber/add-service",
         {
@@ -55,6 +69,7 @@ export default function AddService({ refresh , setRefresh}) {
 
       const data = await res.json();
 
+// הצגת התראת הצלחה ואיפוס השדות במידה וההוספה הצליחה
       if (res.ok) {
                     Swal.fire({
                     toast: true,
@@ -68,8 +83,10 @@ export default function AddService({ refresh , setRefresh}) {
                     color: '#fff'                 // טקסט לבן
                   });
 
+// טריגר לרענון הרשימות בקומפוננטות האחרות
         setRefresh(prev => !prev);
 
+// איפוס שדות המחיר והמשך
         setNewService((prev) => ({
           ...prev,
           price: "",
@@ -77,6 +94,7 @@ export default function AddService({ refresh , setRefresh}) {
         }));
         
       } else {
+// הצגת התראת אזהרה במידה והשירות כבר קיים
         Swal.fire({
                     title: 'אופס...',
                     text: 'השירות כבר קיים בתפריט שלך!',
@@ -94,6 +112,7 @@ export default function AddService({ refresh , setRefresh}) {
       console.error(err);
     }
     finally{
+// סיום מצב הטעינה
       setIsLoading(false);
     };
   };
@@ -102,7 +121,9 @@ export default function AddService({ refresh , setRefresh}) {
     <div className={classes.container}>
       <h3 className={classes.title}>הוספת שירות</h3>
 
+{/* טופס הוספת השירות */}
       <form onSubmit={handleAddService} className={classes.form}>
+{/* תפריט נגלל לבחירת שם שירות מתוך הרשימה הגלובלית */}
         <select
           className={classes.select}
           value={newService.serviceName}
@@ -117,6 +138,7 @@ export default function AddService({ refresh , setRefresh}) {
           ))}
         </select>
 
+{/* שדה להזנת מחיר השירות */}
         <input
           className={classes.input}
           type="number"
@@ -127,6 +149,7 @@ export default function AddService({ refresh , setRefresh}) {
           }
         />
 
+{/* תפריט נגלל לבחירת משך זמן השירות בדקות */}
         <select
           className={classes.select}
           value={newService.duration}
@@ -141,6 +164,7 @@ export default function AddService({ refresh , setRefresh}) {
           <option value="90">שעה וחצי</option>
         </select>
 
+{/* כפתור שליחה עם שינוי טקסט וניטרול מבוסס מצב טעינה */}
         <button type="submit" className={classes.button} disabled={isLoading} > {isLoading ? "מוסיף..." : "הוסף +"} 
         </button>
       </form>

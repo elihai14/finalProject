@@ -1,64 +1,78 @@
+/**
+ * ============================================================================
+ * מודול ניהול זמינות ואילוצי עבודה לספרים 
+ * ============================================================================
+ * תפקיד המודול:
+ * מודול זה מנהל את משמרות העבודה, הזמינות והאילוצים של הספרים במערכת.
+ * המודול מאפשר לספרים ומנהלים לשלוף את ימי ושעות העבודה, להוסיף אילוצי עבודה
+ * חדשים, לבטל משמרות, ולשלוף מזהה זמינות לפי תאריך ושעה.
+ */
+
 const express = require("express");
 const router = express.Router();
 
-//routes/user.js
 const dbSingleton = require("../dbSingleton");
 
-// Execute a query to the database
+// קבלת חיבור יחיד למסד הנתונים
 const db = dbSingleton.getConnection();
 
-
-// ראוטר מחזיר את פרטי כל ימי העבודה של ספר 
+/**
+ * שליפת ימי העבודה והזמינות הפעילים של ספר מחובר 
+ * GET /availability/
+ */
 router.get("/", (req, res) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
   }
-  const {startDate, endDate} = req.query;
+  const { startDate, endDate } = req.query;
 
   const status = req.session.user.status;
   console.log(status);
-  
+
   if (status != "ספר" && status != "מנהל")
     return res.status(403).json({ message: "Not authorized" });
+
   let values = [];
   const mail = req.session.user.email;
-  values.push(mail)
+  values.push(mail);
+
   let query =
     "SELECT * FROM availability WHERE mail_address = ? AND status = 'פעיל'";
-  if(startDate)
-  {
-    query += " AND date >= ?"
+
+  // סינון לפי תאריך התחלה או כברירת מחדל מהיום והלאה
+  if (startDate) {
+    query += " AND date >= ?";
     values.push(startDate);
-  }
-  else 
-  {
-        const date = new Date();
+  } else {
+    const date = new Date();
 
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, "0");
-        const dd = String(date.getDate()).padStart(2, "0");
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
 
-        const today = `${yyyy}-${mm}-${dd}`;
-        query += " AND date >= ?";
-        values.push(today);
+    const today = `${yyyy}-${mm}-${dd}`;
+    query += " AND date >= ?";
+    values.push(today);
   }
 
-  if (endDate)
-  {
-      query += " AND date <= ?";
-      values.push(endDate);
-
+  // סינון לפי תאריך סיום במידה ונשלח
+  if (endDate) {
+    query += " AND date <= ?";
+    values.push(endDate);
   }
-  db.query(query, values , (err, results) => {
+
+  db.query(query, values, (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Error" });
 
     return res.status(200).json(results);
   });
 });
 
-// מחזיר את שעות העבודה של ספר בתאריך מסוים 
+/**
+ * שליפת שעות העבודה והזמינות של ספר בתאריך ספציפי
+ * POST /availability/barbers-constraints
+ */
 router.post("/barbers-constraints", (req, res) => {
-
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
   }
@@ -66,6 +80,7 @@ router.post("/barbers-constraints", (req, res) => {
   const { bMail, date } = req.body;
   const query =
     "SELECT * FROM availability WHERE mail_address = ? AND status = 'פעיל' AND `date` = ?";
+
   db.query(query, [bMail, date], (err, results) => {
     if (err) {
       return res.status(500).json({ message: "Internal Error" });
@@ -75,7 +90,10 @@ router.post("/barbers-constraints", (req, res) => {
   });
 });
 
-// נתיב המחזיר את פרטי ימי ושעות העבודה של ספר בטווח תאריכים מסוים
+/**
+ * שליפת פרטי ימי ושעות העבודה של ספר בטווח תאריכים 
+ * GET /availability/range
+ */
 router.get("/range", (req, res) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
@@ -87,8 +105,10 @@ router.get("/range", (req, res) => {
 
   const mail = req.session.user.mail_address;
   const { startDate, endDate } = req.query;
+
   if (!startDate)
     return res.status(400).json({ message: "חובה לציין תאריך התחלה " });
+
   let query;
   let queryParams;
 
@@ -101,6 +121,7 @@ router.get("/range", (req, res) => {
       "SELECT * FROM availability WHERE mail_address = ? AND date >= ? AND status = 'פעיל' ORDER BY date ASC";
     queryParams = [mail, startDate];
   }
+
   db.query(query, queryParams, (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Error" });
 
@@ -108,9 +129,11 @@ router.get("/range", (req, res) => {
   });
 });
 
-// נתיב להוספת יום ושעות עבודה עבור ספר 
+/**
+ * הוספת שעות עבודה חדשות עבור ספר (כולל בדיקת תקינות זמנים וחפיפות)
+ * POST /availability/add-constraint
+ */
 router.post("/add-constraint", (req, res) => {
-  // 1. אבטחה: בדיקה שהמשתמש מחובר
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
   }
@@ -127,6 +150,7 @@ router.post("/add-constraint", (req, res) => {
       .status(400)
       .json({ message: "שעת הסיום חייבת להיות אחרי שעת התחלה" });
 
+  // בדיקת חפיפה מול שעות עבודה קיימות של אותו ספר
   const checkQuery =
     "SELECT * FROM availability WHERE mail_address = ? AND date = ? AND start_time < ? AND end_time > ? AND status = 'פעיל' ";
 
@@ -149,12 +173,15 @@ router.post("/add-constraint", (req, res) => {
         if (err) return res.status(500).json({ message: "Internal Error" });
 
         return res.status(201).json({ message: "האילוץ נוסף בהצלחה" });
-      }
+      },
     );
   });
 });
 
-// נתיב למחיקת זמני עבודה של ספר 
+/**
+ * ביטול משמרת של ספר וביטול של התורים שנקבעו באותן שעות
+ * PUT /availability/remove-constraint/:id
+ */
 router.put("/remove-constraint/:id", (req, res) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });
@@ -167,10 +194,14 @@ router.put("/remove-constraint/:id", (req, res) => {
   const mail = req.session.user.email;
   const constraintCode = parseInt(req.params.id, 10);
 
+  // שליפת הזמינות המקורית כדי לדעת אילו תורים יש לבטל במקביל
   const getAvailabilityQuery =
     "SELECT * FROM availability WHERE constraint_code = ? AND mail_address = ?";
 
-  db.query(getAvailabilityQuery, [constraintCode, mail], (err, availResults) => {
+  db.query(
+    getAvailabilityQuery,
+    [constraintCode, mail],
+    (err, availResults) => {
       if (err) return res.status(500).json({ message: "Internal Error" });
 
       if (availResults.length === 0)
@@ -180,11 +211,14 @@ router.put("/remove-constraint/:id", (req, res) => {
       const startTime = availResults[0].start_time;
       const endTime = availResults[0].end_time;
 
-      const updateQuery = "UPDATE availability SET status = 'לא פעיל' WHERE constraint_code = ? AND mail_address = ?";
+      // עדכון סטטוס הזמינות ל'לא פעיל'
+      const updateQuery =
+        "UPDATE availability SET status = 'לא פעיל' WHERE constraint_code = ? AND mail_address = ?";
 
       db.query(updateQuery, [constraintCode, mail], (err, updateResults) => {
         if (err) return res.status(500).json({ message: "Internal Error" });
 
+        // ביטול אוטומטי של כל התורים של הספר שנופלים בחלון הזמן שבוטל
         const cancelAppointmentsQuery = `
         UPDATE appointments 
         SET is_cancel = 1
@@ -200,8 +234,9 @@ router.put("/remove-constraint/:id", (req, res) => {
           (err, cancelResults) => {
             if (err) return res.status(500).json({ message: "Internal Error" });
 
-            return res.status(200)
-            .json({ message: "הזמינות בוטלה בהצלחה והתורים התואמים בוטלו" });
+            return res.status(200).json({
+              message: "הזמינות בוטלה בהצלחה והתורים התואמים בוטלו",
+            });
           },
         );
       });
@@ -209,7 +244,10 @@ router.put("/remove-constraint/:id", (req, res) => {
   );
 });
 
-
+/**
+ * שליפת שעות הפעילות של המספרה ממוינות לפי ימי השבוע
+ * GET /availability/days-activity
+ */
 router.get("/days-activity", (req, res) => {
   const query =
     "SELECT * FROM dayshoursactivity ORDER BY FIELD(day, 'ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת')";
@@ -219,7 +257,10 @@ router.get("/days-activity", (req, res) => {
   });
 });
 
-// נתיב לעדכון שעות פעילות המספרה ביום מסוים
+/**
+ * עדכון שעות הפעילות של המספרה עבור יום ספציפי (מנהל בלבד)
+ * PUT /availability/update-day/:day
+ */
 router.put("/update-day/:day", (req, res) => {
   if (req.session.user.status !== "מנהל")
     return res.status(403).json({ message: "Not authorized" });
@@ -237,7 +278,10 @@ router.put("/update-day/:day", (req, res) => {
   });
 });
 
-// נתיב לשליפת קוד זמינות עבודה של ספר בטווח תאריכים 
+/**
+ * שליפת קוד זמינות עבור ספר בתאריך ושעה מסוימים
+ * POST /availability/get-code
+ */
 router.post("/get-code", (req, res) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "User not logged in" });

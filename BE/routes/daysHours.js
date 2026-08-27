@@ -1,13 +1,26 @@
+/**
+ * ============================================================================
+ * מודול ניהול ימי ושעות פעילות 
+ * ============================================================================
+ * תפקיד המודול:
+ * מודול זה אחראי על ניהול שעות הפעילות והפתיחה של המספרה/הטרקלין.
+ * המודול מאפשר שליפת שעות פעילות עבור יום ספציפי, שליפת תרשים שעות הפעילות
+ * השבועי המלא (ממוין לפי ימי השבוע ראשון-שבת), ועדכון שעות פתיחה וסגירה
+ * על ידי מנהל המערכת.
+ */
+
 const express = require("express");
 const router = express.Router();
 
-//routes/user.js
 const dbSingleton = require("../dbSingleton");
 
-// Execute a query to the database
+// קבלת חיבור יחיד (Singleton) למסד הנתונים
 const db = dbSingleton.getConnection();
 
-// נתיב המחזיר פרטי היום מטבלת ימי פעילות המספרה
+/**
+ * שליפת פרטי שעות פעילות עבור יום ספציפי
+ * POST /daysHours/get-day
+ */
 router.post("/get-day", (req, res) => {
   if (!req.session || !req.session.user || !req.session.user.email) {
     return res.status(401).json({ message: "Unauthorized: Please log in" });
@@ -28,11 +41,16 @@ router.post("/get-day", (req, res) => {
   });
 });
 
-// נתיב המחזיר פרטי כל הימים מטבלת ימי פעילות המספרה
+/**
+ * שליפת שעות הפעילות של כל ימי השבוע (ממוין מיום ראשון עד שבת)
+ * POST /daysHours/
+ */
 router.post("/", (req, res) => {
   if (!req.session || !req.session.user || !req.session.user.email) {
     return res.status(401).json({ message: "Unauthorized: Please log in" });
   }
+
+  // השאילתה שולפת את שעות הפעילות וממיינת את הימים לפי הסדר שלהם בשבוע (מראשון עד שבת)
   const query = `SELECT day, 
   TIME_FORMAT(start, '%H:%i') AS start, 
   TIME_FORMAT(end, '%H:%i') AS end 
@@ -60,6 +78,10 @@ router.post("/", (req, res) => {
   });
 });
 
+/**
+ * עדכון שעות פתיחה וסגירה עבור יום מסוים
+ * PUT /daysHours/update
+ */
 router.put("/update", (req, res) => {
   if (!req.session || !req.session.user || !req.session.user.email) {
     return res.status(401).json({ message: "Unauthorized: Please log in" });

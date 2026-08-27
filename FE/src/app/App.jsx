@@ -1,9 +1,13 @@
+// ייבוא קומפוננטות תשתית ועיצוב
   import Footer from "../components/footer/Footer";
   import Header from "../components/header/Header";
   import classes from "./app.module.css";
+// ייבוא רכיבי ניתוח נתיבים וראוטינג מ-React Router
   import { Routes, Route, useLocation } from "react-router-dom";
+// ייבוא הוקים של React לניהול ספציפי של מצב ומעגל חיים
   import { useState } from "react";
   import { useEffect } from "react";
+// ייבוא קומפוננטות הטפסים והמסכים השונים באפליקציה
   import NewAppForm from "../components/newAppForm/NewAppForm";
   import AppList from "../components/appList/AppList";
   import LoginForm from "../components/loginForm/LoginForm";
@@ -13,6 +17,7 @@
   import AddService from "../components/addService/AddService";
   import ServiceList from "../components/serviceList/ServiceList";
   import SideBar from "../components/sideBar/SideBar";
+// ייבוא פונקציית השליפה הכללית לאימות משתמש מחובר
   import { fetchUser } from "../../js/mainFunctionView";
   import AvailabilityList from "../components/availabilityList/AvailabilityList";
   import AddAvailabilityForm from "../components/addAvailabilityForm/AddAvailabilityForm";
@@ -22,14 +27,18 @@
   import GlobalServicesList from "../components/globalServiceList/GlobalServiceList";
 import DaysHoursManagement from "../components/daysHoursManagement/DaysHoursManagement";
 
+// קומפוננטת השורש הראשית של האפליקציה
   export default function App() {
 
+// ניהול ה-סטייט הראשי של המשתמש, טעינה ורענון נתונים
     const [user, setUser] = useState(null); 
     const [isLoading, setIsLoading] = useState(true); // מצב טעינה
     const location = useLocation();
     const [refresh, setRefresh] = useState(false); 
     const [refreshAppointments, setRefreshAppointments] = useState(0);
+// הגדרת נתיבים שבהם סרגל הצד יהיה מוסתר
     const hideSidebarRoutes = ["/", "/login", "/register"];
+// בדיקה האם להציג את סרגל הצד בהתאם לנתיב הנוכחי
     const shouldShowSidebar = !hideSidebarRoutes.includes(location.pathname);
     const [reloadApps, setReloadApps] = useState(true);
 
@@ -40,7 +49,7 @@ import DaysHoursManagement from "../components/daysHoursManagement/DaysHoursMana
     }
 
 
-
+// useEffect לאימות סטטוס התחברות המשתמש בכל שינוי נתיב (URL)
     useEffect(() => {
       const checkAuth = async () => {
         setIsLoading(true);
@@ -58,17 +67,20 @@ import DaysHoursManagement from "../components/daysHoursManagement/DaysHoursMana
       <div>
         <div className={classes.topNavWrapper}>
           {/* <Header  /> */}
+{/* סרגל ניווט עליון עם העברת פרטי משתמש ופונקציית עדכון */}
           <Navbar user={user} setUser={setUser} />
         </div>
 
+{/* רנדור מותנה של סרגל הצד לפי הנתיב הנוכחי */}
         {shouldShowSidebar && <SideBar />}
+{/* הגדרת נתיבי הראוטינג המרכזיים באפליקציה */}
         <Routes>
           <Route path="/" element={<LoginForm />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/update" element={<UpdateDetailsForm />} />
 
-          {/* שלושת הדאשבורדים מציגים את AppList הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
+          {/* שלושת הדאשבורדים מציגים את רשימת התורים הדינמית שמתאימה את עצמה לפי הסטטוס בעברית */}
           <Route
             path="/admin-dashboard"
             element={
@@ -99,6 +111,7 @@ import DaysHoursManagement from "../components/daysHoursManagement/DaysHoursMana
                 <div className={classes.form_column}>
                   <div className={classes.card_wrapper}>
                     <AddService refresh={refresh} setRefresh={setRefresh} />
+{/* תצוגת רכיבי מנהל בלבד בהתאם להרשאות משתמש */}
                     {user?.status === "מנהל" && (
                       <AdminAddService setRefresh={setRefresh} />
                     )}
@@ -108,6 +121,7 @@ import DaysHoursManagement from "../components/daysHoursManagement/DaysHoursMana
                 <div className={classes.list_column}>
                   <div className={classes.card_wrapper}>
                     <ServiceList refresh={refresh} />
+{/* תצוגת רשימת שירותים גלובלית למנהלים בלבד */}
                     {user?.status === "מנהל" && (
                       <GlobalServicesList
                         refresh={refresh}
@@ -199,4 +213,3 @@ import DaysHoursManagement from "../components/daysHoursManagement/DaysHoursMana
       </div>
     );
   }
-
