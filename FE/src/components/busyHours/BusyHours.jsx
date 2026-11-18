@@ -1,6 +1,4 @@
-// ייבוא הוקים ורכיבים מ-React
 import React, { useState, useEffect } from 'react';
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from './busyHours.module.css';
 
 // קומפוננטה להצגת מפת עומסים לפי שעות פעילות

@@ -1,8 +1,6 @@
-// ייבוא הוקים וספריות של React
 import React, { useState, useEffect } from "react";
 // ייבוא קומפוננטת כרטיס חלון הזמינות
 import AvailabilityCard from "../availabilityCard/AvailabilityCard";
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./availabilityList.module.css";
 // ייבוא פונקציות עזר לשליפת אילוצים/זמינות וביטול אילוץ
 import {

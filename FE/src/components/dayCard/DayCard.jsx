@@ -1,8 +1,6 @@
-// ייבוא הוקים מ-React
 import { useState } from "react";
 // ייבוא פונקציית עזר ליצירת מערך שעות
 import { getHoursArr } from "../../../js/mainFunctionView";
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./dayCard.module.css";
 
 // קומפוננטת כרטיס יום להצגה ועריכה של שעות פתיחה וסגירה

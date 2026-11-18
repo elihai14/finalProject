@@ -3,12 +3,8 @@
  * מודול ניהול תורים ואנליטיקה 
  * ============================================================================
  * תפקיד המודול:
- * מודול זה מרכז את כל הפעולות הקשורות לתורים במערכת:
- * 1. שליפת תורים לפי סינונים (לקוח, ספר, שירות, טווח תאריכים).
- * 2. הוספה, ביטול ושליפת פרטי תור לפי מזהה יחודי.
- * 3. בדיקת תורים קיימים למניעת חפיפות.
- * 4. הפקת נתונים ודוחות מנהל: סכום הכנסות, סך לקוחות, לקוחות חוזרים,
- *    ניתוח השעות העמוסות ביותר והימים העמוסים בשבוע.
+ * מודול זה מרכז את כל הפעולות הקשורות לתורים במערכת
+
  */
 
 const express = require("express");
@@ -21,7 +17,9 @@ const db = dbSingleton.getConnection();
 
 const today = new Date();
 const todayStr = today.toISOString().split("T")[0];
-const currentTimeStr = `${String(today.getHours()).padStart(2, "0")}:${String(today.getMinutes()).padStart(2, "0")}`;
+const currentTimeStr = `${String(today.getHours()).padStart(2, "0")}:${String(
+  today.getMinutes()
+).padStart(2, "0")}`;
 
 /**
  * שליפת תורים פעילים לפי סינונים דינמיים (שם לקוח, מייל לקוח, שירות, ספר, טווח תאריכים)
@@ -105,7 +103,7 @@ router.post("/add-appointment", (req, res) => {
       if (err) return res.status(500).json({ message: "שגיאה בהוספת התור" });
 
       return res.status(200).json({ message: "התור נוסף בהצלחה" });
-    },
+    }
   );
 });
 

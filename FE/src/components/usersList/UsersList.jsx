@@ -1,4 +1,3 @@
-// ייבוא הוקים מ-React, קובץ ה-CSS, פונקציית טעינת רשימת משתמשים וקומפוננטת כרטיס משתמש
 import { useState, useEffect } from "react";
 import classes from "./usersList.module.css";
 import { getUsersList } from "../../../js/mainFunctionView";

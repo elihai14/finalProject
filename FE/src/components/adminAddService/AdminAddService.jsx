@@ -1,6 +1,4 @@
-// ייבוא הוקים של React לניהול State ומעגל חיים
 import { useEffect, useState } from "react";
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./adminAddService.module.css";
 // ייבוא ספריית התראות מעוצבות
 import Swal from 'sweetalert2';

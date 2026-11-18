@@ -1,4 +1,3 @@
-// ייבוא הוקים מ-React, רכיב Link לניווט, קובץ העיצוב ואייקונים מ-react-icons
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import classes from "./sideBar.module.css";

@@ -1,6 +1,4 @@
-// ייבוא ספריית React
 import React from "react";
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./appointmentsFilter.module.css";
 
 // קומפוננטת סרגל סינון תורים לפי תאריכים, שירותים, לקוחות וספרים

@@ -1,6 +1,4 @@
-// ייבוא הוקים מ-React
 import React, { useState, useEffect } from "react";
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./dashboardStats.module.css";
 // ייבוא קומפוננטות עזר לסטטיסטיקות ויצוא נתונים
 import BusyHours from "../busyHours/BusyHours";

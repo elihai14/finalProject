@@ -1,6 +1,4 @@
-// ייבוא הוק של React לניהול State
 import { useState } from "react";
-// ייבוא קובץ העיצוב
 import classes from "./addAvailabilityForm.module.css";
 // ייבוא פונקציות עזר לשליפת שעות והוספת אילוצים
 import { getHoursArr } from "../../../js/mainFunctionView";

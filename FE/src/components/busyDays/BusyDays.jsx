@@ -1,4 +1,3 @@
-// ייבוא הוקים מ-React
 import React, { useState, useEffect } from "react";
 // ייבוא קומפוננטות ורכיבים מ-Chart.js להצגת דיאגרמת עמודות
 import {

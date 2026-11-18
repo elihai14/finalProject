@@ -1,4 +1,3 @@
-// ייבוא הוקים מ-React ו-React Router, קובץ ה-CSS ופונקציית עדכון הפרטים
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // 1. הוספנו useNavigate
 import classes from "./updateDetailsForm.module.css";

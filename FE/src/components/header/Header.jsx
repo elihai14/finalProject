@@ -1,7 +1,6 @@
 
 
 import classes from './header.module.css'
-import Navbar from '../navBar/NavBar';
 
 /**
  * Header component code

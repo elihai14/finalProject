@@ -1,8 +1,6 @@
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./newAppForm.module.css";
 // ייבוא פונקציות העזר לקבלת פרטי המשתמש, שעות פנויות ויצירת תור חדש
 import { fetchUser, getHoursSelect, handleCreateApp } from "../../../js/mainFunctionView";
-// ייבוא הוקים מ-React
 import { useState, useEffect } from "react";
 
 // קומפוננטת טופס לקביעת תור חדש

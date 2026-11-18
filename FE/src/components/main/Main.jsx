@@ -1,4 +1,3 @@
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from './main.module.css'
 // ייבוא קומפוננטת הטופס לקביעת תור חדש
 import NewAppForm from '../newAppForm/NewAppForm';

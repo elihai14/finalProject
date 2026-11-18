@@ -1,8 +1,6 @@
-// ייבוא הוקים וספריות של React
 import React, { useState, useEffect } from "react";
 // ייבוא קומפוננטת כרטיס תור בודד
 import AppCard from "../appCard/AppCard";
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./appList.module.css";
 // ייבוא קומפוננטת סינון התורים
 import AppointmentsFilter from "../appointmentsFilter/AppointmentsFilter";

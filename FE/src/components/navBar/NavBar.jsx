@@ -1,7 +1,5 @@
-// ייבוא הוקים מ-React וספריית הניווט
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./navBar.module.css";
 // ייבוא קומפוננטת טופס עדכון הפרטים האישיים
 import UpdateDetailsForm from "../updateDetailsForm/UpdateDetailsForm";

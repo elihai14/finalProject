@@ -1,12 +1,9 @@
 /**
  * ============================================================================
- * קובץ השרת הראשי 
+ * קובץ השרת הראשי
  * ============================================================================
  * תפקיד המודול:
  * קובץ זה מהווה את נקודת הכניסה הראשית של השרת .
- * הקובץ מייבא ומגדיר את כל תופסי התקשורת  כגון CORS ו-Sessions,
- * מגדיר את אובייקט שליחת הדוא"ל (Nodemailer), מקשר את נתיבי ה-API השונים (Routes),
- * ומעלה את שרת ה-Express לאוויר בפורט המוגדר.
  */
 
 const express = require("express");
@@ -30,19 +27,19 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "elihaiafuta@gmail.com",
-    pass: "sphxfmclreqrnznh",
+    pass: "byiq qbex bhyn ddou",
   },
 });
 
-// הגדרת נתיב לקבצים הסטטיים של ממשק המשתמש 
+// הגדרת נתיב לקבצים הסטטיים של ממשק המשתמש
 const distPath = path.join(__dirname, "..", "FE", "dist");
 
-// הגדרות Middlewares מרכזיים 
+// הגדרות Middlewares מרכזיים
 app.use(
   cors({
     origin: ["http://localhost:3001", "http://localhost:3000"],
     credentials: true,
-  }),
+  })
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -51,19 +48,19 @@ app.use(express.urlencoded({ extended: false }));
 app.locals.otpCodes = {};
 app.locals.transporter = transporter;
 
-// הגדרת ניהול סשנים של משתמשים 
+// הגדרת ניהול סשנים של משתמשים
 app.use(
   session({
     secret: "secret-key",
     resave: false,
     saveUninitialized: false,
-  }),
+  })
 );
 
 // הגשת קבצים סטטיים
 app.use(express.static(distPath));
 
-// שיוך נתיבי הAPI השונים בשרת 
+// שיוך נתיבי הAPI השונים בשרת
 app.use("/users", usersRouter);
 app.use("/appointments", appRouter);
 app.use("/services", servicesRouter);

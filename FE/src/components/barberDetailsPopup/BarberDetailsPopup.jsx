@@ -1,6 +1,5 @@
 // ייבוא פונקציית createPortal מ-React DOM להצגת רכיבים מחוץ לעץ הרגיל
 import { createPortal } from "react-dom";
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./barberDetailsPopup.module.css";
 
 // קומפוננטת פופאפ להצגת הפרטים המלאים של הספר (שם, טלפון, ושירותים מוצעים)

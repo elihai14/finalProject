@@ -1,6 +1,4 @@
-// ייבוא הוקים מ-React
 import { useEffect, useState } from "react";
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./globalServiceList.module.css";
 // ייבוא ספרית SweetAlert2 להצגת חלונות קופצים מעוצבים
 import Swal from "sweetalert2";

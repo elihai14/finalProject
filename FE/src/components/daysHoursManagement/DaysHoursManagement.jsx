@@ -1,10 +1,8 @@
 // ייבוא פונקציית שליפת הנתונים מהקובץ המרכזי
 import { getDays } from "../../../js/mainFunctionView";
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./daysHoursManagement.module.css";
 // ייבוא קומפוננטת כרטיס יום להצגת השעות
 import DayCard from "../dayCard/DayCard";
-// ייבוא הוקים מ-React
 import { useEffect, useState } from "react";
 
 // קומפוננטת ניהול שעות וימי הפעילות של העסק

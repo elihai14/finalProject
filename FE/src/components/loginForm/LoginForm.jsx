@@ -1,4 +1,3 @@
-// ייבוא הוקים מ-React ואימפורטים נדרשים
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";

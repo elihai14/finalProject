@@ -1,6 +1,4 @@
-// ייבוא הוקים של React לניהול State
 import { useState } from "react";
-// ייבוא קובץ העיצוב (CSS Module)
 import classes from "./appCard.module.css";
 // ייבוא קומפוננטת חלון קופץ להצגת פרטי הספר
 import BarberDetailsPopup from "../barberDetailsPopup/BarberDetailsPopup";

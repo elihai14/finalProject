@@ -1,4 +1,3 @@
-// ייבוא הוק ה-useState מ-React, קובץ ה-CSS והפונקציה לעדכון סטטוס המשתמש
 import { useState } from "react";
 import classes from "./userCard.module.css";
 import { handleUpdateStatus } from "../../../js/mainFunctionView";
