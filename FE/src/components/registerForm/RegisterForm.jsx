@@ -1,12 +1,12 @@
 // ייבוא הוקים מ-React, רכיבי ניווט וספריית ההתראות SweetAlert2
 import { useState } from "react";
-import { useNavigate ,Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import classes from "./registerForm.module.css";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 // קומפוננטת טופס הרשמת משתמש חדש
 function RegisterForm() {
-// ניהול משתני State עבור פרטי הנרשם, מצבי טעינה ושגיאות
+  // ניהול משתני State עבור פרטי הנרשם, מצבי טעינה ושגיאות
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -14,22 +14,25 @@ function RegisterForm() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-// פונקציה לטיפול בשליחת טופס ההרשמה
+  // פונקציה לטיפול בשליחת טופס ההרשמה
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (!isValidFullName(fullName)) {
+      setError(" יש להזין שם פרטי ושם משפחה, עם רווח ביניהם ובעברית בלבד !");
+      return;
+    }
     setIsLoading(true);
     setError("");
-    
-   
+
     try {
-// שליחת פרטי המשתמש החדש לשרת
+      // שליחת פרטי המשתמש החדש לשרת
       const response = await fetch("http://localhost:5000/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           fullName: fullName,
           phoneNumber: phone,
-          mailAddress: email 
+          mailAddress: email,
         }),
       });
 
@@ -38,15 +41,15 @@ function RegisterForm() {
       if (response.ok) {
         // הרשמה בוצעה בהצלחה - מעבר ללוגין
         Swal.fire({
-              title: 'נרשמת בהצלחה!',
-              text: 'כעת תוכל להתחבר למערכת',
-              icon: 'success',
-              confirmButtonText: 'מעולה',
-              confirmButtonColor: '#dfb76c', // צבע הזהב העקבי
-              background: '#1a1a1a',        // רקע כהה
-              color: '#fff'
-            }).then(() => {
-                    navigate("/"); 
+          title: "נרשמת בהצלחה!",
+          text: "כעת תוכל להתחבר למערכת",
+          icon: "success",
+          confirmButtonText: "מעולה",
+          confirmButtonColor: "#dfb76c", // צבע הזהב העקבי
+          background: "#1a1a1a", // רקע כהה
+          color: "#fff",
+        }).then(() => {
+          navigate("/");
         });
       } else {
         // כאן נתפסת הבדיקה של הבקאנד (למשל: "משתמש כבר קיים")
@@ -59,16 +62,18 @@ function RegisterForm() {
     }
   };
 
-return (
+  const isValidFullName = (name) => {
+    return /^[א-ת]{2,}\s+[א-ת]{2,}$/.test(name.trim());
+  };
+  return (
     <div className={classes.loginContainer}>
-{/* כותרת הטופס */}
+      {/* כותרת הטופס */}
       <h2>הרשמה</h2>
 
       {/* הצגת שגיאה מהבקאנד (כמו "משתמש רשום") */}
       {error && <p className={classes.errorMessage}>{error}</p>}
 
       <form onSubmit={handleRegister} className={classes.form}>
-        
         {/* שם מלא */}
         <input
           type="text"
@@ -104,14 +109,16 @@ return (
           {isLoading ? "נרשם..." : "הרשמה"}
         </button>
 
-{/* קישור מעבר לדף התחברות למשתמשים רשומים */}
+        {/* קישור מעבר לדף התחברות למשתמשים רשומים */}
         <p className={classes.footerText}>
-          כבר יש לך חשבון? <Link to="/login" className={classes.linkBtn}>התחבר</Link>
+          כבר יש לך חשבון?{" "}
+          <Link to="/login" className={classes.linkBtn}>
+            התחבר
+          </Link>
         </p>
       </form>
     </div>
-  ); 
-
+  );
 }
 
 export default RegisterForm;

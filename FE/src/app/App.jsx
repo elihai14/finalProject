@@ -67,13 +67,13 @@
       <div>
         <div className={classes.topNavWrapper}>
           {/* <Header  /> */}
-{/* סרגל ניווט עליון עם העברת פרטי משתמש ופונקציית עדכון */}
+          {/* סרגל ניווט עליון עם העברת פרטי משתמש ופונקציית עדכון */}
           <Navbar user={user} setUser={setUser} />
         </div>
 
-{/* רנדור מותנה של סרגל הצד לפי הנתיב הנוכחי */}
+        {/* רנדור מותנה של סרגל הצד לפי הנתיב הנוכחי */}
         {shouldShowSidebar && <SideBar />}
-{/* הגדרת נתיבי הראוטינג המרכזיים באפליקציה */}
+        {/* הגדרת נתיבי הראוטינג המרכזיים באפליקציה */}
         <Routes>
           <Route path="/" element={<LoginForm />} />
           <Route path="/login" element={<LoginForm />} />
@@ -87,7 +87,7 @@
               <div className={classes.page_container}>
                 <div className={classes.form_column}>
                   <div className={classes.card_wrapper}>
-                    <DashboardStats userStatus={user?.status} />
+                    <DashboardStats userStatus={user?.status} user={user} />
                   </div>
                 </div>
 
@@ -111,7 +111,7 @@
                 <div className={classes.form_column}>
                   <div className={classes.card_wrapper}>
                     <AddService refresh={refresh} setRefresh={setRefresh} />
-{/* תצוגת רכיבי מנהל בלבד בהתאם להרשאות משתמש */}
+                    {/* תצוגת רכיבי מנהל בלבד בהתאם להרשאות משתמש */}
                     {user?.status === "מנהל" && (
                       <AdminAddService setRefresh={setRefresh} />
                     )}
@@ -121,7 +121,7 @@
                 <div className={classes.list_column}>
                   <div className={classes.card_wrapper}>
                     <ServiceList refresh={refresh} />
-{/* תצוגת רשימת שירותים גלובלית למנהלים בלבד */}
+                    {/* תצוגת רשימת שירותים גלובלית למנהלים בלבד */}
                     {user?.status === "מנהל" && (
                       <GlobalServicesList
                         refresh={refresh}
@@ -167,7 +167,7 @@
               <div className={classes.page_container}>
                 <div className={classes.form_column}>
                   <div className={classes.card_wrapper}>
-                    <DashboardStats userStatus={user?.status} />
+                    <DashboardStats userStatus={user?.status} user={user} />
                   </div>
                 </div>
 

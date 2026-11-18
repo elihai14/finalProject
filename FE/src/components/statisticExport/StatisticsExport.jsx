@@ -4,17 +4,16 @@ import * as XLSX from "xlsx";
 import classes from "./statisticsExport.module.css";
 
 // קומפוננטה לייצוא דוחות סטטיסטיקה של העסק לקובץ Excel (.xlsx)
-const StatisticsExport = ({ statsData, startDate, endDate }) => {
-
-// פונקציית הייצוא הראשית
+const StatisticsExport = ({ statsData, startDate, endDate, appointments }) => {
+  // פונקציית הייצוא הראשית
   const handleExport = () => {
-// בדיקה אם קיימים נתונים לייצוא
+    // בדיקה אם קיימים נתונים לייצוא
     if (!statsData) {
       alert("אין נתונים זמינים לייצוא");
       return;
     }
 
-// --- 1. בניית הגיליון הראשון: סיכום מדדים כללי ---
+    // --- 1. בניית הגיליון הראשון: סיכום מדדים כללי ---
     const summaryRows = [
       {
         "מדד סטטיסטי": "כמות הכנסות חודשיות",
@@ -34,7 +33,7 @@ const StatisticsExport = ({ statsData, startDate, endDate }) => {
       });
     }
 
-// הפיכת נתוני הסיכום לגיליון אקסל
+    // הפיכת נתוני הסיכום לגיליון אקסל
     const wsSummary = XLSX.utils.json_to_sheet(summaryRows, {
       header: ["מדד סטטיסטי", "ערך"],
     });
@@ -52,7 +51,7 @@ const StatisticsExport = ({ statsData, startDate, endDate }) => {
     if (statsData.busyDays && statsData.busyHours) {
       const analyticsRows = [];
 
-// הוספת נתוני הימים העמוסים ביותר
+      // הוספת נתוני הימים העמוסים ביותר
       analyticsRows.push({
         "נתוני עומסים ודירוגים": "🏆 דירוג 3 הימים העמוסים ביותר",
         פרטים: "",
@@ -70,10 +69,10 @@ const StatisticsExport = ({ statsData, startDate, endDate }) => {
         });
       });
 
-// שורת רווח מפרידה
+      // שורת רווח מפרידה
       analyticsRows.push({ "נתוני עומסים ודירוגים": "", פרטים: "", נתון: "" });
 
-// הוספת נתוני השעות העמוסות ביותר
+      // הוספת נתוני השעות העמוסות ביותר
       analyticsRows.push({
         "נתוני עומסים ודירוגים": "⏰ דירוג שעות לפי עומס",
         פרטים: "",
@@ -87,7 +86,7 @@ const StatisticsExport = ({ statsData, startDate, endDate }) => {
         });
       });
 
-// הפיכת נתוני העומסים לגיליון אקסל
+      // הפיכת נתוני העומסים לגיליון אקסל
       const wsAnalytics = XLSX.utils.json_to_sheet(analyticsRows, {
         header: ["נתוני עומסים ודירוגים", "פרטים", "נתון"],
       });
@@ -109,10 +108,55 @@ const StatisticsExport = ({ statsData, startDate, endDate }) => {
     const currentDate = new Date()
       .toLocaleDateString("he-IL")
       .replace(/\./g, "-");
-    XLSX.writeFile(workbook, `דוח_סטטיסטיקה_עסקית_${startDate}-${endDate}.xlsx`);
+
+    // --- 4. יצירת גיליון רשימת התורים ---
+
+    if (appointments && appointments.length > 0) {
+      const appointmentsRows = appointments.map((item) => ({
+        "תאריך": new Date(item.appointment_date).toLocaleDateString("he-IL", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          timeZone: "UTC",
+        }),
+        שעה: item.appointment_time,
+        "שם הספר": item.barberName,
+        "שם הלקוח": item.customerName,
+        "סוג השירות": item.service_name,
+        מחיר: `${item.price} ₪`,
+      }));
+
+      // יצירת גיליון התורים
+      const wsAppointments = XLSX.utils.json_to_sheet(appointmentsRows, {
+        header: ["תאריך", "שעה", "שם הספר", "שם הלקוח", "סוג השירות", "מחיר"],
+      });
+
+      // הגדרת RTL
+      if (!wsAppointments["!wb"]) {
+        wsAppointments["!wb"] = {};
+      }
+
+      wsAppointments["!wb"].sheetView = [{ sheetDirection: "rtl" }];
+
+      // רוחב עמודות
+      wsAppointments["!cols"] = [
+        { wch: 15 },
+        { wch: 12 },
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 15 },
+      ];
+
+      XLSX.utils.book_append_sheet(workbook, wsAppointments, "רשימת תורים");
+    }
+        XLSX.writeFile(
+          workbook,
+          `דוח_סטטיסטיקה_עסקית_${startDate}-${endDate}.xlsx`
+        );
   };
 
-// רינדור כפתור הייצוא
+  // רינדור כפתור הייצוא
   return (
     <button
       onClick={handleExport}

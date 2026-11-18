@@ -46,7 +46,7 @@ export default function AppCard({ app, onCancel }) {
           ✂️ {app.barberName}
         </span>
 
-        <span className={classes.clientName}>👤 לקוח: {app.customerName}</span>
+        <span className={classes.clientName}>👤 {app.customerName}</span>
       </div>
 
 {/* אזור פרטי השירות, המחיר וכפתור הביטול */}
