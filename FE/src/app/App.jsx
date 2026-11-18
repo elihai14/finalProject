@@ -25,7 +25,7 @@
   import UpdateDetailsForm from "../components/updateDetailsForm/UpdateDetailsForm";
   import AdminAddService from "../components/adminAddService/AdminAddService";
   import GlobalServicesList from "../components/globalServiceList/GlobalServiceList";
-import DaysHoursManagement from "../components/daysHoursManagement/DaysHoursManagement";
+  import DaysHoursManagement from "../components/daysHoursManagement/DaysHoursManagement";
 
 // קומפוננטת השורש הראשית של האפליקציה
   export default function App() {
