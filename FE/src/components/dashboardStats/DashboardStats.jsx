@@ -4,13 +4,16 @@ import classes from "./dashboardStats.module.css";
 import BusyHours from "../busyHours/BusyHours";
 import BusyDays from "../busyDays/BusyDays";
 import StatisticsExport from "../statisticExport/StatisticsExport";
-import { getStatisticData } from "../../../js/mainFunctionView";
+import { getStatisticData, fetchAppointments } from "../../../js/mainFunctionView";
 
 // קומפוננטה ראשית להצגת דשבורד סטטיסטיקות ונתונים עסקיים
-function DashboardStats({ userStatus }) {
+function DashboardStats({ userStatus, user }) {
 
 // ניהול משתני ה-State עבור הנתונים הסטטיסטיים, תאריכים, דירוגים ומצבי טעינה
-  const [chartData, setChartData] = useState([]);
+const [apps, setApps] = useState([]);
+const [appsLoading, setAppsLoading] = useState(false);
+const [appsError, setAppsError] = useState("");  
+const [chartData, setChartData] = useState([]);
   const [repeatCount, setRepeatCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [dashDates, setDashDates] = useState({ startDate:"", endDate: "" });
@@ -40,6 +43,20 @@ function DashboardStats({ userStatus }) {
       })
     },[])
 
+
+    useEffect(() => {
+      if (!dashDates.startDate || !dashDates.endDate) return;
+
+      fetchAppointments(
+        {},
+        setAppsLoading,
+        setAppsError,
+        user,
+        setApps,
+        dashDates.startDate,
+        dashDates.endDate
+      );
+    }, [dashDates.startDate, dashDates.endDate]);
 // שליפת נתוני הסטטיסטיקה מהשרת בכל שינוי של תאריכים או הרשאות משתמש
   useEffect(() => {
     getStatisticData(
@@ -98,6 +115,8 @@ function DashboardStats({ userStatus }) {
                 statsData={statsData}
                 startDate={dashDates.startDate || prevMonth}
                 endDate={dashDates.endDate || today}
+                appointments={apps}
+                
               />
             </div>
           </div>

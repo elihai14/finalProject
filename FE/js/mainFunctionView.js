@@ -33,7 +33,7 @@ function calculateSlots(
   date,
   start,
   end,
-  availableSlots,
+  availableSlots
 ) {
   const currentDate = new Date();
   const dateToCheck = new Date(date);
@@ -106,7 +106,7 @@ export async function getHoursSelect(
   barberMail,
   date,
   serviceName,
-  clientMail,
+  clientMail
 ) {
   const availabilityRes = await fetch(
     `http://localhost:5000/availability/barbers-constraints`,
@@ -118,7 +118,7 @@ export async function getHoursSelect(
         bMail: barberMail,
         date: date,
       }),
-    },
+    }
   );
 
   const availability = await availabilityRes.json();
@@ -146,7 +146,7 @@ export async function getHoursSelect(
         clientMail: clientMail,
       }),
       credentials: "include",
-    },
+    }
   );
 
   const existingApp = await appsRes.json();
@@ -161,7 +161,7 @@ export async function getHoursSelect(
         date,
         c.start_time,
         c.end_time,
-        hours,
+        hours
       );
     });
   }
@@ -181,7 +181,7 @@ export async function handleCreateApp(
   setSelectedDate,
   setSelectedHour,
   setHours,
-  setReloadApps,
+  setReloadApps
 ) {
   const constraint_code_response = await fetch(
     `http://localhost:5000/availability/get-code`,
@@ -194,7 +194,7 @@ export async function handleCreateApp(
         date: date,
         time: time,
       }),
-    },
+    }
   );
   const code = await constraint_code_response.json();
   if (!constraint_code_response.ok) {
@@ -244,7 +244,7 @@ export async function handleCreateApp(
         time: time,
         price: price.price,
       }),
-    },
+    }
   );
   const addApp = await addAppResponse.json();
   if (!addAppResponse.ok) {
@@ -309,7 +309,7 @@ export async function handleUpdateStatus(
   status,
   selectedStatus,
   refresh,
-  setRefresh,
+  setRefresh
 ) {
   if (status === selectedStatus) {
     Swal.fire({
@@ -511,7 +511,7 @@ export async function handleAddConstraint(
   selectedEndTime,
   setSelectedEndTime,
   setEndHours,
-  setRefresh,
+  setRefresh
 ) {
   e.preventDefault();
   try {
@@ -526,7 +526,7 @@ export async function handleAddConstraint(
           start_time: startTime,
           end_time: selectedEndTime,
         }),
-      },
+      }
     );
     const data = await response.json();
     if (!response.ok) {
@@ -550,7 +550,7 @@ export async function fetchAvailability(
   setIsLoading,
   setAvailability,
   setError,
-  filters,
+  filters
 ) {
   setIsLoading(true);
 
@@ -565,7 +565,7 @@ export async function fetchAvailability(
       {
         method: "GET",
         credentials: "include", // שומר על ה-session
-      },
+      }
     );
     const data = await response.json();
     if (response.ok) {
@@ -588,7 +588,7 @@ export async function handleCancelConstraint(
   setError,
   setSuccessMessage,
   setAvailability,
-  availability,
+  availability
 ) {
   setError("");
   setSuccessMessage("");
@@ -614,7 +614,7 @@ export async function handleCancelConstraint(
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-        },
+        }
       );
 
       console.log("Status:", response.status, "ID sent:", id);
@@ -622,7 +622,7 @@ export async function handleCancelConstraint(
       if (response.ok) {
         // עדכון הסטייט המקומי כדי שהאילוץ ייעלם מיד מהמסך
         setAvailability(
-          availability.filter((cons) => cons.constraint_code !== id),
+          availability.filter((cons) => cons.constraint_code !== id)
         );
 
         Swal.fire({
@@ -669,7 +669,7 @@ export async function getStatisticData(
   setChartData,
   userStatus,
   setRepeatCount,
-  setLoading,
+  setLoading
 ) {
   setLoading(true);
 
@@ -698,7 +698,7 @@ export async function getStatisticData(
               startDate: dashDates.startDate || prevMonth,
               endDate: dashDates.endDate || today,
             }),
-          },
+          }
         ).then((res) => res.json());
       }
     })
@@ -719,12 +719,21 @@ export async function fetchAppointments(
   setError,
   user,
   setAppointments,
+  startDate,
+  endDate
 ) {
+  const requestBody = {
+    ...customFilters,
+    ...(startDate &&
+      endDate && {
+        startDate,
+        endDate,
+      }),
+  };
   setIsLoading(true);
   setError("");
 
   // התאמת גוף הבקשה לפי הסטטוס וההרשאות של המשתמש המחובר
-  const requestBody = { ...customFilters };
   if (user.status === "ספר") requestBody.barber_mail = user.mail_address;
   else if (user.status === "לקוח") requestBody.clientMail = user.mail_address;
 
@@ -750,7 +759,7 @@ export async function fetchFilterOptions(
   user,
   setServices,
   setBarbers,
-  setCustomers,
+  setCustomers
 ) {
   try {
     const requestBody = {};
@@ -780,8 +789,8 @@ export async function fetchFilterOptions(
             (barber, index, self) =>
               barber.mail_address &&
               index ===
-                self.findIndex((b) => b.mail_address === barber.mail_address),
-          ),
+                self.findIndex((b) => b.mail_address === barber.mail_address)
+          )
       );
       // חילוץ לקוחות ייחודיים בלבד
       setCustomers([
@@ -798,7 +807,7 @@ export async function handleCancelAppointment(
   id,
   getApps,
   filters,
-  setReloadApps,
+  setReloadApps
 ) {
   const result = await Swal.fire({
     title: "האם לבטל את התור?",
@@ -819,7 +828,7 @@ export async function handleCancelAppointment(
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
 
       if (response.ok) {
@@ -846,7 +855,9 @@ export async function handleCancelAppointment(
 export async function fetchBarberDetails(barberMail) {
   try {
     const response = await fetch(
-      `http://localhost:5000/users/barber-details/${encodeURIComponent(barberMail)}`,
+      `http://localhost:5000/users/barber-details/${encodeURIComponent(
+        barberMail
+      )}`
     );
 
     if (!response.ok) {
