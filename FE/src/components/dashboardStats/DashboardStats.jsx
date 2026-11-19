@@ -1,63 +1,59 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import classes from "./dashboardStats.module.css";
-// ייבוא קומפוננטות עזר לסטטיסטיקות ויצוא נתונים
 import BusyHours from "../busyHours/BusyHours";
 import BusyDays from "../busyDays/BusyDays";
 import StatisticsExport from "../statisticExport/StatisticsExport";
-import { getStatisticData, fetchAppointments } from "../../../js/mainFunctionView";
+import {
+  getStatisticData,
+  fetchAppointments,
+} from "../../../js/mainFunctionView";
 
-// קומפוננטה ראשית להצגת דשבורד סטטיסטיקות ונתונים עסקיים
 function DashboardStats({ userStatus, user }) {
-
-// ניהול משתני ה-State עבור הנתונים הסטטיסטיים, תאריכים, דירוגים ומצבי טעינה
-const [apps, setApps] = useState([]);
-const [appsLoading, setAppsLoading] = useState(false);
-const [appsError, setAppsError] = useState("");  
-const [chartData, setChartData] = useState([]);
+  const [apps, setApps] = useState([]);
+  const [appsLoading, setAppsLoading] = useState(false);
+  const [appsError, setAppsError] = useState("");
+  const [chartData, setChartData] = useState([]);
   const [repeatCount, setRepeatCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [dashDates, setDashDates] = useState({ startDate:"", endDate: "" });
+  const [dashDates, setDashDates] = useState({ startDate: "", endDate: "" });
   const [daysRank, setDaysRank] = useState([]);
   const [hoursRank, setHoursRank] = useState([]);
 
-  const today = new Date().toLocaleDateString("fr-CA"); // מחזיר YYYY-MM-DD מקומי
+  const today = useMemo(() => new Date().toLocaleDateString("fr-CA"), []);
 
-  // חישוב חודש קדימה בטוח: מבוסס על ה-startDate אם קיים, אחרת על היום
   const getPrevMonthSafe = () => {
     const base = dashDates.startDate
       ? new Date(dashDates.startDate.replace(/-/g, "/"))
       : new Date();
 
-    if (isNaN(base.getTime())) return today; // הגנה ממצבי קצה של אינפוט ריק
+    if (isNaN(base.getTime())) return today;
 
     base.setMonth(base.getMonth() - 1);
     return base.toLocaleDateString("fr-CA");
   };
   const prevMonth = getPrevMonthSafe();
 
-// הגדרת תאריכי ברירת המחדל (חודש אחורה עד היום) בטעינה הראשונית
-  useEffect(()=>
-    {
-      setDashDates({startDate: prevMonth,
-                    endDate: today
-      })
-    },[])
+  useEffect(() => {
+    setDashDates({
+      startDate: prevMonth,
+      endDate: today,
+    });
+  }, [today]);
 
+  useEffect(() => {
+    if (!dashDates.startDate || !dashDates.endDate) return;
 
-    useEffect(() => {
-      if (!dashDates.startDate || !dashDates.endDate) return;
+    fetchAppointments(
+      {},
+      setAppsLoading,
+      setAppsError,
+      user,
+      setApps,
+      dashDates.startDate,
+      dashDates.endDate
+    );
+  }, [dashDates.startDate, dashDates.endDate, user]);
 
-      fetchAppointments(
-        {},
-        setAppsLoading,
-        setAppsError,
-        user,
-        setApps,
-        dashDates.startDate,
-        dashDates.endDate
-      );
-    }, [dashDates.startDate, dashDates.endDate]);
-// שליפת נתוני הסטטיסטיקה מהשרת בכל שינוי של תאריכים או הרשאות משתמש
   useEffect(() => {
     getStatisticData(
       today,
@@ -70,44 +66,50 @@ const [chartData, setChartData] = useState([]);
     );
   }, [userStatus, dashDates, today]);
 
-// הצגת הודעת שגיאה/טעינה במידה והנתונים טרם התקבלו
   if (loading) {
     return (
       <div className={classes.error_message}>
         <span className={classes.error_icon}>⚠</span>
         <div>
-          <h3>שגיאה בטעינת הנתונים</h3>
-          <p>לא ניתן לטעון את נתוני הדשבורד כרגע. נסה לרענן את העמוד.</p>
+          <h3>טוען נתונים...</h3>
+          <p>אנא המתן בזמן טעינת נתוני הדשבורד.</p>
         </div>
       </div>
     );
   }
 
-  // עיבוד בטוח של ימי העומס ללא לולאות מסורבלות
-  const daysArr = (daysRank || []).map((item, i) => ({
-    rank: i + 1,
-    day: item.day_name,
-    appointments: parseInt(item.total_appointments, 10) || 0,
-  }));
+  const daysArr = (daysRank || [])
+    .map((item) => ({
+      day: item.day_name,
+      appointments: parseInt(item.total_appointments, 10) || 0,
+    }))
+    .sort((a, b) => b.appointments - a.appointments)
+    .slice(0, 3)
+    .map((item, i) => ({
+      rank: i + 1,
+      ...item,
+    }));
 
-// אריזת הנתונים המעובדים לצורך ייצוא דוחות
+  const sortedHours = [...(hoursRank || [])]
+    .sort((a, b) => (b?.count || 0) - (a?.count || 0))
+    .slice(0, 3);
+
   const statsData = {
-    monthlyRevenue: chartData[0].total_revenue || 0,
-    monthlyCustomers: chartData[0].total_customers,
+    monthlyRevenue: chartData?.[0]?.total_revenue || 0,
+    monthlyCustomers: chartData?.[0]?.total_customers || 0,
     returningCustomersPercent: repeatCount,
     busyDays: daysArr,
-    busyHours: [
-      { rank: 1, hour: hoursRank[0], load: "גבוה מאוד" },
-      { rank: 2, hour: hoursRank[1], load: "גבוה" },
-      { rank: 3, hour: hoursRank[2], load: "בינוני" },
-    ],
+    busyHours: sortedHours.map((item, index) => ({
+      rank: index + 1,
+      hour: item?.hour || "",
+      appointments: item?.count || 0,
+      load: `${item?.count || 0} תורים`,
+    })),
   };
 
   return (
     <div className={classes.dashboard_wrapper}>
-{/* סרגל סינון תאריכים וכפתור ייצוא דוחות */}
       <div className={classes.dashFilterBar}>
-{/* כפתור ייצוא דוח המופיע רק למנהל או ספר */}
         {(userStatus === "מנהל" || userStatus === "ספר") && (
           <div className={classes.action_bar_wrapper}>
             <div className={classes.export_btn_container}>
@@ -116,27 +118,25 @@ const [chartData, setChartData] = useState([]);
                 startDate={dashDates.startDate || prevMonth}
                 endDate={dashDates.endDate || today}
                 appointments={apps}
-                
+                status = {userStatus}
               />
             </div>
           </div>
         )}
 
-        
-{/* שדה בחירת תאריך סיום */}
         <div className={classes.dashFilterGroup}>
           <label>עד תאריך:</label>
           <input
             type="date"
             value={dashDates.endDate}
-            min={dashDates.startDate} 
+            min={dashDates.startDate}
             onChange={(e) => {
               e.preventDefault();
-              setDashDates((prev) => ({ ...prev, endDate: e.target.value })); 
+              setDashDates((prev) => ({ ...prev, endDate: e.target.value }));
             }}
           />
         </div>
-{/* שדה בחירת תאריך התחלה */}
+
         <div className={classes.dashFilterGroup}>
           <label>מתאריך:</label>
           <input
@@ -144,17 +144,17 @@ const [chartData, setChartData] = useState([]);
             value={dashDates.startDate}
             onChange={(e) => {
               e.preventDefault();
-              setDashDates((prev) => ({ ...prev, startDate: e.target.value ,
-                                                 endDate: e.target.value
-                })); 
+              setDashDates((prev) => ({
+                ...prev,
+                startDate: e.target.value,
+                endDate: e.target.value,
+              }));
             }}
           />
         </div>
       </div>
 
-{/* פריסת הנתונים של הדשבורד */}
       <div className={classes.dashboard_layout}>
-{/* עמודת עומסים ולקוחות חוזרים (עבור מנהל בלבד) */}
         {userStatus === "מנהל" && (
           <div className={classes.busy_column}>
             <div className={classes.stat_card}>
@@ -174,13 +174,12 @@ const [chartData, setChartData] = useState([]);
           </div>
         )}
 
-{/* גריד הכנסות וכמות לקוחות */}
         <div className={classes.stats_grid}>
           <div className={classes.stat_card}>
             <h3>הכנסות תקופתיות</h3>
             <div className={classes.chart_wrapper}>
               <span className={classes.number}>
-                {chartData[0].total_revenue || 0}
+                {chartData?.[0]?.total_revenue || 0}
               </span>
             </div>
           </div>
@@ -189,15 +188,13 @@ const [chartData, setChartData] = useState([]);
             <h3>כמות לקוחות תקופתית</h3>
             <div className={classes.chart_wrapper}>
               <span className={classes.number}>
-                {chartData[0].total_customers || 0}
+                {chartData?.[0]?.total_customers || 0}
               </span>
             </div>
           </div>
 
-{/* הצגת קומפוננטת שעות עומס עבור מנהל */}
           {userStatus === "מנהל" && (
             <div className={classes.stat_card} style={{ gridColumn: "span 2" }}>
-              {/* שליחת התאריכים המעודכנים לקומפוננטת העומס */}
               <BusyHours
                 startDate={dashDates.startDate || prevMonth}
                 endDate={dashDates.endDate || today}

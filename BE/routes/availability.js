@@ -58,6 +58,7 @@ router.get("/", (req, res) => {
     query += " AND date <= ?";
     values.push(endDate);
   }
+  query += " ORDER BY date "
 
   db.query(query, values, (err, results) => {
     if (err) return res.status(500).json({ message: "Internal Error" });

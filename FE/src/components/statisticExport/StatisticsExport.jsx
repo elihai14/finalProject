@@ -3,8 +3,16 @@ import React from "react";
 import * as XLSX from "xlsx";
 import classes from "./statisticsExport.module.css";
 
+// פונקציית עזר לחילוץ מספרי של כמות תורים מתוך פריט סטטיסטיקה
+const getCountValue = (item) => {
+  if (!item) return 0;
+  const raw = item.appointments ?? item.count ?? item.load ?? 0;
+  const parsed = parseInt(String(raw), 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
 // קומפוננטה לייצוא דוחות סטטיסטיקה של העסק לקובץ Excel (.xlsx)
-const StatisticsExport = ({ statsData, startDate, endDate, appointments }) => {
+const StatisticsExport = ({ statsData, startDate, endDate, appointments, status }) => {
   // פונקציית הייצוא הראשית
   const handleExport = () => {
     // בדיקה אם קיימים נתונים לייצוא
@@ -16,11 +24,11 @@ const StatisticsExport = ({ statsData, startDate, endDate, appointments }) => {
     // --- 1. בניית הגיליון הראשון: סיכום מדדים כללי ---
     const summaryRows = [
       {
-        "מדד סטטיסטי": "כמות הכנסות חודשיות",
+        "מדד סטטיסטי": "כמות הכנסות תקופתית",
         ערך: `₪${statsData.monthlyRevenue?.toLocaleString() || 0}`,
       },
       {
-        "מדד סטטיסטי": "כמות לקוחות חודשית",
+        "מדד סטטיסטי": "כמות לקוחות תקופתית",
         ערך: `${statsData.monthlyCustomers || 0} לקוחות`,
       },
     ];
@@ -28,8 +36,8 @@ const StatisticsExport = ({ statsData, startDate, endDate, appointments }) => {
     // רק אם המשתמש הוא מנהל (קיים אחוז לקוחות חוזרים), נוסיף את השורה הזו
     if (statsData.returningCustomersPercent !== undefined) {
       summaryRows.push({
-        "מדד סטטיסטי": "אחוז לקוחות חוזרים",
-        ערך: `${statsData.returningCustomersPercent}%`,
+        "מדד סטטיסטי": "כמות לקוחות חוזרים",
+        ערך: `${statsData.returningCustomersPercent}`,
       });
     }
 
@@ -48,8 +56,13 @@ const StatisticsExport = ({ statsData, startDate, endDate, appointments }) => {
     XLSX.utils.book_append_sheet(workbook, wsSummary, "סיכום מדדים כללי");
 
     // --- 3. בדיקה חכמה: האם יש נתוני עומסים? (רק עבור מנהל) ---
-    if (statsData.busyDays && statsData.busyHours) {
+    if (statsData.busyDays && statsData.busyHours && status === "מנהל") {
       const analyticsRows = [];
+
+      // מיון הימים העמוסים מהגבוה לנמוך לפי כמות התורים
+      const sortedBusyDays = [...statsData.busyDays].sort(
+        (a, b) => getCountValue(b) - getCountValue(a)
+      );
 
       // הוספת נתוני הימים העמוסים ביותר
       analyticsRows.push({
@@ -57,13 +70,11 @@ const StatisticsExport = ({ statsData, startDate, endDate, appointments }) => {
         פרטים: "",
         נתון: "",
       });
-      statsData.busyDays.forEach((item) => {
-        // חילוץ בטוח של מספר התורים - בדיקה של appointments או count והפיכה למספר
-        const appointmentsCount =
-          parseInt(item.appointments || item.count, 10) || 0;
+      sortedBusyDays.forEach((item, index) => {
+        const appointmentsCount = getCountValue(item);
 
         analyticsRows.push({
-          "נתוני עומסים ודירוגים": `מקום ${item.rank}`,
+          "נתוני עומסים ודירוגים": `מקום ${index + 1}`,
           פרטים: item.day,
           נתון: `${appointmentsCount} תורים`,
         });
@@ -72,17 +83,27 @@ const StatisticsExport = ({ statsData, startDate, endDate, appointments }) => {
       // שורת רווח מפרידה
       analyticsRows.push({ "נתוני עומסים ודירוגים": "", פרטים: "", נתון: "" });
 
+      // מיון השעות העמוסות מהגבוה לנמוך לפי כמות התורים
+      const sortedBusyHours = [...statsData.busyHours].sort(
+        (a, b) => getCountValue(b) - getCountValue(a)
+      );
+
       // הוספת נתוני השעות העמוסות ביותר
       analyticsRows.push({
         "נתוני עומסים ודירוגים": "⏰ דירוג שעות לפי עומס",
         פרטים: "",
         נתון: "",
       });
-      statsData.busyHours.forEach((item) => {
+      sortedBusyHours.forEach((item, index) => {
+        const hourCount = getCountValue(item);
+
         analyticsRows.push({
-          "נתוני עומסים ודירוגים": `מקום ${item.rank}`,
+          "נתוני עומסים ודירוגים": `מקום ${index + 1}`,
           פרטים: item.hour,
-          נתון: item.load || `${item.appointments || item.count} תורים`,
+          נתון:
+            item.appointments !== undefined || item.count !== undefined
+              ? `${hourCount} תורים`
+              : item.load || `${hourCount} תורים`,
         });
       });
 
@@ -105,15 +126,10 @@ const StatisticsExport = ({ statsData, startDate, endDate, appointments }) => {
     if (!workbook.Workbook.Views) workbook.Workbook.Views = [];
     workbook.Workbook.Views[0] = { RTL: true };
 
-    const currentDate = new Date()
-      .toLocaleDateString("he-IL")
-      .replace(/\./g, "-");
-
-    // --- 4. יצירת גיליון רשימת התורים ---
-
+    // --- 5. יצירת גיליון רשימת התורים ---
     if (appointments && appointments.length > 0) {
       const appointmentsRows = appointments.map((item) => ({
-        "תאריך": new Date(item.appointment_date).toLocaleDateString("he-IL", {
+        תאריך: new Date(item.appointment_date).toLocaleDateString("he-IL", {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
@@ -150,10 +166,11 @@ const StatisticsExport = ({ statsData, startDate, endDate, appointments }) => {
 
       XLSX.utils.book_append_sheet(workbook, wsAppointments, "רשימת תורים");
     }
-        XLSX.writeFile(
-          workbook,
-          `דוח_סטטיסטיקה_עסקית_${startDate}-${endDate}.xlsx`
-        );
+
+    XLSX.writeFile(
+      workbook,
+      `דוח_סטטיסטיקה_עסקית_${startDate}-${endDate}.xlsx`
+    );
   };
 
   // רינדור כפתור הייצוא

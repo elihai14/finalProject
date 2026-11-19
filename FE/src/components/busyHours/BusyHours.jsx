@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import classes from './busyHours.module.css';
+import React, { useState, useEffect } from "react";
+import classes from "./busyHours.module.css";
 
 // קומפוננטה להצגת מפת עומסים לפי שעות פעילות
 function BusyHours({ startDate, endDate, setHoursRank }) {
-// ניהול משתני State לאחסון הנתונים, טווח השעות, מצבי טעינה ושגיאות
   const [hoursData, setHoursData] = useState({});
-  const [businessHours, setBusinessHours] = useState([]); // כאן נשמור את טווח השעות הדינמי
+  const [businessHours, setBusinessHours] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-// טעינת הנתונים מהשרת בכל שינוי בטווח התאריכים
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
       try {
-// שליפת נתוני עומסי השעות לפי התאריכים שנבחרו
         const res = await fetch(
           `http://localhost:5000/appointments/busy-hours?startDate=${startDate}&endDate=${endDate}`
         );
@@ -22,24 +20,35 @@ function BusyHours({ startDate, endDate, setHoursRank }) {
 
         const data = await res.json();
 
-// חילוץ שעת ההתחלה והסיום מנתוני השרת
-        const startHour = parseInt(data.min_start.split(":")[0]);
-        const endHour = parseInt(data.max_end.split(":")[0]);
+        const startHour = parseInt(data.min_start.split(":")[0], 10);
+        const endHour = parseInt(data.max_end.split(":")[0], 10);
 
-        // 1. יצירת טווח שעות דינמי
         const generated = [];
         for (let i = startHour; i < endHour; i++) {
           generated.push(`${i < 10 ? "0" + i : i}:00`);
         }
         setBusinessHours(generated);
-        setHoursRank(generated);
 
-        //  המרה ממערך של אובייקטים למפה נוחה לחיפוש 
         const map = {};
-        data.appointments.forEach((item) => {
-          map[item.hour] = item.total;
+        (data.appointments || []).forEach((item) => {
+          map[item.hour] = Number(item.total) || 0;
         });
         setHoursData(map);
+
+        // מיון כל שעות הפעילות לפי כמות התורים בפועל מהגבוה לנמוך
+        const ranked = generated
+          .map((hourStr) => {
+            const hourKey = parseInt(hourStr.split(":")[0], 10);
+            return {
+              hour: hourStr,
+              count: map[hourKey] || 0,
+            };
+          })
+          .sort((a, b) => b.count - a.count);
+
+        if (setHoursRank) {
+          setHoursRank(ranked);
+        }
 
         setLoading(false);
       } catch (err) {
@@ -49,28 +58,26 @@ function BusyHours({ startDate, endDate, setHoursRank }) {
       }
     };
 
-    fetchData();
-  }, [startDate, endDate]);
+    if (startDate && endDate) {
+      fetchData();
+    }
+  }, [startDate, endDate, setHoursRank]);
 
-// פונקציית עזר להחזרת קלאס עיצוב מתאים לפי כמות התורים (רמת עומס)
   const getLoadClass = (count) => {
     if (count >= 8) return classes.highLoad;
     if (count >= 5) return classes.mediumLoad;
     return classes.lowLoad;
   };
 
-// הצגת הודעת טעינה או שגיאה במידת הצורך
   if (loading) return <div>טוען נתונים...</div>;
   if (error) return <div style={{ color: "red" }}>שגיאה: {error}</div>;
 
   return (
     <div className={classes.container}>
       <h3>דירוג עומס ממוצע </h3>
-{/* גריד להצגת כרטיסי השעות */}
       <div className={classes.hoursGrid}>
         {businessHours.map((hour) => {
-          // חילוץ השעה כמספר לחיפוש ב-hourly_stats (למשל "09:00" -> 9)
-          const hourKey = parseInt(hour.split(":")[0]);
+          const hourKey = parseInt(hour.split(":")[0], 10);
           const count = hoursData[hourKey] || 0;
           return (
             <div
@@ -84,7 +91,6 @@ function BusyHours({ startDate, endDate, setHoursRank }) {
         })}
       </div>
 
-{/* מקרא רמות העומס */}
       <div className={classes.legend_container}>
         <div className={classes.legend_item}>
           <span className={`${classes.legend_dot} ${classes.red}`}></span> עמוס

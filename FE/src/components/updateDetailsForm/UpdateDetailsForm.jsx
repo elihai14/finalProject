@@ -1,81 +1,90 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // 1. הוספנו useNavigate
 import classes from "./updateDetailsForm.module.css";
-import { handleUpdate } from '../../../js/mainFunctionView';
+import { handleUpdate } from "../../../js/mainFunctionView";
 
 // קומפוננטת טופס עדכון פרטים אישיים (שם וטלפון)
-export default function UpdateDetailsForm() { // 2. הסרנו את onClose
-    const navigate = useNavigate(); // 3. אתחול הניווט
+export default function UpdateDetailsForm() {
+  // ניהול המצבים (States) של שדות הטופס, טעינה ושגיאות
+  const [phone, setPhone] = useState("");
+  const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-// ניהול המצבים (States) של שדות הטופס, טעינה ושגיאות
-    const [phone, setPhone] = useState("");
-    const [name, setName] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
+  // בדיקת תקינות שם מלא בעברית (שם פרטי ושם משפחה עם רווח ביניהם)
+  const isValidFullName = (fullName) => {
+    return /^[א-ת]{2,}\s+[א-ת]{2,}$/.test(fullName);
+  };
 
-// פונקציה לטיפול בשליחת הטופס
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      setName("");
-      setPhone("");
-// ולידציה למספר הטלפון (אם הוקלד)
-        if (phone) {
-          const isStartingCorrect = phone.startsWith("05");
-          const isLengthCorrect = phone.length === 10;
-          const isOnlyNumbers = !isNaN(phone);
+  // פונקציה לטיפול בשליחת הטופס
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(""); // איפוס שגיאות קודמות
 
-          if (!isStartingCorrect || !isLengthCorrect || !isOnlyNumbers) {
-              setError(". מס' טלפון לא תקין , עליו להתחיל ב05 ולהכיל 10 ספרות");
-              return; // עוצר כאן! הבקשה לשרת לא תצא
-          }
-      }
-// קריאה לפונקציה המעדכנת את הפרטים בשרת
-        await handleUpdate(
-            e, 
-            setIsLoading, 
-            setError, 
-            phone, 
-            name
-        );
-        
-    };
+    const trimmedName = name.trim();
+    const trimmedPhone = phone.trim();
 
-// רינדור הטופס
-    return (
-      <div className={classes.pageContainer}>
-        <div className={classes.formWrapper}>
-          <h2 className={classes.title}>עדכון פרטים</h2>
+    // בדיקה שהמשתמש הזין לפחות שדה אחד לעדכון
+    if (!trimmedName && !trimmedPhone) {
+      setError("יש להזין שם מלא או מספר טלפון לעדכון.");
+      return;
+    }
 
-{/* הצגת הודעת שגיאה במידה וקיימת */}
-          {error && <p className={classes.errorMessage}>{error}</p>}
+    // ולידציה לשם מלא (רק אם הוזן ערך בשדה השם)
+    if (trimmedName && !isValidFullName(trimmedName)) {
+      setError("יש להזין שם פרטי ושם משפחה, עם רווח ביניהם ובעברית בלבד!");
+      return;
+    }
 
-          <form onSubmit={(e)=>handleSubmit(e)} className={classes.form}>
+    // ולידציה למספר הטלפון (רק אם הוזן ערך בשדה הטלפון)
+    if (trimmedPhone && !/^05\d{8}$/.test(trimmedPhone)) {
+      setError("מס' טלפון לא תקין, עליו להתחיל ב-05 ולהכיל 10 ספרות.");
+      return;
+    }
 
-{/* שדה הזנת טלפון */}
-            <input
-              type="tel"
-              placeholder="מס' טלפון"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className={classes.input}
-            />
-{/* שדה הזנת שם */}
-            <input
-              type="text"
-              placeholder="שם "
-              value={name}
-              minLength={2}
-              onChange={(e) => setName(e.target.value)}
-              className={classes.input}
-            />
+    // קריאה לפונקציה המעדכנת את הפרטים בשרת
+    await handleUpdate(e, setIsLoading, setError, trimmedPhone, trimmedName);
 
-{/* כפתור שמירת שינויים */}
-            <button type="submit" className={classes.button} disabled={isLoading}>
-              {isLoading ? "מעדכן..." : "שמור שינויים"}
-            </button>
+    // איפוס השדות לאחר השליחה
+    setName("");
+    setPhone("");
+  };
 
-          </form>
-        </div>
+  // רינדור הטופס
+  return (
+    <div className={classes.pageContainer}>
+      <div className={classes.formWrapper}>
+        <h2 className={classes.title}>עדכון פרטים</h2>
+
+        {/* הצגת הודעת שגיאה במידה וקיימת */}
+        {error && <p className={classes.errorMessage}>{error}</p>}
+
+        <form onSubmit={handleSubmit} className={classes.form}>
+          {/* שדה הזנת טלפון */}
+          <input
+            type="tel"
+            placeholder="מס' טלפון"
+            value={phone}
+            maxLength={10}
+            onChange={(e) => setPhone(e.target.value)}
+            className={classes.input}
+          />
+
+          {/* שדה הזנת שם */}
+          <input
+            type="text"
+            placeholder="שם מלא"
+            value={name}
+            minLength={2}
+            onChange={(e) => setName(e.target.value)}
+            className={classes.input}
+          />
+
+          {/* כפתור שמירת שינויים */}
+          <button type="submit" className={classes.button} disabled={isLoading}>
+            {isLoading ? "מעדכן..." : "שמור שינויים"}
+          </button>
+        </form>
       </div>
-    );
+    </div>
+  );
 }

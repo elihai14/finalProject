@@ -69,6 +69,7 @@ router.post("/", (req, res) => {
     query += " AND appointments.barber_mail_address = ? ";
     values.push(barber_mail);
   }
+  query += " ORDER BY appointment_date, appointment_time";
 
   db.query(query, values, (err, results) => {
     if (err) return res.status(400).json({ message: "Internal Server Error" });
@@ -220,7 +221,7 @@ router.get("/busy-hours", (req, res) => {
       AND appointment_date <= ?
       AND is_cancel = 0 
     GROUP BY HOUR(appointment_time)
-    ORDER BY total
+    ORDER BY total DESC
   `;
 
   db.query(hoursQuery, (err, hoursRes) => {
@@ -231,14 +232,13 @@ router.get("/busy-hours", (req, res) => {
         return res.status(500).json({ error: "Database error appointments" });
 
       res.status(200).json({
-        min_start: hoursRes[0].min_start || "08:00:00",
-        max_end: hoursRes[0].max_end || "18:00:00",
+        min_start: hoursRes[0]?.min_start || "08:00:00",
+        max_end: hoursRes[0]?.max_end || "18:00:00",
         appointments: apptsRes,
       });
     });
   });
 });
-
 /**
  * דוח אנליטיקה: ניתוח הימים העמוסים ביותר בשבוע בטווח תאריכים
  * GET /appointments/busy-days

@@ -531,6 +531,14 @@ export async function handleAddConstraint(
     const data = await response.json();
     if (!response.ok) {
       console.error("שגיאה בהוספת האילוץ:", data.message);
+      Swal.fire({
+        title: "אופס...",
+        text: data.message,
+        icon: "error",
+        confirmButtonColor: "#dfb76c",
+        background: "#1a1a1a",
+        color: "#fff",
+      });
     } else {
       setSelectedDate("");
       setHours([]);
@@ -539,6 +547,16 @@ export async function handleAddConstraint(
       setSelectedEndTime("");
       setEndHours([]);
       setRefresh((prev) => !prev);
+      Swal.fire({
+        title: "הפעולה הצליחה",
+        text: "הזמינות נוספה בהצלחה !",
+        icon: "success",
+        confirmButtonText: "מעולה !",
+        background: "#1a1a1a",
+        color: "#fff",
+        confirmButtonColor: "#555",
+        cancelButtonColor: "#ef4444",
+      });
     }
   } catch (error) {
     console.error("שגיאה בהוספת האילוץ:", error);
